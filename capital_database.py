@@ -91,6 +91,6 @@ class Radio(PointToPoint):
 
 class Wired(PointToPoint):
     def __init__(self,cost,rel,icon,lifespan,maintenance,sug_maint,max_capacity,target_capacity,power):
-        super().__init__(self,cost,rel,icon,lifespan,maintenance,sug_maint,max_capacity,target_capacity,power,wire_type):
+        super().__init__(self,cost,rel,icon,lifespan,maintenance,sug_maint,max_capacity,target_capacity,power,wire_type)
         # Wire types are ...
         self.wire_type = wire_type
