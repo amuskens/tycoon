@@ -6,11 +6,11 @@ class Item:
 
     >>> testItem = Item(20000,1,0,100,100,100)
     >>> testItem.SetOperating()
-    >>> testItem.GetOperatingStatus() == True
+    >>> testItem.Operating() == True
     True
     >>> testItem.Update()
     False
-    >>> print(testItem.GetOperatingStatus())
+    >>> print(testItem.Operating())
     True
     """
     def __init__(self,cost,rel,icon,lifespan,maintenance,sug_maint):
@@ -29,7 +29,7 @@ class Item:
         self.age = 0
 
     # Check operating status
-    def GetOperatingStatus(self):
+    def Operating(self):
         return self.operating
 
     # Make the item operational
@@ -40,15 +40,26 @@ class Item:
     def SetFail(self):
         self.operating = False
 
+    # Tells whether or not the item is beyond its operating lifespan.
+    def OverLifespan(self):
+        if self.age >= self.lifespan:
+            return True
+        else:
+            return False
+
     # Updates the item for every turn, and calculates potential failure
     # Returns True if the item failed.
     def Update(self):
-        random.seed()
 
         self.age = self.age + 1
         
+        # If the item already failed, continue to return it did.
+        if self.Operating() == False:
+            return True
+
         # Calculate failure chance. Tested the algorithm with a TEST program.
         # This failure chance is only for a failure by natural causes. 
+        random.seed()
         chance = random.random() / (self.reliability_constant * 20) + (self.age / self.lifespan / (self.maintenance_budget / self.suggested_maint_budget)) * random.random()
         if chance >= 1:
             self.SetFail()

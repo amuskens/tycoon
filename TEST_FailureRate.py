@@ -4,7 +4,7 @@ from capital_database import Item
 # Note: item initialization argument order: 
 # cost,rel,icon,lifespan,maintenance,sug_maint
 
-newItem = Item(20000,1,1,100,10,100)
+newItem = Item(20000,1,1,100,100,100)
 
 # Test how many turns till the item fails.
 i = 0
