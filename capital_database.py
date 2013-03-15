@@ -1,15 +1,29 @@
 import random
 
 class Item:
+    """
+    Test item operation:
+
+    >>> testItem = Item(20000,1,0,100,100,100)
+    >>> testItem.SetOperating()
+    >>> testItem.GetOperatingStatus() == True
+    True
+    >>> testItem.Update()
+    False
+    >>> print(testItem.GetOperatingStatus())
+    True
+    """
     def __init__(self,cost,rel,icon,lifespan,maintenance,sug_maint):
         self.cost = cost
-        # Note the reliability constant is a number between 1 and 100. 100 is most reliable
+        # Note the reliability constant is a number between 0 and 1. 1 is most reliable
         self.reliability_constant = rel
         self.icon = icon
         # Lifespan is the number of turns the item will generally last. 
         self.lifespan = lifespan
         self.maintenance_budget = maintenance
         self.suggested_maint_budget = sug_maint
+
+        # Note: New items are set operational by default.
         self.operating = True
         # Age is the number of turns the item has been operating for.
         self.age = 0
@@ -20,7 +34,7 @@ class Item:
 
     # Make the item operational
     def SetOperating(self):
-        self.operating = true
+        self.operating = True
 
     # Make the item fail
     def SetFail(self):
@@ -33,14 +47,19 @@ class Item:
 
         self.age = self.age + 1
         
-        # Calculate failure chance. Maybe a better algorithm could be used? 
+        # Calculate failure chance. Tested the algorithm with a TEST program.
         # This failure chance is only for a failure by natural causes. 
-        chance = random.random() / self.reliability_constant + (self.age / self.lifespan / (self.maintenance_budget / self.suggested_maint_budget))
-        if chance >= 0.5:
+        chance = random.random() / (self.reliability_constant * 20) + (self.age / self.lifespan / (self.maintenance_budget / self.suggested_maint_budget)) * random.random()
+        if chance >= 1:
             self.SetFail()
             return True
         
         return False
+
+    def Age(self):
+        # This function is used to age itmes which are not deployed. 
+        # Non deployed items shouldn't fail.
+        self.age = self.age + 1
 
 # Structural Types
 
@@ -94,3 +113,7 @@ class Wired(PointToPoint):
         super().__init__(self,cost,rel,icon,lifespan,maintenance,sug_maint,max_capacity,target_capacity,power,wire_type)
         # Wire types are ...
         self.wire_type = wire_type
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
