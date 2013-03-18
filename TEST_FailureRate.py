@@ -1,10 +1,10 @@
-from capital_database import Item
+from capital import Item
 
 # Test reliability operations. 
 # Note: item initialization argument order: 
 # cost,rel,icon,lifespan,maintenance,sug_maint
 
-newItem = Item("Item",20000,1,1,100,100,100)
+newItem = Item(("Item",20000,1,1,10,100,100))
 
 # Test how many turns till the item fails.
 i = 0
