@@ -224,10 +224,12 @@ class Radio(PointToPoint):
         return self.radio_type
 
 class Wired(PointToPoint):
+
     def __init__(self,name,cost,rel,icon,lifespan,maintenance,sug_maint,max_capacity,target_capacity,power,max_length,wire_type):
         super(Wired,self).__init__(name,cost,rel,icon,lifespan,maintenance,sug_maint,max_capacity,target_capacity,power,max_length)
         # Wire types are ...
         self.wire_type = wire_type
+
     def GetType(self):
         return self.wire_type
 
