@@ -1,5 +1,15 @@
 import sys
+
+# Import all the different types of items.
+from capital import Item
+from capital import Structure
+from capital import Building
 from capital import Tower
+from capital import Network
+from capital import Router
+from capital import PointToPoint
+from capital import Radio
+from capital import Wired
 
 """
 The idea is to load the item specs from the config files into the overall template database.
@@ -26,9 +36,13 @@ class CapitalDatabase():
 
     def __init__(self):
         # Load in the database dictionaries from files.
+        # These dictionaries contain the possible items you can buy for the game.
         self.Towers = self.loadDict("towers.cfg")
         self.Radios = self.loadDict("radios.cfg")
-        
+        self.WiredConnections = self.loadDict("wired.cfg")
+        self.Routers = self.loadDict("routers.cfg")
+        self.Buildings = self.loadDict("buildings.cfg")
+
     # Load in the contents of a configuration file in order to 
     # build the database of capital.
     def loadDict(self,filename):
@@ -42,7 +56,7 @@ class CapitalDatabase():
 
             # Allow comments in config file.
             if fields[0] == '#': continue
-            
+
             tempList = []
             for field in fields:
                 tempList.append(field)
@@ -53,13 +67,19 @@ class CapitalDatabase():
         return returnDict
 
     def GetTower(self,id):
-        a = Tower(self.Towers[id])
-        return a
+        return Tower(self.Towers[id])
 
-    def GetRadio(id):
-        a = Radio(self.Radios[id])
-        return a
+    def GetRadio(self,id):
+        return Radio(self.Radios[id])
 
+    def GetWired(self,id):
+        return WiredConnections(self.WiredConnections[id])
+
+    def GetRouter(self,id):
+        return Router(self.Routers[id])
+
+    def GetBuilding(self,id):
+        return Building(self.Buildings[id])
 
 if __name__ == "__main__":
     import doctest
