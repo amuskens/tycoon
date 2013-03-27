@@ -1,4 +1,4 @@
 # Emacs
 *~
 # Mac OSX
-*.DS_store
+.DS_Store
