@@ -3,12 +3,7 @@ Graph module for undirected graphs.
 """
 
 import random
-
-try:
-    import display
-except:
-    print("Warning: failed to load display module.  Graph drawing will not work.")
-    
+   
 class Digraph:
     """
     Directed graph.  The vertices must be immutable.
@@ -195,19 +190,6 @@ def spanning_tree(G, start):
                 todo.append((n, (cur, n)))
                 
     return T
-
-def shortest_path(G, source, dest):
-    """
-    Returns the shortest path from vertex source to vertex dest.
-
-    >>> G = Digraph([(1, 2), (2, 3), (3, 4), (4, 5), (1, 6), (3, 6), (6, 7)])
-    >>> path = shortest_path(G, 1, 7)
-    >>> path
-    [1, 6, 7]
-    >>> G.is_path(path)
-    True
-    """
-    pass
 
 def compress(walk):
     """
