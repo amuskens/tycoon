@@ -1,4 +1,5 @@
 import sys
+import os.path
 
 # Import all the different types of items.
 from capital import Item
@@ -35,13 +36,18 @@ class CapitalDatabase():
     """
 
     def __init__(self):
+        # Set the file path to point in the directory.
+        file_path = os.path.dirname(__file__)
+        if file_path != "":
+            os.chdir(file_path)
+
         # Load in the database dictionaries from files.
         # These dictionaries contain the possible items you can buy for the game.
-        self.Towers = self.loadDict("/gameconfig/towers.cfg")
-        self.Radios = self.loadDict("/gameconfig/radios.cfg")
-        self.WiredConnections = self.loadDict("/gameconfig/wired.cfg")
-        self.Routers = self.loadDict("/gameconfig/routers.cfg")
-        self.Buildings = self.loadDict("/gameconfig/buildings.cfg")
+        self.Towers = self.loadDict("gameconfig/towers.cfg")
+        self.Radios = self.loadDict("gameconfig/radios.cfg")
+        self.WiredConnections = self.loadDict("gameconfig/wired.cfg")
+        self.Routers = self.loadDict("gameconfig/routers.cfg")
+        self.Buildings = self.loadDict("gameconfig/buildings.cfg")
 
     # Load in the contents of a configuration file in order to 
     # build the database of capital.
