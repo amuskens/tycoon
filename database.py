@@ -37,11 +37,11 @@ class CapitalDatabase():
     def __init__(self):
         # Load in the database dictionaries from files.
         # These dictionaries contain the possible items you can buy for the game.
-        self.Towers = self.loadDict("towers.cfg")
-        self.Radios = self.loadDict("radios.cfg")
-        self.WiredConnections = self.loadDict("wired.cfg")
-        self.Routers = self.loadDict("routers.cfg")
-        self.Buildings = self.loadDict("buildings.cfg")
+        self.Towers = self.loadDict("/gameconfig/towers.cfg")
+        self.Radios = self.loadDict("/gameconfig/radios.cfg")
+        self.WiredConnections = self.loadDict("/gameconfig/wired.cfg")
+        self.Routers = self.loadDict("/gameconfig/routers.cfg")
+        self.Buildings = self.loadDict("/gameconfig/buildings.cfg")
 
     # Load in the contents of a configuration file in order to 
     # build the database of capital.
