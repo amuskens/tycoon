@@ -163,6 +163,9 @@ class Building(Structure):
     def __init(self,inList):
         (name,cost,rel,icon,lifespan,maintenance,sug_maint,foundation_cost,slots) = inList
         super(Building,self).__init__((name,cost,rel,icon,lifespan,maintenance,sug_maint,foundation_cost,slots))
+    
+    def type(self):
+        return("Building")
 
 class Tower(Structure):
     def __init__(self,inList):
@@ -170,6 +173,9 @@ class Tower(Structure):
         super(Tower,self).__init__((name,cost,rel,icon,lifespan,maintenance,sug_maint,foundation_cost,slots))
         self.tower_height = tower_height
         self.tower_type = tower_type
+
+    def type(self):
+        return("Tower")
 
 
 # Netowrk types:
@@ -220,6 +226,9 @@ class Router(Network):
         super(Router,self).__init__((name,cost,rel,icon,lifespan,maintenance,sug_maint,max_capacity,target_capacity,power))
         self.service_range = service_range
 
+    def type(self):
+        return("Router")
+
 class PointToPoint(Network):
     def __init__(self,inList):
         (name,cost,rel,icon,lifespan,maintenance,sug_maint,max_capacity,target_capacity,power,max_length) = inList
@@ -238,7 +247,10 @@ class Radio(PointToPoint):
         # Allowed frequencies is a range in a tuple. E.g. (2000,10000)
         self.allowed_freq = (freq_lo,freq_hi)
 
-    def GetType(self):
+    def type(self):
+        return("Radio")
+
+    def RadioGetType(self):
         return self.radio_type
 
     # Check if a frequency is allowed on the radio.
@@ -278,7 +290,10 @@ class Wired(PointToPoint):
         self.attenuation = attenuation
         self.cur_max_capacity = max_capacity
 
-    def GetType(self):
+    def type(self):
+        return("Wired")
+
+    def WiredGetType(self):
         return self.wire_type
 
     # Returns the maximum bandwidth at a certain distance as determined
