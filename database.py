@@ -1,8 +1,12 @@
 import sys
 import os.path
+from tkinter import *
+from tkinter import font
 
 # Import all the different types of items.
 from capital import *
+
+
 
 """
 The idea is to load the item specs from the config files into the overall template database.
@@ -36,11 +40,13 @@ class CapitalDatabase():
         # Load in the database dictionaries from files.
         # These dictionaries contain the possible items you can buy for the game.
         try:
+            # Load equipment configurations
             self.Towers = self.loadDict("gameconfig/towers.cfg")
             self.Radios = self.loadDict("gameconfig/radios.cfg")
             self.WiredConnections = self.loadDict("gameconfig/wired.cfg")
             self.Routers = self.loadDict("gameconfig/routers.cfg")
             self.Buildings = self.loadDict("gameconfig/buildings.cfg")
+
         except:
             print("Failed to initialize capital database.")
             quit()
