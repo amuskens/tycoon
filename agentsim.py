@@ -167,12 +167,11 @@ class GUI():
         #   Pause       pause the simulation
 
         appHighlightFont = font.Font(family='Arial', size=14, weight='bold')
-        self._messageLabel = Label(self._topframe,text='Messages:',
+        self._l1 = Label(self._topframe,text='Cash:',
                                    font=appHighlightFont,justify='left')
-        self._messageLabel.pack(anchor='nw', fill='x')
-
+        self._l1.pack(anchor='w', fill='y')
         self._cash_label = Label(self._topframe)
-        self._cash_label.pack(anchor='nw', fill='x')
+        self._cash_label.pack(anchor='nw', fill='y')
         
         self._messageButtonPop = Button(self._topframe,
             text='Pop Message',
