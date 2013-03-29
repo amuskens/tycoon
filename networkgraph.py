@@ -1,17 +1,9 @@
-import dict_reverselookup
+import dict_functions
 
 from digraph import Digraph
 import dyjkstra
 
-from capital import Item
-from capital import Structure
-from capital import Building
-from capital import Tower
-from capital import Network
-from capital import Router
-from capital import PointToPoint
-from capital import Radio
-from capital import Wired
+from capital import *
 
 class NetworkGraph:
         # A network graph will contain the game's main graph.
@@ -40,6 +32,18 @@ class NetworkGraph:
 
                 # Set the start bandwidth at the origin
                 self.origin_bandwidth = origin_startbandwidth
+
+        # Returns the set of edges in the graph
+        def GetEdges(self):
+                return self.graph.edges()
+
+        # Returns the set of vertices in the graph
+        def GetNodes(self):
+                return self.graph.vertices()
+
+        # Get the node number from the node name
+        def GetNodeNumber(self,node_name):
+                return rev_lookup(self.V_name,node_name)
 
         # Returns a list of items at the node
         def NodeGetItems(self,node_name):
@@ -73,6 +77,10 @@ class NetworkGraph:
                 # Increment vertex counter
                 self.vertex_counter = self.vertex_counter + 1
 
+        # Get the number of items at the node
+        def ItemsAtNode(self,node_num):
+                return str(len(self.V_items[node_num]))
+
         # Add the edge to the graph. Note st_node and end_node are
         # the names of the nodes; not ID's
         def AddEdge(self,st_node,end_node,items):
@@ -82,12 +90,14 @@ class NetworkGraph:
 
         # Add items to a pre-existing node
         def AddItemsToNode(self,node_name,items):
-                self.V_items[rev_lookup(self.V_name,node_name)].append(items)
+                for item in items:
+                        self.V_items[rev_lookup(self.V_name,node_name)].append(item)
 
         # Add items to a pre-existing edge. Note these should only be point to point type items.
         def AddItemsToEdge(self,st_node,end_node,items):
                 e = (rev_lookup(self.V_name,st_node),rev_lookup(self.V_name,end_node))
-                self.E_items[e].append(items)
+                for item in items:
+                        self.E_items[e].append(item)
 
         # Removes items in the list from a node
         def RemoveItemsFromNode(self,node_name,items):
@@ -111,9 +121,25 @@ class NetworkGraph:
                 node = rev_lookup(self.V_name,node_name)
                 path = least_cost_path(self.graph,0,node,self.cost)
                 if path == None: return 0
-                # Calculate.... NOt done yet
-                        
-                
+                # Calculate.... NOt done yet        
+
+
+def rev_lookup(dict,item):
+        """
+        Tests:	
+	>>> a = { }
+	>>> a['Hi'] = 5
+        >>> a[56] = 234
+	>>> rev_lookup(a,5)
+	'Hi'
+        >>> rev_lookup(a,234)
+        56
+	"""
+        for key in dict.keys():
+                if dict[key] == item:
+                        return key
+
+        return None
 
 if __name__ == "__main__":
         import doctest
