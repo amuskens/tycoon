@@ -127,8 +127,8 @@ class GUI():
             raise Exception("GUI: can only have one instance of a simulation")
         GUI.num_instances = 1
 
-        self._canvas_x_size = 500
-        self._canvas_y_size = 500
+        self._canvas_x_size = 1000
+        self._canvas_y_size = 1000
 
         # if canvas is resized, the corners will change
         self._canvas_x_min = 0
@@ -153,7 +153,7 @@ class GUI():
 
         # create a frame on the left to hold our controls
         self._frame = Frame(self._root, relief='groove', borderwidth=2)
-        self._frame.pack(side='left', fill='y')
+        self._frame.pack(side='top', fill='x')
 
         # Add set of buttons bound to specific actions
         #   Reset       pause and then reset the simulation by invoking init_fn
@@ -193,9 +193,6 @@ class GUI():
             self._speed = int(v)
 
         self._speed = 1
-        self._speedscale = Scale(self._frame,
-            from_=1, to=100, label='Speed', command=on_speed_change)
-        self._speedscale.pack(side='right', fill='both', expand=1)
 
         self._cf = Frame(self._root)
 
