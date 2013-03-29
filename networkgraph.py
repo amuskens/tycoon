@@ -111,13 +111,9 @@ class NetworkGraph:
                 node = rev_lookup(self.V_name,node_name)
                 path = least_cost_path(self.graph,0,node,self.cost)
                 if path == None: return 0
-
-                for point in path:
-                        # Calculate the amount of bandwidth consumed at point.
+                # Calculate.... NOt done yet
                         
                 
-
-
 
 if __name__ == "__main__":
         import doctest
