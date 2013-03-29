@@ -85,9 +85,9 @@ class Shape():
         return self._ypos
 
     def set_xpos(self, x):
-        self._xpos = agentsim.gui.clip_x(x)
+        self._xpos = Gui.clip_x(x)
         return self._xpos
 
     def set_ypos(self, y):
-        self._ypos = agentsim.gui.clip_y(y)
+        self._ypos = Gui.clip_y(y)
         return self._ypos
