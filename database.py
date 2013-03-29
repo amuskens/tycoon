@@ -2,15 +2,7 @@ import sys
 import os.path
 
 # Import all the different types of items.
-from capital import Item
-from capital import Structure
-from capital import Building
-from capital import Tower
-from capital import Network
-from capital import Router
-from capital import PointToPoint
-from capital import Radio
-from capital import Wired
+from capital import *
 
 """
 The idea is to load the item specs from the config files into the overall template database.
