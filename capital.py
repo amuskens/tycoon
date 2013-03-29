@@ -15,14 +15,14 @@ class Item:
     def __init__(self,inList):
         (name,cost,rel,icon,lifespan,maintenance,sug_maint) = inList
         self.name = name
-        self.cost = cost
+        self.cost = float(cost)
         # Note the reliability constant is a number between 0 and 1. 1 is most reliable
-        self.reliability_constant = rel
+        self.reliability_constant = float(rel)
         self.icon = icon
         # Lifespan is the number of turns the item will generally last. 
-        self.lifespan = lifespan
-        self.maintenance_budget = maintenance
-        self.suggested_maint_budget = sug_maint
+        self.lifespan = float(lifespan)
+        self.maintenance_budget = float(maintenance)
+        self.suggested_maint_budget = float(sug_maint)
 
         # Note: New items are set operational by default.
         self.operating = True
@@ -57,8 +57,12 @@ class Item:
             return False
 
     # Set the maintenance budget
-    def SetMaintenance(num):
+    def SetMaintenance(self,num):
         self.maintenance_budget = num
+
+    # Get maintennace budget
+    def GetMaintenance(self):
+        return (self.maintenance_budget)
 
     # Updates the item for every turn, and calculates potential failure
     # Returns True if the item failed.
