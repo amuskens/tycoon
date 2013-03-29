@@ -112,6 +112,21 @@ class NetworkGraph:
                         if i in self.E_items[e]:
                                 self.V_items[e].remove(i)
 
+        # Determine an edge's operational status
+        def EdgeOperational(self,e):
+                for item in self.E_items[e]:
+                        if not item.Operating(): return False
+                return True
+
+        # Determine a node's operational status
+        def NodeOperational(self,node_num):
+                for item in self.V_items[e]:
+                        if not item.Operating(): return False
+                        if item.type() == 'Structure':
+                                for subitem in item.GetInventory():
+                                        if not subitem.Operating(): return False
+                return True
+                                
         # Temp Cost function
         def cost(self,e):
                 return 1
