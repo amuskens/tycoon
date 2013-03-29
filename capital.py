@@ -163,13 +163,15 @@ class Structure(Item):
         else:
             return None
 
+    def type(self):
+        return("Structure")
+
 class Building(Structure):
     def __init(self,inList):
         (name,cost,rel,icon,lifespan,maintenance,sug_maint,foundation_cost,slots) = inList
         super(Building,self).__init__((name,cost,rel,icon,lifespan,maintenance,sug_maint,foundation_cost,slots))
     
-    def type(self):
-        return("Building")
+
 
 class Tower(Structure):
     def __init__(self,inList):
@@ -177,9 +179,6 @@ class Tower(Structure):
         super(Tower,self).__init__((name,cost,rel,icon,lifespan,maintenance,sug_maint,foundation_cost,slots))
         self.tower_height = tower_height
         self.tower_type = tower_type
-
-    def type(self):
-        return("Tower")
 
 
 # Netowrk types:
