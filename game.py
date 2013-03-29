@@ -30,13 +30,15 @@ class Game:
                 self.gameNetwork = NetworkGraph((500,500),"Edmonton",[],100000)
 
                 # Test network, showing a demo of how to use the functions:
-                self.gameNetwork.NewNode((480,800),"Calgary",[])
-                self.gameNetwork.AddEdge("Edmonton","Calgary",[])
+                self.gameNetwork.NewNode((480,800),"Calgary",[self.ItemDatabase.GetTower(1)])
+                self.gameNetwork.AddEdge("Edmonton","Calgary",[self.ItemDatabase.GetRadio(3)])
+                self.gameNetwork.AddEdge("Calgary","Edmonton",[self.ItemDatabase.GetRadio(3)])
                 self.gameNetwork.NewNode((300,810),"Banff",[])
                 self.gameNetwork.AddEdge("Banff","Calgary",[])
-                self.gameNetwork.NewNode((600,200),"Fort McMurray",[])
+                self.gameNetwork.NewNode((800,50),"Fort McMurray",[])
                 self.gameNetwork.AddEdge("Edmonton","Fort McMurray",[])
-                self.gameNetwork.AddItemsToNode("Edmonton",[self.ItemDatabase.GetRadio(0),self.ItemDatabase.GetRadio(1)])
+                self.gameNetwork.AddEdge("Fort McMurray","Edmonton",[self.ItemDatabase.GetRadio(0)])
+                self.gameNetwork.AddItemsToNode("Edmonton",[self.ItemDatabase.GetTower(0),self.ItemDatabase.GetTower(1)])
 
                 # Initialize message stack
                 self._messages = []
@@ -58,12 +60,34 @@ class Game:
                 self.cashLabel['textvariable'] = self.cashcontents
                 self.cashcontents.set(' $ ' + str(self.cash))
 
-                # Initialize a dictionary of lines
+                # Initialize a dictionary of lines objects
                 self.E_lines = { }
+                self.E_text = { }
+                self.E_direction_marker = { }
                 for edge in self.gameNetwork.GetEdges():
                         (x1,y1) = self.gameNetwork.V_coord[edge[0]]
                         (x2,y2) = self.gameNetwork.V_coord[edge[1]]
-                        self.E_lines[edge] = self._canvas.create_line(x1,y1,x2,y2,fill='green',width=3)
+
+                        # Check operational for color
+                        if self.gameNetwork.EdgeOperational(edge):
+                                fillcolor = 'green'
+                        else: fillcolor = 'red'
+
+                        self.E_lines[edge] = self._canvas.create_line(x1,y1,x2,y2,fill=fillcolor,width=3)
+                        (mid_x,mid_y) = midpoint((x1,y1),(x2,y2))
+                        self.E_text[edge] = self._canvas.create_text(mid_x,mid_y,text='Link',justify='center')
+
+                        # Draw indicator for bidirectional links
+                        (mid2_x,mid2_y) = midpoint((mid_x,mid_y),(x2,y2))
+                        self.E_direction_marker[edge] = self._canvas.create_line(mid2_x,mid2_y,
+                                                                                 mid2_x + 10 * math.cos(math.atan2(y2-y1,x2-x1) + 3 * math.pi/4),
+                                                                                 mid2_y + 10 * math.sin(math.atan2(y2-y1,x2-x1) + 3 * math.pi/4),
+                                                                                 fill=fillcolor,width=2)
+                        self.E_direction_marker[edge] = self._canvas.create_line(mid2_x,mid2_y,
+                                                                                 mid2_x + 10 * math.cos(math.atan2(y2-y1,x2-x1) - 3 * math.pi/4),
+                                                                                 mid2_y + 10 * math.sin(math.atan2(y2-y1,x2-x1) - 3 * math.pi/4),
+                                                                                 fill=fillcolor,width=2)
+                        
                 
                 # Initialize dictionary of node imagery
                 self.V_images = { }
@@ -88,7 +112,7 @@ class Game:
                                 fail = item.Update()
                                 # Add a message telling what failed and where, if it did.
                                 if fail == True:
-                                        self._messages.append(item.GetName() + " failed at " + self.gameNetwork.V_names[nodeKey])
+                                        self._messages.append(item.GetName() + " failed at " + self.gameNetwork.V_name[nodeKey])
                                 else:
                                         # Record maintennace cost
                                         total_maintCost = total_maintCost + item.GetMaintenance()
@@ -117,3 +141,8 @@ def rgb_to_color(r, g, b):
 	
     return '#{0:02x}{1:02x}{2:02x}'.format(
 										   int((r * 255) % 256), int((g * 255) % 256), int((b * 255) % 256), )
+
+def midpoint(pt1,pt2):
+        (x1,y1) = pt1
+        (x2,y2) = pt2
+        return ((x1+x2)//2,(y1+y2)//2)
