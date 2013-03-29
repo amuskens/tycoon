@@ -5,20 +5,12 @@ Main Game Starter
 
 import sys
 import random
-import agentsim
 from game import *
 
 arg_debug = 0
 
-# Need to implement steps
-def do_init():
-    pass
-
-def do_step():
-    pass
-
 def main():
-    game = Game(title="Telecom Network Tycoon", init_fn=do_init, step_fn=do_step)
+    game = Game(title="Telecom Network Tycoon")
     game.start()
 
 
