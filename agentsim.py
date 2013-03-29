@@ -67,6 +67,7 @@ that may be after quite some time!
 
 import random
 from tkinter import *
+from tkinter import font
 from bitflag import BitFlag
 
 
@@ -122,7 +123,7 @@ class GUI():
     # there can only be one instance of this class
     num_instances = 0
 
-    def __init__(self, init_fn=None, step_fn=None, title="Simulation"):
+    def __init__(self, init_fn=None, step_fn=None, title="Simulation",xmax=1000,ymax=1000):
         if GUI.num_instances != 0:
             raise Exception("GUI: can only have one instance of a simulation")
         GUI.num_instances = 1
@@ -133,8 +134,8 @@ class GUI():
         # if canvas is resized, the corners will change
         self._canvas_x_min = 0
         self._canvas_y_min = 0
-        self._canvas_x_max = self._canvas_x_size
-        self._canvas_y_max = self._canvas_y_size
+        self._canvas_x_max =xmax
+        self._canvas_y_max = ymax
 
         # simulation function hooks
         self._init_fn = init_fn
@@ -152,14 +153,31 @@ class GUI():
         self._root.bind("<Key-q>", self._do_shutdown)
 
         # create a frame on the left to hold our controls
-        self._frame = Frame(self._root, relief='groove', borderwidth=2)
-        self._frame.pack(side='top', fill='x')
+        self._frame = Frame(self._root, relief='groove', borderwidth=5)
+        self._frame.pack(side='left', fill='y')
+
+        # Create the frame on the top to display messages
+        self._topframe = Frame(self._root,relief='groove',borderwidth=5)
+        self._topframe.pack(side='top', fill = 'x')
 
         # Add set of buttons bound to specific actions
         #   Reset       pause and then reset the simulation by invoking init_fn
         #   One Step    do one step of the simulation by invoking step_fn
         #   Run         start a continuous simulation
         #   Pause       pause the simulation
+
+        appHighlightFont = font.Font(family='Arial', size=14, weight='bold')
+        self._messageLabel = Label(self._topframe,text='Messages:',
+                                   font=appHighlightFont,justify='left')
+        self._messageLabel.pack(anchor='nw', fill='x')
+
+        self._cash_label = Label(self._topframe)
+        self._cash_label.pack(anchor='nw', fill='x')
+        
+        self._messageButtonPop = Button(self._topframe,
+            text='Pop Message',
+            command=self._do_popmessage
+            )
 
         self._b1 = Button(self._frame,
             text='Reset',
@@ -169,25 +187,17 @@ class GUI():
         self._b1.pack(anchor='w', fill='x')
 
         self._b2 = Button(self._frame,
-            text='One Step',
+            text='Next Turn',
             command=self._do_onestep
             )
 
         self._b2.pack(anchor='w', fill='x')
 
         self._b3 = Button(self._frame,
-            text='Run',
-            command=self._do_run
+            text='New Network Node'
             )
 
         self._b3.pack(anchor='w', fill='x')
-
-        self._b4 = Button(self._frame,
-            text='Pause',
-            command=self._do_pause
-            )
-
-        self._b4.pack(anchor='w', fill='x')
 
         def on_speed_change(v):
             self._speed = int(v)
@@ -215,9 +225,9 @@ class GUI():
         self._canvas = Canvas(self._cf,
             width=self._canvas_x_size,
             height=self._canvas_y_size,
-            scrollregion=(0, 0, self._canvas_x_size, self._canvas_y_size),
+                              scrollregion=(0, 0, self._canvas_x_max,  self._canvas_y_max),
             highlightthickness=0,
-            borderwidth=0,
+            borderwidth=1,
             yscrollcommand=self._vscroll.set,
             xscrollcommand=self._hscroll.set,
             )
@@ -228,7 +238,7 @@ class GUI():
         self._vscroll.configure( command=self._canvas.yview )
 
         def _do_resize(ev):
-            self._canvas_resize(ev.width, ev.height)
+            pass
 
         self._canvas.bind( "<Configure>", _do_resize)
 
@@ -254,6 +264,9 @@ class GUI():
         self._running = 0
         if self._step_fn != None:
             self._step_fn()
+
+    def _do_popmessage(self):
+        pass
 
     def _do_pause(self):
         self._running = 0
@@ -296,6 +309,9 @@ class GUI():
         return (self._canvas_x_min, self._canvas_y_min,
                 self._canvas_x_max, self._canvas_y_max)
 
+    def get_cashlabel(self):
+        return self._cash_label
+
     def clip_x(self, x):
         return max(self._canvas_x_min, min(self._canvas_x_max, x))
 
@@ -331,31 +347,3 @@ class GUI():
 
         # now we also have to move all the objects that are off the canvas
         # into it, or they are in lala land.
-
-
-
-# Agent simulation main methods
-
-
-def init(init_fn=None, step_fn=None, title="Simulation"):
-    # let us modify the value of the global gui variable
-    global gui
-    gui = GUI(init_fn=init_fn, step_fn=step_fn, title=title)
-
-
-def start():
-    gui.start()
-
-
-def rgb_to_color(r, g, b):
-    """
-    Utility to generate a Tk color rgb string from  integer r, g, b, 
-    where 0 <= r, g, b <= 1
-
-    Use as in
-        agentsim.gui.get_canvas().create_oval(10, 20, 30, 40, 
-            fill=agentsim.rgb_to_color(.8, .8, 0) )
-    """
-
-    return '#{0:02x}{1:02x}{2:02x}'.format(
-        int((r * 255) % 256), int((g * 255) % 256), int((b * 255) % 256), )
