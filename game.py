@@ -113,6 +113,9 @@ class Game:
                                                                          mid2_x + 10 * math.cos(math.atan2(y2-y1,x2-x1) - 3 * math.pi/4),
                                                                          mid2_y + 10 * math.sin(math.atan2(y2-y1,x2-x1) - 3 * math.pi/4),
                                                                          fill='blue',width=2)
+                # Attach mouse events:
+                self._canvas.tag_bind(self.E_lines[edge],"<ButtonRelease-2>", lambda x: self.submenuLink(edge))
+
         # Function adds new node imagery dictionaries and canvas
         def NewNodeCanvas(self,node):
                 (x,y) = self.gameNetwork.V_coord[node]
@@ -141,6 +144,13 @@ class Game:
                                      self._canvas.canvasy(lasty),
                                      self._canvas,node,self.gameNetwork,
                                      self.icons,nodeflag=1)
+
+        # Display a submenu for clicking a link
+        def submenuLink(self,edge):
+                menu = CanvasSubMenu(self._canvas.canvasx(lastx),
+                                     self._canvas.canvasy(lasty),
+                                     self._canvas,edge,self.gameNetwork,
+                                     self.icons,nodeflag=0,linkflag=1)
                 
         # Loads a dictionary of imags
         def loadImages(self):
@@ -153,6 +163,20 @@ class Game:
                 self.icons['addbutton']= PhotoImage(file = 'images/addbutton.gif')
                 self.icons['addbutton_active']= PhotoImage(file = 'images/addbutton_active.gif')
                 self.icons['notify']= PhotoImage(file = 'images/notify.gif')
+
+                # Canvas submenu
+                self.icons['addnode']= PhotoImage(file = 'images/canvassubmenu/addnode.gif')
+                self.icons['addnode_active']= PhotoImage(file = 'images/canvassubmenu/addnode_active.gif')
+                self.icons['addnode_inactive']= PhotoImage(file = 'images/canvassubmenu/addnode_inactive.gif')
+                self.icons['delnode']= PhotoImage(file = 'images/canvassubmenu/delnode.gif')
+                self.icons['delnode_active']= PhotoImage(file = 'images/canvassubmenu/delnode_active.gif')
+                self.icons['delnode_inactive']= PhotoImage(file = 'images/canvassubmenu/delnode_inactive.gif')
+                self.icons['addlink']= PhotoImage(file = 'images/canvassubmenu/newlink.gif')
+                self.icons['addlink_active']= PhotoImage(file = 'images/canvassubmenu/newlink_active.gif')
+                self.icons['addlink_inactive']= PhotoImage(file = 'images/canvassubmenu/newlink_inactive.gif')
+                self.icons['dellink']= PhotoImage(file = 'images/canvassubmenu/dellink.gif')
+                self.icons['dellink_active']= PhotoImage(file = 'images/canvassubmenu/dellink_active.gif')
+                self.icons['dellink_inactive']= PhotoImage(file = 'images/canvassubmenu/dellink_inactive.gif')
 
         def do_turn(self):
                 total_maintCost = 0
