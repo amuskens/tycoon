@@ -58,7 +58,7 @@ class Item:
 
     # Set the maintenance budget
     def SetMaintenance(self,num):
-        self.maintenance_budget = num
+        self.maintenance_budget = float(num)
 
     # Get maintennace budget
     def GetMaintenance(self):
@@ -76,13 +76,13 @@ class Item:
         
         # If the item already failed, continue to return it did.
         if self.Operating() == False:
-            return True
+            return False
 
 
         # Calculate failure chance. Tested the algorithm with a TEST program.
         # This failure chance is only for a failure by natural causes. 
         random.seed()
-        chance = random.random() / (self.reliability_constant * 20) + (self.age / self.lifespan / (self.maintenance_budget / self.suggested_maint_budget) * math.log1p(self.age / 60) * random.random())
+        chance = random.random() / (self.reliability_constant * 20) + (self.age / self.lifespan / (self.maintenance_budget / self.suggested_maint_budget) * random.random())
         if chance >= 1:
             self.SetFail()
             return True
@@ -192,6 +192,13 @@ class Tower(Structure):
 
     def StructType(self):
         return 'Tower'
+        
+    def GetTowerType(self):
+        return self.tower_type
+
+    def GetTowerHeight(self):
+        return self.tower_height
+	
 
 
 # Netowrk types:

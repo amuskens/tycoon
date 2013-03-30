@@ -4,7 +4,7 @@ from capital import Item
 # Note: item initialization argument order: 
 # cost,rel,icon,lifespan,maintenance,sug_maint
 
-newItem = Item(("Item",20000,1,1,1000,100,100))
+newItem = Item(("Item",20000,0.8,1,1000,900,100))
 
 # Test how many turns till the item fails.
 i = 0

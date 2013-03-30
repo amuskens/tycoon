@@ -322,6 +322,9 @@ class GUI():
     def clip_x(self, x):
         return max(self._canvas_x_min, min(self._canvas_x_max, x))
 
+    def GetRoot(self):
+        return self._root
+
     def clip_y(self, y):
         return max(self._canvas_y_min, min(self._canvas_y_max, y))
 

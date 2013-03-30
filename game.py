@@ -32,7 +32,6 @@ class Game:
                 # This stack will contain the messages 
                 # which will display at turns.
                 self._messages = []
-                self.lastmessage = ''
                 
                 
                 # let us modify the value of the global gui variable
@@ -56,6 +55,8 @@ class Game:
 
                 # Load images
                 self.loadImages()
+
+                self.subwindows = []
 
                 # Load up the canvas, load up bg
                 self._canvas = gui.get_canvas()       
@@ -89,7 +90,13 @@ class Game:
                 (x1,y1) = self.gameNetwork.V_coord[edge[0]]
                 (x2,y2) = self.gameNetwork.V_coord[edge[1]]
 
-                self.E_lines[edge] = self._canvas.create_line(x1,y1,x2,y2,fill='green',width=3)
+                # Color code nodes by operation
+                if len(self.gameNetwork.E_items[edge]) > 0:
+                        fillcolor = 'green'
+                else:
+                        fillcolor='black'
+
+                self.E_lines[edge] = self._canvas.create_line(x1,y1,x2,y2,fill=fillcolor,activefill='purple',width=3)
                 (mid_x,mid_y) = midpoint((x1,y1),(x2,y2))
 
                 # Draw indicator for bidirectional links
@@ -118,7 +125,10 @@ class Game:
         # Creates an instance of a window to display the node data.
         def displayNode(self,node):
                 self.V_displays.add(node)
-                NodeDisplay(lastx,lasty,self._canvas,node,self.gameNetwork,self.icons)
+                self.subwindows.append(NodeDisplay(self._canvas.canvasx(lastx),
+                                                   self._canvas.canvasy(lasty),
+                                                   self._canvas,node,self.gameNetwork,
+                                                   self.icons,gui.GetRoot()))
                 
         # Loads a dictionary of imags
         def loadImages(self):
@@ -128,10 +138,17 @@ class Game:
                 self.icons['bg'] = PhotoImage(file = 'images/terrain.gif')
                 self.icons['close']= PhotoImage(file = 'images/close.gif')
                 self.icons['close_active']= PhotoImage(file = 'images/close_active.gif')
+                self.icons['addbutton']= PhotoImage(file = 'images/addbutton.gif')
+                self.icons['addbutton_active']= PhotoImage(file = 'images/addbutton_active.gif')
 
         def do_turn(self):
                 total_maintCost = 0
-                # Destroy all stat windows, which will be inaccurat
+                # Refresh ll stat windows, which will be inaccurate
+                for window in self.subwindows:
+                        if not window.Closed():
+                                window.refresh()
+                        else:
+                                self.subwindows.remove(window)
 
                 # Updat all of the items at nides for a turn.
                 for nodeKey in self.gameNetwork.V_items.keys():
@@ -171,9 +188,8 @@ class Game:
                 
                 # Empty the message stack to the user.
                 while len(self._messages) > 0:
-                        if not self._messages[0] == self.lastmessage:
-                                self.lastmessage = self._messages.pop(0)
-                                messagebox.showinfo("Message",self.lastmessage)
+                        messagebox.showinfo("Message",self._messages.pop(0),
+                                            icon='warning')
 
 def rgb_to_color(r, g, b):
     """
