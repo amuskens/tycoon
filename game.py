@@ -7,6 +7,8 @@ from networkgraph import *
 from database import *
 from capital import *
 
+import LEVEL1_map
+
 class Game:
         def __init__(self,title="Telecom Simulation"):
 
@@ -30,6 +32,7 @@ class Game:
                 self.gameNetwork = NetworkGraph((500,500),"Station Square",[],100000)
 
                 # Test network, showing a demo of how to use the functions:
+                """
                 self.gameNetwork.NewNode((480,800),"Anders City",[self.ItemDatabase.GetTower(1)])
                 self.gameNetwork.AddEdge("Station Square","Anders City",[self.ItemDatabase.GetRadio(3)])
                 self.gameNetwork.AddEdge("Anders City","Station Square",[self.ItemDatabase.GetRadio(3)])
@@ -39,6 +42,10 @@ class Game:
                 self.gameNetwork.AddEdge("Station Square","Oil City",[])
                 self.gameNetwork.AddEdge("Oil City","Station Square",[self.ItemDatabase.GetRadio(0)])
                 self.gameNetwork.AddItemsToNode("Station Square",[self.ItemDatabase.GetTower(0),self.ItemDatabase.GetTower(1)])
+                """
+
+                LEVEL1_map.level1_setup(self)
+
 
                 # Initialize message stack
                 self._messages = []
@@ -64,40 +71,41 @@ class Game:
                 # Initialize a dictionary of lines objects
                 self.E_lines = { }
                 self.E_direction_marker = { }
+
                 for edge in self.gameNetwork.GetEdges():
-                        (x1,y1) = self.gameNetwork.V_coord[edge[0]]
-                        (x2,y2) = self.gameNetwork.V_coord[edge[1]]
-
-                        # Check operational for color
-                        if self.gameNetwork.EdgeOperational(edge):
-                                fillcolor = 'green'
-                        else: 
-                                fillcolor = 'red'
-
-                        self.E_lines[edge] = self._canvas.create_line(x1,y1,x2,y2,fill=fillcolor,width=3)
-                        (mid_x,mid_y) = midpoint((x1,y1),(x2,y2))
-
-                        # Draw indicator for bidirectional links
-                        (mid2_x,mid2_y) = midpoint((mid_x,mid_y),(x2,y2))
-                        self.E_direction_marker[edge] = self._canvas.create_line(mid2_x,mid2_y,
-                                                                                 mid2_x + 10 * math.cos(math.atan2(y2-y1,x2-x1) + 3 * math.pi/4),
-                                                                                 mid2_y + 10 * math.sin(math.atan2(y2-y1,x2-x1) + 3 * math.pi/4),
-                                                                                 fill=fillcolor,width=2)
-                        self.E_direction_marker[edge] = self._canvas.create_line(mid2_x,mid2_y,
-                                                                                 mid2_x + 10 * math.cos(math.atan2(y2-y1,x2-x1) - 3 * math.pi/4),
-                                                                                 mid2_y + 10 * math.sin(math.atan2(y2-y1,x2-x1) - 3 * math.pi/4),
-                                                                                 fill=fillcolor,width=2)
+                        self.NewEdgeCanvas(edge)
                         
-                
                 # Initialize dictionary of node imagery
                 self.V_images = { }
                 self.V_text = { }
                 for node in self.gameNetwork.GetNodes():
-                        (x,y) = self.gameNetwork.V_coord[node]
-                        self.V_images[node] = self._canvas.create_image(x,y,image=self.icons['tower1'],anchor='center')
-                        self.V_text[node] = self._canvas.create_text(x + 10,y,
-                                                                     text=(self.gameNetwork.V_name[node] + '\n' + self.gameNetwork.ItemsAtNode(node) + ' items'),
-                                                                     anchor='w',fill='white')
+                        self.NewNodeCanvas(node)
+
+        # Function adds new edge imagery dicitonaries and canvas
+        def NewEdgeCanvas(self,edge):
+                (x1,y1) = self.gameNetwork.V_coord[edge[0]]
+                (x2,y2) = self.gameNetwork.V_coord[edge[1]]
+
+                self.E_lines[edge] = self._canvas.create_line(x1,y1,x2,y2,fill='green',width=3)
+                (mid_x,mid_y) = midpoint((x1,y1),(x2,y2))
+
+                # Draw indicator for bidirectional links
+                (mid2_x,mid2_y) = midpoint((mid_x,mid_y),(x2,y2))
+                self.E_direction_marker[edge] = self._canvas.create_line(mid2_x,mid2_y,
+                                                                         mid2_x + 10 * math.cos(math.atan2(y2-y1,x2-x1) + 3 * math.pi/4),
+                                                                         mid2_y + 10 * math.sin(math.atan2(y2-y1,x2-x1) + 3 * math.pi/4),
+                                                                         fill='green',width=2)
+                self.E_direction_marker[edge] = self._canvas.create_line(mid2_x,mid2_y,
+                                                                         mid2_x + 10 * math.cos(math.atan2(y2-y1,x2-x1) - 3 * math.pi/4),
+                                                                         mid2_y + 10 * math.sin(math.atan2(y2-y1,x2-x1) - 3 * math.pi/4),
+                                                                         fill='green',width=2)
+        # Function adds new node imagery dictionaries and canvas
+        def NewNodeCanvas(self,node):
+                (x,y) = self.gameNetwork.V_coord[node]
+                self.V_images[node] = self._canvas.create_image(x,y,image=self.icons['tower1'],anchor='center')
+                self.V_text[node] = self._canvas.create_text(x + 10,y,
+                                                             text=(self.gameNetwork.V_name[node] + '\n' + self.gameNetwork.ItemsAtNode(node) + ' items'),
+                                                             anchor='w',fill='white')
 
         # Loads a dictionary of imags
         def loadImages(self):
@@ -130,9 +138,15 @@ class Game:
                                         # Record maintennace cost
                                         total_maintCost = total_maintCost + item.GetMaintenance()
                                 
-                                
+                
+                # Update how much money to make:
+                revenue = 0
+
+                # Needs to be implemented here.....
+
+
                 # Update game parameters
-                self.cash = self.cash - total_maintCost
+                self.cash = self.cash - total_maintCost + revenue
                 self.turn = self.turn + 1
 
                 self.cashcontents.set(' $ ' + str(self.cash))
