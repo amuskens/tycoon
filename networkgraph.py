@@ -11,6 +11,7 @@ class NetworkGraph:
         def __init__(self,origin_coord,origin_name,origin_items,origin_startbandwidth):
                 self.graph = Digraph()
                 self.vertex_counter = 1
+                self.max_slots = 3
                 
                 # This dictionary will contain the coordinates of
                 # vertices in the graph
@@ -91,13 +92,15 @@ class NetworkGraph:
         # Add items to a pre-existing node
         def AddItemsToNode(self,node_name,items):
                 for item in items:
-                        self.V_items[rev_lookup(self.V_name,node_name)].append(item)
+                        if len(self.V_items[rev_lookup(self.V_name,node_name)]) <= self.max_slots:
+                                self.V_items[rev_lookup(self.V_name,node_name)].append(item)
 
         # Add items to a pre-existing edge. Note these should only be point to point type items.
         def AddItemsToEdge(self,st_node,end_node,items):
                 e = (rev_lookup(self.V_name,st_node),rev_lookup(self.V_name,end_node))
                 for item in items:
-                        self.E_items[e].append(item)
+                        if len(self.E_items[e]) <= self.max_slots:
+                                self.E_items[e].append(item)
 
         # Removes items in the list from a node
         def RemoveItemsFromNode(self,node_name,items):
