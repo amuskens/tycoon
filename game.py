@@ -125,7 +125,7 @@ class Game:
                 self.icons = { }
                 self.icons['tower1'] = PhotoImage(file = 'images/tower.gif')
                 self.icons['tower1_active'] = PhotoImage(file = 'images/tower_active.gif')
-                self.icons['bg'] = PhotoImage(file = 'images/terrain.bmp')
+                self.icons['bg'] = PhotoImage(file = 'images/terrain.gif')
                 self.icons['close']= PhotoImage(file = 'images/close.gif')
                 self.icons['close_active']= PhotoImage(file = 'images/close_active.gif')
 
