@@ -1,5 +1,6 @@
 import random
 import math
+from tkinter import messagebox
 from agentsim import GUI
 
 # Import network graph
@@ -31,25 +32,11 @@ class Game:
         def do_init(self):
                 self.gameNetwork = NetworkGraph((500,500),"Station Square",[],100000)
 
-                # Test network, showing a demo of how to use the functions:
-                """
-                self.gameNetwork.NewNode((480,800),"Anders City",[self.ItemDatabase.GetTower(1)])
-                self.gameNetwork.AddEdge("Station Square","Anders City",[self.ItemDatabase.GetRadio(3)])
-                self.gameNetwork.AddEdge("Anders City","Station Square",[self.ItemDatabase.GetRadio(3)])
-                self.gameNetwork.NewNode((300,810),"IslandVille",[])
-                self.gameNetwork.AddEdge("IslandVille","Anders City",[])
-                self.gameNetwork.NewNode((800,50),"Oil City",[])
-                self.gameNetwork.AddEdge("Station Square","Oil City",[])
-                self.gameNetwork.AddEdge("Oil City","Station Square",[self.ItemDatabase.GetRadio(0)])
-                self.gameNetwork.AddItemsToNode("Station Square",[self.ItemDatabase.GetTower(0),self.ItemDatabase.GetTower(1)])
-                """
-
                 LEVEL1_map.level1_setup(self)
-
 
                 # Initialize message stack
                 self._messages = []
-                self._messages.append("Welcome to Telecom Netowrk Tycoon!")
+                messagebox.showinfo("welcome!","Welcome to Telecom Netowrk Tycoon! \n Begin by building new network nodes! ")
 
                 # Initialize game parameters:
                 self.cash = 10000000
@@ -150,10 +137,10 @@ class Game:
                 self.turn = self.turn + 1
 
                 self.cashcontents.set(' $ ' + str(self.cash))
-
-                print(self.cash)
-                print(self._messages)
-
+                
+                # Empty the message stack to the user.
+                while len(self._messages) > 0:
+                        messagebox.showinfo("Message",self._messages.pop(0))
 
 def rgb_to_color(r, g, b):
     """
