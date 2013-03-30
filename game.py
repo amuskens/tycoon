@@ -27,18 +27,18 @@ class Game:
                 gui.start()
 
         def do_init(self):
-                self.gameNetwork = NetworkGraph((500,500),"Edmonton",[],100000)
+                self.gameNetwork = NetworkGraph((500,500),"Station Square",[],100000)
 
                 # Test network, showing a demo of how to use the functions:
-                self.gameNetwork.NewNode((480,800),"Calgary",[self.ItemDatabase.GetTower(1)])
-                self.gameNetwork.AddEdge("Edmonton","Calgary",[self.ItemDatabase.GetRadio(3)])
-                self.gameNetwork.AddEdge("Calgary","Edmonton",[self.ItemDatabase.GetRadio(3)])
-                self.gameNetwork.NewNode((300,810),"Banff",[])
-                self.gameNetwork.AddEdge("Banff","Calgary",[])
-                self.gameNetwork.NewNode((800,50),"Fort McMurray",[])
-                self.gameNetwork.AddEdge("Edmonton","Fort McMurray",[])
-                self.gameNetwork.AddEdge("Fort McMurray","Edmonton",[self.ItemDatabase.GetRadio(0)])
-                self.gameNetwork.AddItemsToNode("Edmonton",[self.ItemDatabase.GetTower(0),self.ItemDatabase.GetTower(1)])
+                self.gameNetwork.NewNode((480,800),"Anders City",[self.ItemDatabase.GetTower(1)])
+                self.gameNetwork.AddEdge("Station Square","Anders City",[self.ItemDatabase.GetRadio(3)])
+                self.gameNetwork.AddEdge("Anders City","Station Square",[self.ItemDatabase.GetRadio(3)])
+                self.gameNetwork.NewNode((300,810),"IslandVille",[])
+                self.gameNetwork.AddEdge("IslandVille","Anders City",[])
+                self.gameNetwork.NewNode((800,50),"Oil City",[])
+                self.gameNetwork.AddEdge("Station Square","Oil City",[])
+                self.gameNetwork.AddEdge("Oil City","Station Square",[self.ItemDatabase.GetRadio(0)])
+                self.gameNetwork.AddItemsToNode("Station Square",[self.ItemDatabase.GetTower(0),self.ItemDatabase.GetTower(1)])
 
                 # Initialize message stack
                 self._messages = []
@@ -51,8 +51,9 @@ class Game:
                 # Load images
                 self.loadImages()
 
-                # Load up the canvas
+                # Load up the canvas, load up bg
                 self._canvas = gui.get_canvas()       
+                self.bg_image = self._canvas.create_image(0,0,image=self.icons['bg'],anchor='nw')
 
                 # Bind text
                 self.cashLabel = gui.get_cashlabel()
@@ -62,7 +63,6 @@ class Game:
 
                 # Initialize a dictionary of lines objects
                 self.E_lines = { }
-                self.E_text = { }
                 self.E_direction_marker = { }
                 for edge in self.gameNetwork.GetEdges():
                         (x1,y1) = self.gameNetwork.V_coord[edge[0]]
@@ -71,11 +71,11 @@ class Game:
                         # Check operational for color
                         if self.gameNetwork.EdgeOperational(edge):
                                 fillcolor = 'green'
-                        else: fillcolor = 'red'
+                        else: 
+                                fillcolor = 'red'
 
                         self.E_lines[edge] = self._canvas.create_line(x1,y1,x2,y2,fill=fillcolor,width=3)
                         (mid_x,mid_y) = midpoint((x1,y1),(x2,y2))
-                        self.E_text[edge] = self._canvas.create_text(mid_x,mid_y,text='Link',justify='center')
 
                         # Draw indicator for bidirectional links
                         (mid2_x,mid2_y) = midpoint((mid_x,mid_y),(x2,y2))
@@ -97,12 +97,13 @@ class Game:
                         self.V_images[node] = self._canvas.create_image(x,y,image=self.icons['tower1'],anchor='center')
                         self.V_text[node] = self._canvas.create_text(x + 10,y,
                                                                      text=(self.gameNetwork.V_name[node] + '\n' + self.gameNetwork.ItemsAtNode(node) + ' items'),
-                                                                     anchor='w')
+                                                                     anchor='w',fill='white')
 
         # Loads a dictionary of imags
         def loadImages(self):
                 self.icons = { }
                 self.icons['tower1'] = PhotoImage(file = 'images/tower.gif')
+                self.icons['bg'] = PhotoImage(file = 'images/terrain.gif')
 
         def do_turn(self):
                 total_maintCost = 0
@@ -117,6 +118,17 @@ class Game:
                                         # Record maintennace cost
                                         total_maintCost = total_maintCost + item.GetMaintenance()
                                         
+                # Update items at edges
+                for edgekey in self.gameNetwork.E_items.keys():
+                        for item in self.gameNetwork.E_items[edgekey]:
+                                fail = item.Update()
+                                # Add a message telling what failed and where, if it did.
+                                if fail == True:
+                                        self._messages.append(item.GetName() + " failed ")
+                                        self._canvas.itemconfigure(self.E_lines[edgekey],fill='red')
+                                else:
+                                        # Record maintennace cost
+                                        total_maintCost = total_maintCost + item.GetMaintenance()
                                 
                                 
                 # Update game parameters
