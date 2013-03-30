@@ -193,10 +193,18 @@ class GUI():
         self._b2.pack(anchor='w', fill='x')
 
         self._b3 = Button(self._frame,
-            text='New Network Node'
+            text='Run Turns',
+            command=self._do_run
             )
 
         self._b3.pack(anchor='w', fill='x')
+
+        self._b4 = Button(self._frame,
+            text='Pause',
+            command=self._do_pause
+            )
+
+        self._b4.pack(anchor='w', fill='x')
 
         def on_speed_change(v):
             self._speed = int(v)
