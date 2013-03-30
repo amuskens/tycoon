@@ -7,8 +7,20 @@ from agentsim import GUI
 from networkgraph import *
 from database import *
 from capital import *
+from nodedisplay import *
 
 import LEVEL1_map
+
+# Globals for mouse clicks.
+global lastx, lasty
+global displaywindows
+displaywindows = []
+
+# Event callbacks:
+def xy(event):
+        global lastx, lasty
+        lastx = event.x
+        lasty = event.y
 
 class Game:
         def __init__(self,title="Telecom Simulation"):
@@ -20,6 +32,7 @@ class Game:
                 # This stack will contain the messages 
                 # which will display at turns.
                 self._messages = []
+                self.lastmessage = ''
                 
                 
                 # let us modify the value of the global gui variable
@@ -36,7 +49,6 @@ class Game:
 
                 # Initialize message stack
                 self._messages = []
-                messagebox.showinfo("welcome!","Welcome to Telecom Netowrk Tycoon! \n Begin by building new network nodes! ")
 
                 # Initialize game parameters:
                 self.cash = 10000000
@@ -55,6 +67,9 @@ class Game:
                 self.cashLabel['textvariable'] = self.cashcontents
                 self.cashcontents.set(' $ ' + str(self.cash))
 
+                # Bind mouse motion
+                self._canvas.bind("<ButtonPress-1>", xy)
+
                 # Initialize a dictionary of lines objects
                 self.E_lines = { }
                 self.E_direction_marker = { }
@@ -64,6 +79,7 @@ class Game:
                         
                 # Initialize dictionary of node imagery
                 self.V_images = { }
+                self.V_displays = set()
                 self.V_text = { }
                 for node in self.gameNetwork.GetNodes():
                         self.NewNodeCanvas(node)
@@ -89,19 +105,34 @@ class Game:
         # Function adds new node imagery dictionaries and canvas
         def NewNodeCanvas(self,node):
                 (x,y) = self.gameNetwork.V_coord[node]
-                self.V_images[node] = self._canvas.create_image(x,y,image=self.icons['tower1'],anchor='center')
+                self.V_images[node] = self._canvas.create_image(x,y,
+                                                                image=self.icons['tower1'],
+                                                                activeimage=self.icons['tower1_active'],
+                                                                anchor='center')
                 self.V_text[node] = self._canvas.create_text(x + 10,y,
                                                              text=(self.gameNetwork.V_name[node] + '\n' + self.gameNetwork.ItemsAtNode(node) + ' items'),
                                                              anchor='w',fill='white')
+                # Attach mouse events to each node iamge
+                self._canvas.tag_bind(self.V_images[node],"<ButtonRelease-1>", lambda x: self.displayNode(node))
 
+        # Creates an instance of a window to display the node data.
+        def displayNode(self,node):
+                self.V_displays.add(node)
+                NodeDisplay(lastx,lasty,self._canvas,node,self.gameNetwork,self.icons)
+                
         # Loads a dictionary of imags
         def loadImages(self):
                 self.icons = { }
                 self.icons['tower1'] = PhotoImage(file = 'images/tower.gif')
+                self.icons['tower1_active'] = PhotoImage(file = 'images/tower_active.gif')
                 self.icons['bg'] = PhotoImage(file = 'images/terrain.gif')
+                self.icons['close']= PhotoImage(file = 'images/close.gif')
+                self.icons['close_active']= PhotoImage(file = 'images/close_active.gif')
 
         def do_turn(self):
                 total_maintCost = 0
+                # Destroy all stat windows, which will be inaccurat
+
                 # Updat all of the items at nides for a turn.
                 for nodeKey in self.gameNetwork.V_items.keys():
                         for item in self.gameNetwork.V_items[nodeKey]:
@@ -140,7 +171,9 @@ class Game:
                 
                 # Empty the message stack to the user.
                 while len(self._messages) > 0:
-                        messagebox.showinfo("Message",self._messages.pop(0))
+                        if not self._messages[0] == self.lastmessage:
+                                self.lastmessage = self._messages.pop(0)
+                                messagebox.showinfo("Message",self.lastmessage)
 
 def rgb_to_color(r, g, b):
     """
@@ -159,3 +192,5 @@ def midpoint(pt1,pt2):
         (x1,y1) = pt1
         (x2,y2) = pt2
         return ((x1+x2)//2,(y1+y2)//2)
+
+
