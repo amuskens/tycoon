@@ -64,6 +64,10 @@ class Item:
     def GetMaintenance(self):
         return (self.maintenance_budget)
 
+    # Get suggested maintenance
+    def SugMaintenance(self):
+        return (self.suggested_maint_budget)
+
     # Updates the item for every turn, and calculates potential failure
     # Returns True if the item failed.
     def Update(self):
@@ -170,6 +174,9 @@ class Building(Structure):
     def __init(self,inList):
         (name,cost,rel,icon,lifespan,maintenance,sug_maint,foundation_cost,slots) = inList
         super(Building,self).__init__((name,cost,rel,icon,lifespan,maintenance,sug_maint,foundation_cost,slots))
+
+    def StructType(self):
+        return 'Building'
     
 
 
@@ -179,6 +186,9 @@ class Tower(Structure):
         super(Tower,self).__init__((name,cost,rel,icon,lifespan,maintenance,sug_maint,foundation_cost,slots))
         self.tower_height = tower_height
         self.tower_type = tower_type
+
+    def StructType(self):
+        return 'Tower'
 
 
 # Netowrk types:
