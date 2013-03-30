@@ -8,13 +8,13 @@ from networkgraph import *
 from database import *
 from capital import *
 from nodedisplay import *
+from canvassubmenu import *
 
 import LEVEL1_map
 
 # Globals for mouse clicks.
 global lastx, lasty
-global displaywindows
-displaywindows = []
+global mode
 
 # Event callbacks:
 def xy(event):
@@ -57,6 +57,8 @@ class Game:
                 self.loadImages()
 
                 self.subwindows = []
+                global mode
+                mode = 0
 
                 # Load up the canvas, load up bg
                 self._canvas = gui.get_canvas()       
@@ -70,6 +72,7 @@ class Game:
 
                 # Bind mouse motion
                 self._canvas.bind("<ButtonPress-1>", xy)
+                self._canvas.bind("<ButtonPress-2>", xy)
 
                 # Initialize a dictionary of lines objects
                 self.E_lines = { }
@@ -80,6 +83,7 @@ class Game:
                         
                 # Initialize dictionary of node imagery
                 self.V_images = { }
+                self.V_notify = { }
                 self.V_displays = set()
                 self.V_text = { }
                 for node in self.gameNetwork.GetNodes():
@@ -121,6 +125,7 @@ class Game:
                                                              anchor='w',fill='white')
                 # Attach mouse events to each node iamge
                 self._canvas.tag_bind(self.V_images[node],"<ButtonRelease-1>", lambda x: self.displayNode(node))
+                self._canvas.tag_bind(self.V_images[node],"<ButtonRelease-2>", lambda x: self.submenuNode(node))
 
         # Creates an instance of a window to display the node data.
         def displayNode(self,node):
@@ -129,6 +134,13 @@ class Game:
                                                    self._canvas.canvasy(lasty),
                                                    self._canvas,node,self.gameNetwork,
                                                    self.icons,gui.GetRoot()))
+
+        # Display a right-click submenu on the canvas
+        def submenuNode(self,node):
+                menu = CanvasSubMenu(self._canvas.canvasx(lastx),
+                                     self._canvas.canvasy(lasty),
+                                     self._canvas,node,self.gameNetwork,
+                                     self.icons,nodeflag=1)
                 
         # Loads a dictionary of imags
         def loadImages(self):
@@ -140,6 +152,7 @@ class Game:
                 self.icons['close_active']= PhotoImage(file = 'images/close_active.gif')
                 self.icons['addbutton']= PhotoImage(file = 'images/addbutton.gif')
                 self.icons['addbutton_active']= PhotoImage(file = 'images/addbutton_active.gif')
+                self.icons['notify']= PhotoImage(file = 'images/notify.gif')
 
         def do_turn(self):
                 total_maintCost = 0
@@ -157,6 +170,11 @@ class Game:
                                 # Add a message telling what failed and where, if it did.
                                 if fail == True:
                                         self._messages.append(item.GetName() + " failed at " + self.gameNetwork.V_name[nodeKey])
+                                        self.V_notify[nodeKey ] = self._canvas.create_image(self.gameNetwork.V_coord[nodeKey][0] - 8,
+                                                                                           self.gameNetwork.V_coord[nodeKey ][1] - 16,
+                                                                                           image=self.icons['notify'],
+                                                                                           anchor='se')
+                                                                  
                                 else:
                                         # Record maintennace cost
                                         total_maintCost = total_maintCost + item.GetMaintenance()
