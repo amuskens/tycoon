@@ -93,6 +93,9 @@ class Item:
     def Age(self):
         self.age = self.age + 1
 
+    def GetAge(self):
+        return self.age
+
     # Print out the item
     def print(self):
         print(self.name + " object.")

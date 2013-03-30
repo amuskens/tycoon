@@ -108,7 +108,10 @@ class NodeDisplay():
                     temp = 'Within Lifespan'
                     fillcolor='green'
 
-                self.slot_text.append(self.canvas.create_text(x+330,y + 50 + voffset,
+                self.slot_text.append(self.canvas.create_text(x+330,y + 45 + voffset,
+                                                              text='Age: ' + str(item.GetAge()),
+                                                              fill=fillcolor,anchor='nw',font=Font2,tags=str(self.id)))
+                self.slot_text.append(self.canvas.create_text(x+330,y + 57 + voffset,
                                                               text=temp,
                                                               fill=fillcolor,anchor='nw',font=Font2,tags=str(self.id)))
             else:
@@ -125,7 +128,7 @@ class NodeDisplay():
                                                     image=imagedict['close'],
                                                     activeimage=imagedict['close_active'],tags=str(self.id))
 
-        self.canvas.tag_bind(self.closebutton,"<Button-1>", lambda x: self.close)
+        self.canvas.tag_bind(self.closebutton,"<Button-1>", lambda x: self.close())
     
     # Close
     def close(self):

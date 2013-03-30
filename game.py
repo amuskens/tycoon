@@ -97,11 +97,11 @@ class Game:
                 self.E_direction_marker[edge] = self._canvas.create_line(mid2_x,mid2_y,
                                                                          mid2_x + 10 * math.cos(math.atan2(y2-y1,x2-x1) + 3 * math.pi/4),
                                                                          mid2_y + 10 * math.sin(math.atan2(y2-y1,x2-x1) + 3 * math.pi/4),
-                                                                         fill='green',width=2)
+                                                                         fill='blue',width=2)
                 self.E_direction_marker[edge] = self._canvas.create_line(mid2_x,mid2_y,
                                                                          mid2_x + 10 * math.cos(math.atan2(y2-y1,x2-x1) - 3 * math.pi/4),
                                                                          mid2_y + 10 * math.sin(math.atan2(y2-y1,x2-x1) - 3 * math.pi/4),
-                                                                         fill='green',width=2)
+                                                                         fill='blue',width=2)
         # Function adds new node imagery dictionaries and canvas
         def NewNodeCanvas(self,node):
                 (x,y) = self.gameNetwork.V_coord[node]
@@ -125,7 +125,7 @@ class Game:
                 self.icons = { }
                 self.icons['tower1'] = PhotoImage(file = 'images/tower.gif')
                 self.icons['tower1_active'] = PhotoImage(file = 'images/tower_active.gif')
-                self.icons['bg'] = PhotoImage(file = 'images/terrain.gif')
+                self.icons['bg'] = PhotoImage(file = 'images/terrain.bmp')
                 self.icons['close']= PhotoImage(file = 'images/close.gif')
                 self.icons['close_active']= PhotoImage(file = 'images/close_active.gif')
 
