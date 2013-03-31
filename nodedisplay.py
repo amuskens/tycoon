@@ -37,9 +37,7 @@ class NodeDisplay():
         Font3 = font.Font(family='Arial', size=12)
 
         # Start by drawing the interface
-        self.window = self.canvas.create_rectangle(x,y,x+self.width,y+self.height,
-                                                   fill='white',activefill='white',
-                                                   outline='white',tags=str(self.id))
+        self.window = self.canvas.create_image(x-5,y-5,image=imagedict['backpane'],anchor='nw',tags=str(self.id))
         self.canvas.tag_bind(self.window,"<ButtonPress-1>", lambda x: self.close())
         
         # Draw the parameters
@@ -132,8 +130,8 @@ class NodeDisplay():
 
 
         # Draw an add button
-        self.addbutton = self.canvas.create_image(x + self.width - 64,
-                                                    y + self.height,
+        self.addbutton = self.canvas.create_image(x + self.width - 40,
+                                                    y + self.height - 20,
                                                     image=imagedict['addbutton'],
                                                     activeimage=self.imagedict['addbutton_active'],tags=str(self.id))
 

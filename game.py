@@ -224,6 +224,7 @@ class Game:
                 self.icons['addbutton']= PhotoImage(file = 'images/addbutton.gif')
                 self.icons['addbutton_active']= PhotoImage(file = 'images/addbutton_active.gif')
                 self.icons['notify']= PhotoImage(file = 'images/notify.gif')
+                self.icons['backpane']= PhotoImage(file = 'images/backpane.gif')
 
                 # Canvas submenu
                 self.icons['addnode']= PhotoImage(file = 'images/canvassubmenu/addnode.gif')
