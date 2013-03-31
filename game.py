@@ -51,11 +51,13 @@ class Game:
                 # This stack will contain the messages 
                 # which will display at turns.
                 self._messages = []
-                
+                self.inventory = []
                 
                 # let us modify the value of the global gui variable
                 global gui
-                gui = GUI(init_fn=self.do_init, step_fn=self.do_turn, xmax=1200,ymax=1400,title=title)
+                gui = GUI(self.inventory,self.ItemDatabase,
+                          init_fn=self.do_init, step_fn=self.do_turn, 
+                          xmax=1600,ymax=1400,title=title)
 
         def start(self):
                 gui.start()

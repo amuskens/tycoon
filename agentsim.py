@@ -69,6 +69,7 @@ import random
 from tkinter import *
 from tkinter import font
 from bitflag import BitFlag
+from store import *
 
 
 # Singleton GUI instance, only one allowed to be created, remember it for
@@ -123,7 +124,7 @@ class GUI():
     # there can only be one instance of this class
     num_instances = 0
 
-    def __init__(self, init_fn=None, step_fn=None, title="Simulation",xmax=1000,ymax=1000):
+    def __init__(self, inventory, database, init_fn=None, step_fn=None, title="Simulation",xmax=1000,ymax=1000):
         if GUI.num_instances != 0:
             raise Exception("GUI: can only have one instance of a simulation")
         GUI.num_instances = 1
@@ -145,6 +146,9 @@ class GUI():
         self._running = 0
 
         self._title = title
+
+        self.inventory = inventory
+        self.database = database
 
         self._root = Tk()
         img = PhotoImage(file='images/icon.gif')
@@ -188,14 +192,14 @@ class GUI():
         self._b1.pack(anchor='w', fill='x')
 
         self._b2 = Button(self._frame,
-            text='Next Turn',
+            text='Step',
             command=self._do_onestep
             )
 
         self._b2.pack(anchor='w', fill='x')
 
         self._b3 = Button(self._frame,
-            text='Run Turns',
+            text='Play',
             command=self._do_run
             )
 
@@ -207,6 +211,16 @@ class GUI():
             )
 
         self._b4.pack(anchor='w', fill='x')
+
+        self._b5 = Button(self._frame,
+            text='View Store',
+            command=self._goto_store
+            )
+
+        self._b5.pack(anchor='w', fill='x')
+
+        self._list = Listbox(self._frame)
+        self._list.pack(anchor='w', fill='x')
 
         def on_speed_change(v):
             self._speed = int(v)
@@ -285,6 +299,9 @@ class GUI():
         if not self._running:
             self._running = 1
             self._run()
+
+    def _goto_store(self):
+        store = Store(self._root,self.inventory,self.database)
 
     # needs to be own function, not part of _do_run, 
     # because it reschedules itself
