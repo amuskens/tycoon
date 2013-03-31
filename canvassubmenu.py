@@ -10,6 +10,7 @@ from database import *
 from networkgraph import *
 from subslotedit import *
 from getvaluedialog import *
+from distfuncs import dist
 
 class CanvasSubMenu():
     def __init__(self,x,y,canvas,nodeorlink,imagedict,nodeflag=0,linkflag=0):
@@ -37,16 +38,16 @@ class CanvasSubMenu():
         # Begin by drawing the submenu
         # Depending on whether a node was clicked, adding and deleting links should be disabled.
         # There are different combinations of iamgery for inactive icons, depening on the nodeflag
-        if nodeflag:
+        if nodeflag == 1:
             image1 = self.imagedict['addlink']
             image2 = self.imagedict['addlink_active']
-            image3 = self.imagedict['dellink']
-            image4 = self.imagedict['dellink_active']
+            image3 = self.imagedict['dellink_inactive']
+            image4 = self.imagedict['dellink_inactive']
             image5 = self.imagedict['addnode_inactive']
             image6 = self.imagedict['addnode_inactive']
             image7 = self.imagedict['delnode']
             image8 = self.imagedict['delnode_active']
-        elif linkflag:
+        elif linkflag == 1:
             image1 = self.imagedict['addlink_inactive']
             image2 = self.imagedict['addlink_inactive']
             image3 = self.imagedict['dellink']
@@ -110,10 +111,22 @@ class CanvasSubMenu():
         self.canvas.delete(self.closebutton)
 
     def do_addlink(self):
-        pass
+       if self.nodeflag:
+            # Wait until
+            game.clicked = False
+            self.canvas.bind("<Double-Button-1>", lambda x: self.returnCoord())
+
+                
+    def returnCoord(self):
+        game.action_stack.append(['addlink',[self.node,
+                                             (self.canvas.canvasx(game.lastx),
+                                              self.canvas.canvasy(game.lasty))]])
+        self.canvas.unbind("<Double-Button-1>")
+        self.close()
 
     def do_dellink(self):
         pass
+            
 
     def do_addnode(self):
         if self.nodeflag:
