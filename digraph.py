@@ -42,6 +42,9 @@ class Digraph:
             self._tosets[v] = set()
             self._fromsets[v] = set()
 
+    def del_vertex(self, v):
+        pass
+
     def add_edge(self, e):
         """
         Adds an edge to graph.  If vertices in the edge do not exist, it adds them.
@@ -65,6 +68,9 @@ class Digraph:
         # Add the edge
         self._tosets[e[0]].add(e[1])
         self._fromsets[e[1]].add(e[0])
+
+    def del_edge(self, e):
+        pass
 
     def edges(self):
         """

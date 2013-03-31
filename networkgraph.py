@@ -75,8 +75,15 @@ class NetworkGraph:
                 # Add the items to the vertex's inventory
                 self.V_items[self.vertex_counter] = items
                 
+                node = self.vertex_counter
+
                 # Increment vertex counter
                 self.vertex_counter = self.vertex_counter + 1
+
+                # Return the node ID
+                return node
+
+                
 
         # Get the number of items at the node
         def ItemsAtNode(self,node_num):
