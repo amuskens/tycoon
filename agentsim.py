@@ -147,6 +147,8 @@ class GUI():
         self._title = title
 
         self._root = Tk()
+        img = PhotoImage(file='images/icon.gif')
+        self._root.tk.call('wm', 'iconphoto', self._root._w, img)
 
         self._root.wm_title(title)
         self._root.wm_geometry("+100+80")
