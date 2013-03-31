@@ -12,6 +12,7 @@ from database import *
 from capital import *
 from nodedisplay import *
 from canvassubmenu import *
+from distfuncs import *
 
 import LEVEL1_map
 
@@ -35,9 +36,10 @@ Action format:
 
 # Event callbacks:
 def xy(event):
-        global lastx, lasty
+        global lastx, lasty, clicked
         lastx = event.x
         lasty = event.y
+        clicked = True
 
 class Game:
         def __init__(self,title="Telecom Simulation"):
@@ -82,10 +84,16 @@ class Game:
                 self.loadImages()
 
                 self.subwindows = []
-
+                
+                
                 # Load up the canvas, load up bg
                 self._canvas = gui.get_canvas()       
                 self.bg_image = self._canvas.create_image(0,0,image=self.icons['bg'],anchor='nw')
+
+                # Create initial submenu
+                self.submenu =  CanvasSubMenu(100,100,
+                              self._canvas,0,
+                              self.icons)
 
                 # Bind text
                 self.cashLabel = gui.get_cashlabel()
@@ -102,6 +110,7 @@ class Game:
                 self.E_lines = { }
                 self.E_direction_marker = { }
 
+                
                 for edge in self.gameNetwork.GetEdges():
                         self.NewEdgeCanvas(edge)
                         
@@ -124,7 +133,12 @@ class Game:
                 else:
                         fillcolor='black'
 
-                self.E_lines[edge] = self._canvas.create_line(x1,y1,x2,y2,fill=fillcolor,activefill='purple',width=3)
+                # Add a little bit of separation so bidirectional links can be selected.
+                self.E_lines[edge] = self._canvas.create_line(x1 + 2 * math.cos(math.atan2(y2-y1,x2-x1) + math.pi/2),
+                                                              y1 + 2 * math.sin(math.atan2(y2-y1,x2-x1) + math.pi/2),
+                                                              x2 + 2 * math.cos(math.atan2(y2-y1,x2-x1) + math.pi/2),
+                                                              y2 + 2 * math.sin(math.atan2(y2-y1,x2-x1) + math.pi/2),
+                                                              fill=fillcolor,activefill='purple',width=3)
                 (mid_x,mid_y) = midpoint((x1,y1),(x2,y2))
 
                 # Draw indicator for bidirectional links
@@ -144,10 +158,10 @@ class Game:
         def NewNodeCanvas(self,node):
                 (x,y) = self.gameNetwork.V_coord[node]
                 self.V_images[node] = self._canvas.create_image(x,y,
-                                                                image=self.icons['tower1'],
-                                                                activeimage=self.icons['tower1_active'],
+                                                                image=self.icons['node'],
+                                                                activeimage=self.icons['node_active'],
                                                                 anchor='center')
-                self.V_text[node] = self._canvas.create_text(x + 10,y,
+                self.V_text[node] = self._canvas.create_text(x + 30,y,
                                                              text=(self.gameNetwork.V_name[node] + '\n' + self.gameNetwork.ItemsAtNode(node) + ' items'),
                                                              anchor='w',fill='white')
                 # Attach mouse events to each node iamge
@@ -167,7 +181,7 @@ class Game:
         # Display a right-click submenu on the canvas
         def submenuNode(self,node):
                 global lastx, lasty
-                menu = CanvasSubMenu(self._canvas.canvasx(lastx),
+                self.submenu = CanvasSubMenu(self._canvas.canvasx(lastx),
                                      self._canvas.canvasy(lasty),
                                      self._canvas,node,
                                      self.icons,nodeflag=1)
@@ -175,7 +189,7 @@ class Game:
         # Display a submenu for clicking a link
         def submenuLink(self,edge):
                 global lastx, lasty
-                menu = CanvasSubMenu(self._canvas.canvasx(lastx),
+                self.submenu = CanvasSubMenu(self._canvas.canvasx(lastx),
                                      self._canvas.canvasy(lasty),
                                      self._canvas,edge,
                                      self.icons,linkflag=1)
@@ -183,16 +197,23 @@ class Game:
         # Display submenu for other clicks
         def submenuother(self):
                 global lastx, lasty
-                menu = CanvasSubMenu(self._canvas.canvasx(lastx),
-                                     self._canvas.canvasy(lasty),
-                                     self._canvas,0,
-                                     self.icons)
+
+                # Don't open a submenu on top of a node or edge one.
+                distance = dist(self._canvas.canvasx(lastx),self._canvas.canvasy(lasty),self.submenu.x,self.submenu.y)
+                print(distance)
+                if distance > 100:
+                        self.submenu = CanvasSubMenu(self._canvas.canvasx(lastx),
+                                                     self._canvas.canvasy(lasty),
+                                                     self._canvas,0,
+                                                     self.icons)
                 
         # Loads a dictionary of imags
         def loadImages(self):
                 self.icons = { }
-                self.icons['tower1'] = PhotoImage(file = 'images/tower.gif')
-                self.icons['tower1_active'] = PhotoImage(file = 'images/tower_active.gif')
+                self.icons['sstower'] = PhotoImage(file = 'images/tower.gif')
+                self.icons['sstower_active'] = PhotoImage(file = 'images/tower_active.gif')
+                self.icons['node'] = PhotoImage(file = 'images/node.gif')
+                self.icons['node_active'] = PhotoImage(file = 'images/node_active.gif')
                 self.icons['bg'] = PhotoImage(file = 'images/terrain.gif')
                 self.icons['close']= PhotoImage(file = 'images/close.gif')
                 self.icons['close_active']= PhotoImage(file = 'images/close_active.gif')
@@ -296,6 +317,28 @@ class Game:
                         # add the node
                         node = self.gameNetwork.NewNode(coord,name,[])
                         self.NewNodeCanvas(node)
+                        return
+
+                if action[0] == 'addlink':
+                        node = action[1][0]
+                        pt = action[1][1]
+                        dist = 200
+
+                        (closestNode, distance) = self.gameNetwork.ReturnClosePoint(pt)
+
+                        # Return early if the selected link is invaiid. 
+                        if closestNode == node or distance > 100:
+                                return
+
+                        # ask if the user wants to add the edge.
+                        answer = messagebox.askyesno('Question',
+                                                     'Add link from ' + self.gameNetwork.V_name[node] + ' to ' + self.gameNetwork.V_name[closestNode] + '?')
+                        if answer == False:
+                                return
+                        else:
+                                self.gameNetwork.AddEdgeID(node,closestNode,[])
+                                self.NewEdgeCanvas((node,closestNode))
+                                return
 
 
                         
