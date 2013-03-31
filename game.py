@@ -1,3 +1,6 @@
+# game.py
+# Contians the main game class, which holds all other game classes inside.
+
 import random
 import math
 from tkinter import messagebox
@@ -15,6 +18,20 @@ import LEVEL1_map
 # Globals for mouse clicks.
 global lastx, lasty
 global mode
+global action_stack
+action_stack = []
+
+"""
+
+There will be use of a global "action stack" which other
+class can use to send actions to the game class. This will be popped
+until emptied every step, and the instruction swill be executed.
+
+Action format:
+[ <action string>, [ <action argument list. ] ]
+
+"""
+
 
 # Event callbacks:
 def xy(event):
@@ -42,6 +59,8 @@ class Game:
                 gui.start()
 
         def do_init(self):
+                global lastx, lasty
+                
                 self.gameNetwork = NetworkGraph((500,500),"Station Square",[],100000)
 
                 LEVEL1_map.level1_setup(self)
@@ -49,16 +68,20 @@ class Game:
                 # Initialize message stack
                 self._messages = []
 
+                # Initialize the action stack
+                global action_stack
+                action_stack = []
+
                 # Initialize game parameters:
-                self.cash = 10000000
+                self.cash = 1000000
+                self.inventory = []
+                self.loans = []
                 self.turn = 1
 
                 # Load images
                 self.loadImages()
 
                 self.subwindows = []
-                global mode
-                mode = 0
 
                 # Load up the canvas, load up bg
                 self._canvas = gui.get_canvas()       
@@ -73,6 +96,7 @@ class Game:
                 # Bind mouse motion
                 self._canvas.bind("<ButtonPress-1>", xy)
                 self._canvas.bind("<ButtonPress-2>", xy)
+                self._canvas.bind("<ButtonRelease-2>", lambda x: self.submenuother())
 
                 # Initialize a dictionary of lines objects
                 self.E_lines = { }
@@ -135,22 +159,34 @@ class Game:
                 self.V_displays.add(node)
                 self.subwindows.append(NodeDisplay(self._canvas.canvasx(lastx),
                                                    self._canvas.canvasy(lasty),
-                                                   self._canvas,node,self.gameNetwork,
-                                                   self.icons,gui.GetRoot()))
+                                                   self._canvas,
+                                                   node,self.gameNetwork,
+                                                   self.icons,
+                                                   gui.GetRoot()))
 
         # Display a right-click submenu on the canvas
         def submenuNode(self,node):
+                global lastx, lasty
                 menu = CanvasSubMenu(self._canvas.canvasx(lastx),
                                      self._canvas.canvasy(lasty),
-                                     self._canvas,node,self.gameNetwork,
+                                     self._canvas,node,
                                      self.icons,nodeflag=1)
 
         # Display a submenu for clicking a link
         def submenuLink(self,edge):
+                global lastx, lasty
                 menu = CanvasSubMenu(self._canvas.canvasx(lastx),
                                      self._canvas.canvasy(lasty),
-                                     self._canvas,edge,self.gameNetwork,
-                                     self.icons,nodeflag=0,linkflag=1)
+                                     self._canvas,edge,
+                                     self.icons,linkflag=1)
+
+        # Display submenu for other clicks
+        def submenuother(self):
+                global lastx, lasty
+                menu = CanvasSubMenu(self._canvas.canvasx(lastx),
+                                     self._canvas.canvasy(lasty),
+                                     self._canvas,0,
+                                     self.icons)
                 
         # Loads a dictionary of imags
         def loadImages(self):
@@ -179,6 +215,14 @@ class Game:
                 self.icons['dellink_inactive']= PhotoImage(file = 'images/canvassubmenu/dellink_inactive.gif')
 
         def do_turn(self):
+                # Deal with action stack
+                global action_stack
+                
+                # Process each action
+                while len(action_stack) > 0:
+                        action = action_stack.pop(0)
+                        self.processAction(action)
+
                 total_maintCost = 0
                 # Refresh ll stat windows, which will be inaccurate
                 for window in self.subwindows:
@@ -233,6 +277,30 @@ class Game:
                         messagebox.showinfo("Message",self._messages.pop(0),
                                             icon='warning')
 
+        # Process individual action from the action stack
+        def processAction(self,action):
+                if action[0] == 'delnode':
+                        node = action[1][0]
+
+                        # Move all of the items from the node back to the inventory
+                        for item in self.gameNetwork.V_items[node]:
+                                self.inventory.append(item)
+
+                        # Delete the node
+                        # ...
+                        return
+
+                if action[0] == 'addnode':
+                        coord = action[1][0]
+                        name = action[1][1]
+                        # add the node
+                        node = self.gameNetwork.NewNode(coord,name,[])
+                        self.NewNodeCanvas(node)
+
+
+                        
+
+
 def rgb_to_color(r, g, b):
     """
 		Utility to generate a Tk color rgb string from  integer r, g, b,
@@ -246,6 +314,7 @@ def rgb_to_color(r, g, b):
     return '#{0:02x}{1:02x}{2:02x}'.format(
 										   int((r * 255) % 256), int((g * 255) % 256), int((b * 255) % 256), )
 
+# Find the midpoint between two points
 def midpoint(pt1,pt2):
         (x1,y1) = pt1
         (x2,y2) = pt2

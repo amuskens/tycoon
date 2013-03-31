@@ -3,6 +3,7 @@
 from tkinter import *
 import copy
 
+import game
 from game import *
 from capital import *
 from database import *
@@ -11,13 +12,12 @@ from subslotedit import *
 from getvaluedialog import *
 
 class CanvasSubMenu():
-    def __init__(self,x,y,canvas,nodeorlink,network,imagedict,nodeflag=0,linkflag=0):
+    def __init__(self,x,y,canvas,nodeorlink,imagedict,nodeflag=0,linkflag=0):
         self.canvas = canvas
         self.x = x
         self.y = y
         self.width = 200
         self.height = 200
-        self.network = network
         self.imagedict = imagedict
 
         if nodeflag:
@@ -65,24 +65,96 @@ class CanvasSubMenu():
             image7 = self.imagedict['delnode_inactive']
             image8 = self.imagedict['delnode_inactive']
 
+        # Draw buttons and bind mouse events
         self.addlink = canvas.create_image(x + 200,y,
                                            image=image1,
                                            activeimage=image2,
                                            anchor='nw')
+        self.canvas.tag_bind(self.addlink,"<ButtonPress-1>", lambda x: self.do_addlink())
         
         self.dellink = canvas.create_image(x + 300,y,
                                            image=image3,
                                            activeimage=image4,
                                            anchor='nw')
+        self.canvas.tag_bind(self.dellink,"<ButtonPress-1>", lambda x: self.do_dellink())
 
         self.addnode = canvas.create_image(x,y,
                                            image=image5,
                                            activeimage=image6,
                                            anchor='nw')
+        self.canvas.tag_bind(self.addnode,"<ButtonPress-1>", lambda x: self.do_addnode())
+
         self.delnode = canvas.create_image(x + 100,y,
                                            image=image7,
                                            activeimage=image8,
                                            anchor='nw')
+        self.canvas.tag_bind(self.delnode,"<ButtonPress-1>", lambda x: self.do_delnode())
+
+        self.closebutton = canvas.create_image(x + 400,y,
+                                               image=self.imagedict['close'],
+                                               activeimage=self.imagedict['close_active'],
+                                               anchor='center')
+        self.canvas.tag_bind(self.closebutton,"<ButtonPress-1>", lambda x: self.close())
+
+        """
+        The idea is to use a global action stack to pass
+        the operations done back to the game class so the game
+        class can update the graphics in the next step.
+
+        """
+    def close(self):
+        self.canvas.delete(self.addlink)
+        self.canvas.delete(self.addnode )
+        self.canvas.delete(self.delnode)
+        self.canvas.delete(self.dellink)
+        self.canvas.delete(self.closebutton)
+
+    def do_addlink(self):
+        pass
+
+    def do_dellink(self):
+        pass
+
+    def do_addnode(self):
+        if self.nodeflag:
+            return
+        else:
+            self.msg_box_name('Enter a Network node name: ')
+           
+
+    def do_delnode(self):
+        if self.nodeflag:
+            game.action_stack.append(['delnode',[self.node]])
+
+    # Display a message box for input
+    def msg_box_name(self, msg, extra=True):
+        top = self.top = Toplevel()
+        top.resizable(FALSE,FALSE)
+        label0 = Label(top, text=msg)
+        label0.grid(column=0,row=0,columnspan=2,rowspan=2)
+
+        if extra:
+            self.entry0 = Entry(top)
+            self.entry0.grid(column=0,row=2,rowspan=1,columnspan=3)
+
+            button2 = Button(top, text='OK', command=self.submit_name)
+            button2.grid(column=0,row=3,rowspan=1,columnspan=1)
+
+        button3 = Button(top, text='Cancel',
+                                command=lambda: self.top.destroy())
+        button3.grid(column=2,row=3,rowspan=1,columnspan=1)
+
+    def bindMouseRelease(self,shape,item):
+        self.canvas.tag_bind(shape,"<ButtonPress-1>", lambda x: self.GetMaint(item))
+
+    def submit_name(self):
+        data = self.entry0.get()
+        if data:
+            self.name = data
+            game.action_stack.append((['addnode',[(self.x,self.y),self.name]]))
+            self.top.destroy()
+            self.close()
+
 
 
 
