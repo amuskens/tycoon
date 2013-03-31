@@ -40,6 +40,7 @@ class NodeDisplay():
         self.window = self.canvas.create_rectangle(x,y,x+self.width,y+self.height,
                                                    fill='white',activefill='white',
                                                    outline='white',tags=str(self.id))
+        self.canvas.tag_bind(self.window,"<ButtonPress-1>", lambda x: self.close())
         
         # Draw the parameters
         self.titles = []

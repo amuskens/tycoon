@@ -133,23 +133,25 @@ class Game:
                 else:
                         fillcolor='black'
 
+                x1 = x1 + 5 * math.cos(math.atan2(y2-y1,x2-x1) + math.pi/2)
+                x2 = x2 + 5 * math.cos(math.atan2(y2-y1,x2-x1) + math.pi/2)
+                y1 = y1 + 5 * math.sin(math.atan2(y2-y1,x2-x1) + math.pi/2)
+                y2 = y2 + 5 * math.sin(math.atan2(y2-y1,x2-x1) + math.pi/2)
+
                 # Add a little bit of separation so bidirectional links can be selected.
-                self.E_lines[edge] = self._canvas.create_line(x1 + 2 * math.cos(math.atan2(y2-y1,x2-x1) + math.pi/2),
-                                                              y1 + 2 * math.sin(math.atan2(y2-y1,x2-x1) + math.pi/2),
-                                                              x2 + 2 * math.cos(math.atan2(y2-y1,x2-x1) + math.pi/2),
-                                                              y2 + 2 * math.sin(math.atan2(y2-y1,x2-x1) + math.pi/2),
+                self.E_lines[edge] = self._canvas.create_line(x1,y1,x2,y2,
                                                               fill=fillcolor,activefill='purple',width=3)
                 (mid_x,mid_y) = midpoint((x1,y1),(x2,y2))
 
                 # Draw indicator for bidirectional links
                 (mid2_x,mid2_y) = midpoint((mid_x,mid_y),(x2,y2))
                 self.E_direction_marker[edge] = self._canvas.create_line(mid2_x,mid2_y,
-                                                                         mid2_x + 10 * math.cos(math.atan2(y2-y1,x2-x1) + 3 * math.pi/4),
-                                                                         mid2_y + 10 * math.sin(math.atan2(y2-y1,x2-x1) + 3 * math.pi/4),
+                                                                         mid2_x + 10 * math.cos(math.atan2(y2-y1,x2-x1) + 3.5 * math.pi/4),
+                                                                         mid2_y + 10 * math.sin(math.atan2(y2-y1,x2-x1) + 3.5 * math.pi/4),
                                                                          fill='blue',width=2)
                 self.E_direction_marker[edge] = self._canvas.create_line(mid2_x,mid2_y,
-                                                                         mid2_x + 10 * math.cos(math.atan2(y2-y1,x2-x1) - 3 * math.pi/4),
-                                                                         mid2_y + 10 * math.sin(math.atan2(y2-y1,x2-x1) - 3 * math.pi/4),
+                                                                         mid2_x + 10 * math.cos(math.atan2(y2-y1,x2-x1) - 3.5 * math.pi/4),
+                                                                         mid2_y + 10 * math.sin(math.atan2(y2-y1,x2-x1) - 3.5 * math.pi/4),
                                                                          fill='blue',width=2)
                 # Attach mouse events:
                 self._canvas.tag_bind(self.E_lines[edge],"<ButtonRelease-2>", lambda x: self.submenuLink(edge))
