@@ -1,4 +1,5 @@
 import dict_functions
+from distfuncs import *
 
 from digraph import Digraph
 import dyjkstra
@@ -96,6 +97,12 @@ class NetworkGraph:
                 self.graph.add_edge(e)
                 self.E_items[e] = items
 
+        # Add an edge by ID
+        def AddEdgeID(self,st_node,end_node,items):
+                e = (st_node,end_node)
+                self.graph.add_edge(e)
+                self.E_items[e] = items
+
         # Add items to a pre-existing node
         def AddItemsToNode(self,node_name,items):
                 for item in items:
@@ -146,7 +153,22 @@ class NetworkGraph:
                 node = rev_lookup(self.V_name,node_name)
                 path = least_cost_path(self.graph,0,node,self.cost)
                 if path == None: return 0
-                # Calculate.... NOt done yet        
+                # Calculate.... NOt done yet   
+
+        # Returns the node closest to the point
+        def ReturnClosePoint(self,pt):
+                (x,y) = pt
+                dist_array = []
+                for ids in self.V_items.keys():
+                        # Populate a list of distances to the start point
+                        dist_array.append((ids,
+                                           dist(x,
+                                                y,
+                                                self.V_coord[ids][0],
+                                                self.V_coord[ids][1])))
+                # The smallest element is closest
+                (id,dist1) = min(dist_array, key=lambda x: x[1])
+                return (id,dist1)
 
 
 def rev_lookup(dict,item):
