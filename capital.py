@@ -82,7 +82,7 @@ class Item:
         # Calculate failure chance. Tested the algorithm with a TEST program.
         # This failure chance is only for a failure by natural causes. 
         random.seed()
-        chance = random.random() / (self.reliability_constant * 20) + (self.age / self.lifespan / (self.maintenance_budget / self.suggested_maint_budget) * random.random())
+        chance = random.random() / (self.reliability_constant * 20) + (self.age / (self.lifespan + 0.1 * self.reliability_constant * self.lifespan) / (self.maintenance_budget / self.suggested_maint_budget) * random.random())
         if chance >= 1:
             self.SetFail()
             return True
