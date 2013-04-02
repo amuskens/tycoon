@@ -68,7 +68,8 @@ class Game:
 		self.gameNetwork = NetworkGraph((500,500),"Station Square",[],100000)
 
 		LEVEL1_map.level1_setup(self)
-
+		
+		
 		# Initialize message stack
 		self._messages = []
 
@@ -121,7 +122,13 @@ class Game:
 		self.V_text = { }
 		for node in self.gameNetwork.GetNodes():
 			self.NewNodeCanvas(node)
-
+		#Tutorial beginings
+		messagebox.showinfo('Welcome to Telecom Tycoon',message = 'Lets get started\n Please select the add node button.\n')
+		messagebox.showinfo(message='This should be the green plus in the sub-menu.')
+		messagebox.showinfo(message='This node represents a city to supply with bandwidth.')
+		messagebox.showinfo(message='Once you have entered a name for your city, please press OK')
+		messagebox.showinfo(message='Press Step in the menu, then OK')
+		
 	# Function adds new edge imagery dicitonaries and canvas
 	def NewEdgeCanvas(self,edge):
 		(x1,y1) = self.gameNetwork.V_coord[edge[0]]
