@@ -105,8 +105,8 @@ class Game:
 
                 # Bind mouse motion
                 self._canvas.bind("<ButtonPress-1>", xy)
-                self._canvas.bind("<ButtonPress-2>", xy)
-                self._canvas.bind("<ButtonRelease-2>", lambda x: self.submenuother())
+                self._canvas.bind("<ButtonPress-3>", xy)
+                self._canvas.bind("<ButtonRelease-3>", lambda x: self.submenuother())
 
                 # Initialize a dictionary of lines objects
                 self.E_lines = { }
@@ -156,7 +156,7 @@ class Game:
                                                                          mid2_y + 10 * math.sin(math.atan2(y2-y1,x2-x1) - 3.5 * math.pi/4),
                                                                          fill='blue',width=2)
                 # Attach mouse events:
-                self._canvas.tag_bind(self.E_lines[edge],"<ButtonRelease-2>", lambda x: self.submenuLink(edge))
+                self._canvas.tag_bind(self.E_lines[edge],"<ButtonRelease-3>", lambda x: self.submenuLink(edge))
 
         # Function adds new node imagery dictionaries and canvas
         def NewNodeCanvas(self,node):
