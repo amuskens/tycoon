@@ -170,7 +170,7 @@ class Game:
                                                              anchor='w',fill='white')
                 # Attach mouse events to each node iamge
                 self._canvas.tag_bind(self.V_images[node],"<ButtonRelease-1>", lambda x: self.displayNode(node))
-                self._canvas.tag_bind(self.V_images[node],"<ButtonRelease-2>", lambda x: self.submenuNode(node))
+                self._canvas.tag_bind(self.V_images[node],"<ButtonRelease-3>", lambda x: self.submenuNode(node))
 
         # Creates an instance of a window to display the node data.
         def displayNode(self,node):
