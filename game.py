@@ -87,6 +87,8 @@ class Game:
 		self.loans = []
 		self.turn = 1
 
+		self.first_time = True
+
 		# Load images
 		self.loadImages()
 
@@ -147,11 +149,11 @@ class Game:
 
 		self.city_images[city.GetName()] =  self._canvas.create_image(x,y,
 									      image=self.icons['city'],
-									      activeimage=self.icons['node_active'],
+									      activeimage=self.icons['city_active'],
 									      anchor='center')
-		self.city_text[city.GetName()] = self._canvas.create_text(x + 30,y,
+		self.city_text[city.GetName()] = self._canvas.create_text(x,y + 70,
 							     text=city.GetName(),
-							     anchor='w',fill='white')
+							     anchor='center',fill='white')
 	def NewEdgeCanvas(self,edge):
 		(x1,y1) = self.gameNetwork.V_coord[edge[0]]
 		(x2,y2) = self.gameNetwork.V_coord[edge[1]]
@@ -236,7 +238,6 @@ class Game:
 
 		# Don't open a submenu on top of a node or edge one.
 		distance = dist(self._canvas.canvasx(lastx),self._canvas.canvasy(lasty),self.submenu.x,self.submenu.y)
-		print(distance)
 		if distance > 100:
 			self.submenu.close()
 			del self.submenu
@@ -278,8 +279,9 @@ class Game:
 
 	def do_turn(self):
 		# Message display
-		if  self.gameNetwork.vertex_counter == 2:
+		if  self.gameNetwork.vertex_counter == 2 and self.first_time == True:
 			 messagebox.showinfo(message='Press Step in the menu, then OK')
+			 self.first_time = False
 		# Deal with action queue.
 		global action_q
 		
