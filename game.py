@@ -67,7 +67,7 @@ class Game:
 		
 		self.gameNetwork = NetworkGraph((500,500),"Station Square",[],100000)
 
-		LEVEL1_map.level1_setup(self)
+		self.economic = LEVEL1_map.level1_setup(self)
 		
 		
 		# Initialize message stack
@@ -129,6 +129,8 @@ class Game:
 		messagebox.showinfo(message='Once you have entered a name for your city, please press OK')
 		messagebox.showinfo(message='Press Step in the menu, then OK')
 		
+
+	# Draw cities
 	# Function adds new edge imagery dicitonaries and canvas
 	def NewEdgeCanvas(self,edge):
 		(x1,y1) = self.gameNetwork.V_coord[edge[0]]
@@ -234,6 +236,7 @@ class Game:
 		self.icons['addbutton_active']= PhotoImage(file = 'images/addbutton_active.gif')
 		self.icons['notify']= PhotoImage(file = 'images/notify.gif')
 		self.icons['backpane']= PhotoImage(file = 'images/backpane.gif')
+		self.icons['city']= PhotoImage(file = 'images/city_icon.gif')
 
 		# Canvas submenu
 		self.icons['addnode']= PhotoImage(file = 'images/canvassubmenu/addnode.gif')
