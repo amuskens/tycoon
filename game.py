@@ -129,17 +129,14 @@ class Game:
 		messagebox.showinfo('Welcome to Telecom Tycoon',message = 'Lets get started\n Please select the add node button.\n')
 		messagebox.showinfo(message='This should be the green plus in the sub-menu.')
 		messagebox.showinfo(message='This node represents a city to supply with bandwidth.')
-<<<<<<< HEAD
 		messagebox.showinfo(message='Once you name your new city, press Step.')
-
-	
-=======
 		messagebox.showinfo(message='Once you have entered a name for your city, please press OK')
 		messagebox.showinfo(message='Press Step in the menu, then OK')
-		
 
 	# Draw cities
->>>>>>> dbc7f7b5cfad3f7658e0d74754032ff0b79059db
+	def DrawCities(self):
+		pass
+
 	# Function adds new edge imagery dicitonaries and canvas
 	def NewEdgeCanvas(self,edge):
 		(x1,y1) = self.gameNetwork.V_coord[edge[0]]
