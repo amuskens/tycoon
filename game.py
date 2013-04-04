@@ -12,6 +12,8 @@ from database import *
 from capital import *
 from nodedisplay import *
 from canvassubmenu import *
+from economic import *
+from city import *
 from distfuncs import *
 
 import LEVEL1_map
@@ -19,12 +21,12 @@ import LEVEL1_map
 # Globals for mouse clicks.
 global lastx, lasty
 global mode
-global action_stack
-action_stack = []
+global action_q
+action_q = []
 
 """
 
-There will be use of a global "action stack" which other
+There will be use of a global "action queu" which other
 class can use to send actions to the game class. This will be popped
 until emptied every step, and the instruction swill be executed.
 
@@ -32,8 +34,7 @@ Action format:
 [ <action string>, [ <action argument list. ] ]
 
 """
-while self.gameNetwork.vertex_counter == 2:
-	messagebox.showinfo(message='Press Step in the menu, then OK')
+
 	
 
 
@@ -68,17 +69,17 @@ class Game:
 	def do_init(self):
 		global lastx, lasty
 		
-		self.gameNetwork = NetworkGraph((500,500),"Station Square",[],100000)
+		self.gameNetwork = NetworkGraph((500,500),"Root",[],100000)
 
-		self.economic = LEVEL1_map.level1_setup(self)
+		self.economy = LEVEL1_map.level1_setup(self)
 		
 		
 		# Initialize message stack
 		self._messages = []
 
-		# Initialize the action stack
-		global action_stack
-		action_stack = []
+		# Initialize the action queue
+		global action_q
+		action_q = []
 
 		# Initialize game parameters:
 		self.cash = 1000000
@@ -112,6 +113,12 @@ class Game:
 		self._canvas.bind("<ButtonPress-3>", xy)
 		self._canvas.bind("<ButtonRelease-3>", lambda x: self.submenuother())
 
+		# Draw cities
+		self.city_images = {}
+		self.city_text = {}
+		for city in self.economy.GetCities():
+			self.DrawCity(city)
+
 		# Initialize a dictionary of lines objects
 		self.E_lines = { }
 		self.E_direction_marker = { }
@@ -134,10 +141,17 @@ class Game:
 		messagebox.showinfo(message='Press Step in the menu, then OK')
 
 	# Draw cities
-	def DrawCities(self):
-		pass
+	def DrawCity(self,city):
+		# Get the coordinates of the city.
+		(x,y) = city.GetCoord()
 
-	# Function adds new edge imagery dicitonaries and canvas
+		self.city_images[city.GetName()] =  self._canvas.create_image(x,y,
+									      image=self.icons['city'],
+									      activeimage=self.icons['node_active'],
+									      anchor='center')
+		self.city_text[city.GetName()] = self._canvas.create_text(x + 30,y,
+							     text=city.GetName(),
+							     anchor='w',fill='white')
 	def NewEdgeCanvas(self,edge):
 		(x1,y1) = self.gameNetwork.V_coord[edge[0]]
 		(x2,y2) = self.gameNetwork.V_coord[edge[1]]
@@ -200,6 +214,7 @@ class Game:
 		global lastx, lasty
 		# Close the previous instance of the menu
 		self.submenu.close()
+		del self.submenu
 		self.submenu = CanvasSubMenu(self._canvas.canvasx(lastx),
 					     self._canvas.canvasy(lasty),
 					     self._canvas,node,
@@ -209,6 +224,7 @@ class Game:
 	def submenuLink(self,edge):
 		global lastx, lasty
 		self.submenu.close()
+		del self.submenu
 		self.submenu = CanvasSubMenu(self._canvas.canvasx(lastx),
 					     self._canvas.canvasy(lasty),
 					     self._canvas,edge,
@@ -223,6 +239,7 @@ class Game:
 		print(distance)
 		if distance > 100:
 			self.submenu.close()
+			del self.submenu
 			self.submenu = CanvasSubMenu(self._canvas.canvasx(lastx),
 						     self._canvas.canvasy(lasty),
 						     self._canvas,0,
@@ -242,7 +259,8 @@ class Game:
 		self.icons['addbutton_active']= PhotoImage(file = 'images/addbutton_active.gif')
 		self.icons['notify']= PhotoImage(file = 'images/notify.gif')
 		self.icons['backpane']= PhotoImage(file = 'images/backpane.gif')
-		self.icons['city']= PhotoImage(file = 'images/city_icon.gif')
+		self.icons['city']= PhotoImage(file = 'images/city-icon.gif')
+		self.icons['city_active']= PhotoImage(file = 'images/city-icon_active.gif')
 
 		# Canvas submenu
 		self.icons['addnode']= PhotoImage(file = 'images/canvassubmenu/addnode.gif')
@@ -259,12 +277,15 @@ class Game:
 		self.icons['dellink_inactive']= PhotoImage(file = 'images/canvassubmenu/dellink_inactive.gif')
 
 	def do_turn(self):
-		# Deal with action stack
-		global action_stack
+		# Message display
+		if  self.gameNetwork.vertex_counter == 2:
+			 messagebox.showinfo(message='Press Step in the menu, then OK')
+		# Deal with action queue.
+		global action_q
 		
 		# Process each action
-		while len(action_stack) > 0:
-			action = action_stack.pop(0)
+		while len(action_q) > 0:
+			action = action_q.pop(0)
 			self.processAction(action)
 
 		total_maintCost = 0

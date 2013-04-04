@@ -118,7 +118,7 @@ class CanvasSubMenu():
 
                 
     def returnCoord(self):
-        game.action_stack.append(['addlink',[self.node,
+        game.action_q.append(['addlink',[self.node,
                                              (self.canvas.canvasx(game.lastx),
                                               self.canvas.canvasy(game.lasty))]])
         self.canvas.unbind("<Double-Button-1>")
@@ -137,7 +137,7 @@ class CanvasSubMenu():
 
     def do_delnode(self):
         if self.nodeflag:
-            game.action_stack.append(['delnode',[self.node]])
+            game.action_q.append(['delnode',[self.node]])
 
     # Display a message box for input
     def msg_box_name(self, msg, extra=True):
@@ -164,7 +164,7 @@ class CanvasSubMenu():
         data = self.entry0.get()
         if data:
             self.name = data
-            game.action_stack.append((['addnode',[(self.x,self.y),self.name]]))
+            game.action_q.append((['addnode',[(self.x,self.y),self.name]]))
             self.top.destroy()
             self.close()
 

@@ -21,7 +21,7 @@ class City():
         return self.name
 
     def GetCoord(self):
-        return (x,y)
+        return (self.x,self.y)
 
     def GetPopulation(self):
         return self.population
