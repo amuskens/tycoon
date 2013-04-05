@@ -119,6 +119,51 @@ def quad_line_intersect(quad,line):
 
     return int_pts
 
+# Defines a quadratic bezier curve (order 2)
+# Parametric curve in form:
+# B(t) = (1-t)^2  P0 + 2(1-t)t P1 + t^2 P2, t in [0,1]
+# P0...Pn are coordinate points.
+
+class QuadraticBezier():
+    def __init__(self,P0,P1,P2):
+        # Points are in tuples (x,y)
+        self.P0 = P0
+        self.P1 = P1
+        self.P2 = P2
+
+    # Evaluate for a point at t
+    def evaluate(self,t):
+        x = (1-t)**2 * self.P0[0] + 2*(t-1)*t*self.P1[0] + t**2 * self.P2[0]
+        y = (1-t)**2 * self.P0[1] + 2*(t-1)*t*self.P1[1] + t**2 * self.P2[1]
+
+        return (x,y)
+    
+    # Find t at point. If the point does not lie on teh curve, return an empty set.
+    def solve(self,pt):
+
+        (x,y) = pt
+        
+        quadx = Quadratic(self.P0[0] - 2*self.P1[0] + self.P2[0],
+                          -2 * self.P0[0] + 2 * self.P1[0],
+                          self.P0[0] - x)
+
+        quady = Quadratic(self.P0[1] - 2*self.P1[1] + self.P2[1],
+                          -2 * self.P0[1] + 2 * self.P1[1],
+                          self.P0[1] - y)
+
+        rootx = quadx.roots()
+        rooty = quady.roots()
+
+        solutions = set()
+
+        for root in rootx:
+            if root in rooty and 0 <= root <= 1:
+                solutions.add(root)
+
+        return solutions
+        
+
+
 if __name__ == "__main__":
         import doctest
         doctest.testmod()
