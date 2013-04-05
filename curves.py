@@ -100,10 +100,17 @@ def quad_line_intersect(quad,line):
     >>> b = Linear(0,0)
     >>> {(0, 0)} == quad_line_intersect(a,b)
     True
+    >>> a = Quadratic(1,0,1)
+    >>> None == quad_line_intersect(a,b)
+    True
     """
 
     temp_quad = Quadratic(quad.a,quad.b - line.m,quad.c - line.b)
     roots = temp_quad.roots()
+
+    # If no roots, end early.
+    if not roots:
+        return None
 
     # Just got a list of either 0, 1, or 2  roots
     int_pts = set()
