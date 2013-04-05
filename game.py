@@ -69,7 +69,7 @@ class Game:
 	def do_init(self):
 		global lastx, lasty
 		
-		self.gameNetwork = NetworkGraph((500,500),"Root",[],100000)
+		self.gameNetwork = NetworkGraph((800,800),"Root",[],100000)
 
 		self.economy = LEVEL1_map.level1_setup(self)
 		
@@ -98,11 +98,6 @@ class Game:
 		# Load up the canvas, load up bg
 		self._canvas = gui.get_canvas()	      
 		self.bg_image = self._canvas.create_image(0,0,image=self.icons['bg'],anchor='nw')
-
-		# Create initial submenu
-		self.submenu =	CanvasSubMenu(100,100,
-			      self._canvas,0,
-			      self.icons)
 
 		# Bind text for cash display
 		self.cashLabel = gui.get_cashlabel()
@@ -134,6 +129,12 @@ class Game:
 		self.V_text = { }
 		for node in self.gameNetwork.GetNodes():
 			self.NewNodeCanvas(node)
+
+		# Create initial submenu
+		self.submenu =	CanvasSubMenu(100,100,
+			      self._canvas,0,
+			      self.icons)
+
 		#Tutorial beginings
 		messagebox.showinfo('Welcome to Telecom Tycoon',message = 'Lets get started\n Please select the add node button.\n')
 		messagebox.showinfo(message='This should be the green plus in the sub-menu.')
