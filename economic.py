@@ -9,6 +9,9 @@ import random
 
 from city import *
 
+# This is a library which implements linear and quadratic curves.
+from curves import *
+
 class Economic():
 
     def __init__(self,cities_list):
@@ -32,4 +35,7 @@ class Economic():
 
         # It should find the nearest population center, then subtract  a "fade factor"
         # depending on the distnace from the popualtion center. Shouldn't be negative.
+
+        # Each city should have a demand curve. This function returns 
+        # the curve, which is the downward sloping half of a quadratic.
         return None

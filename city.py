@@ -3,6 +3,8 @@
 import random
 import math
 
+from curves import *
+
 class City():
 
     # Initialize a new city
@@ -12,6 +14,9 @@ class City():
         self.y = y
         self.population = population
         self.growth_factor = growth_factor
+
+        # Set default starting curve.
+        self.demand_curve = Linear(-1,5)
 
         # Assume to start, each person demands one megabit of bandwidth
         self.demand = population * 1000000
