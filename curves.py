@@ -77,13 +77,15 @@ class Quadratic():
 
         # Test for complex roots. We don't want to deal with these
         if (self.b**2 - 4 * self.a * self.c) < 0:
-            return None
-            
-
+            return []
+        
         root1 = (-self.b + math.sqrt(self.b**2 - 4 * self.a * self.c)) / (self.a * 2)
         root2 = (-self.b - math.sqrt(self.b**2 - 4 * self.a * self.c)) / (self.a * 2)
 
-        return (root1, root2)
+        if root1 == root2:
+            return [root1]
+        else:
+            return [root1, root2]
 
 # Returns the point of intersection between a quadratic and a line
 def quad_line_intersect(quad,line):
@@ -109,7 +111,7 @@ def quad_line_intersect(quad,line):
     roots = temp_quad.roots()
 
     # If no roots, end early.
-    if not roots:
+    if roots == []:
         return None
 
     # Just got a list of either 0, 1, or 2  roots
@@ -123,6 +125,7 @@ def quad_line_intersect(quad,line):
 # Parametric curve in form:
 # B(t) = (1-t)^2  P0 + 2(1-t)t P1 + t^2 P2, t in [0,1]
 # P0...Pn are coordinate points.
+# P0 is the origin, P2 is the endpoint. P1 is an intermediate point.
 
 class QuadraticBezier():
     def __init__(self,P0,P1,P2):
@@ -161,6 +164,10 @@ class QuadraticBezier():
                 solutions.add(root)
 
         return solutions
+
+# Find the intersection between two bezier curves
+def Bez_intersect(bez1,bez2):
+    pass
         
 
 
