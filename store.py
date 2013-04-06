@@ -6,6 +6,8 @@ from capital import *
 from database import *
 import game
 
+global refresh_flag
+
 class Store():
     def __init__(self,parent,inventory,database):
         self.inventory = inventory
@@ -215,6 +217,14 @@ class Store():
 
     def close(self):
         self.root.destroy()
+
+    # This method is called when the window idles.
+    def standby(self):
+        global refresh_flag
+        if refresh_flag:
+            self.refresh_inv()
+            refresh_flag = False
+        
         
 
 
