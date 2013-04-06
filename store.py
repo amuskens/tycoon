@@ -196,6 +196,16 @@ class Store():
                 tempstr = tempstr + '\nType: ' + item.WiredGetType()
                 self.sel_item = item
                 self.des.set(tempstr)
+
+            elif self.v.get() == 'router':
+                item = self.database.GetRouter(sel)
+                tempstr = 'Item Description: \n' + 'Name: ' + item.GetName()
+                tempstr = tempstr + '\nCost: $ ' + "%0.2f" % item.GetCost()
+                tempstr = tempstr + '\nSuggested maintenance budget: $ %0.2f'% (item.SugMaintenance() * 24 * 7) + ' per week'
+                tempstr = tempstr + '\nProjected Lifespan: %0.2f' % (item.GetLifespan() / 365 / 24) + ' years'
+                tempstr = tempstr + '\nMaximum Capacity: %0.2f' % (float(item.GetMaxCapacity()) / 1000000) + ' megabits per second'
+                self.sel_item = item
+                self.des.set(tempstr)
                 
         self.itemselector.after(250,self.refresh_descrip_sel)
 

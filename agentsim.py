@@ -173,10 +173,10 @@ class GUI():
         #   Pause       pause the simulation
 
         appHighlightFont = font.Font(family='Arial', size=14, weight='bold')
-        self._l1 = Label(self._topframe,text='Cash:',
+        self._l1 = Label(self._topframe,text='Status:',
                                    font=appHighlightFont,justify='left')
         self._l1.pack(anchor='w', fill='y')
-        self._cash_label = Label(self._topframe)
+        self._cash_label = Label(self._topframe,justify=LEFT)
         self._cash_label.pack(anchor='nw', fill='y')
 
         self._b1 = Button(self._frame,
@@ -218,19 +218,27 @@ class GUI():
 
         self._b5.pack(anchor='w', fill='x')
 
+        def on_speed_change(v):
+            self._speed = int(v)
+
+        self._speed = 1
+        self._speedscale = Scale(self._frame,
+                                 from_=1, to=100, label='Game Speed', orient=HORIZONTAL,
+                                 length=100,command=on_speed_change)
+        self._speedscale.pack(side='top', fill='x')
+
+
+        # Inventory label
         self.inv_lbl =Label(self._frame,text='Inventory:',
                                    font=appHighlightFont,justify='left')
                          
         self.inv_lbl.pack(anchor='w',fill='x')
 
-        # THis listbox contains a display of the inventory
+        # This listbox contains a display of the inventory
         self.list = Listbox(self._frame,selectmode=EXTENDED,height=30)
         self.list.pack(anchor='w', fill='x')
 
-        def on_speed_change(v):
-            self._speed = int(v)
-
-        self._speed = 1
+        
 
         self._cf = Frame(self._root)
 
@@ -319,7 +327,7 @@ class GUI():
                     self.list.insert(END,item.GetName())
 
                 # queue a new event to be executed after some time
-                id = self._root.after(200 - self._speed, self._run)
+                id = self._root.after(400 - int(3.5 * self._speed), self._run)
 
     def _cancel_next_simulation(self):
         """ 

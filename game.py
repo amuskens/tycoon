@@ -344,9 +344,17 @@ class Game:
 
 		# Update game parameters
 		self.cash = self.cash - total_maintCost + revenue
+
+		# A turn corresponds to one hour
 		self.turn = self.turn + 1
 
-		self.cashcontents.set(' $ %0.2f' % self.cash)
+		tempstr = 'Cash:  $ %0.2f' % self.cash + '  Cost per week: $%0.2f' % (total_maintCost * 24 * 7)
+		tempstr = tempstr + '  Weekly Revenue: $%0.2f' % (revenue * 24 * 7)
+		tempstr = tempstr + '  Net Profit per week: $ %0.2f' % ((-total_maintCost + revenue) * 7 * 24)
+		tempstr = tempstr + '\nTime: %02d' % (self.turn % 24) + ':00'
+		tempstr = tempstr + '  Day: ' + str(self.turn //  24)
+		tempstr = tempstr + ' Year: ' + str(self.turn  //  (365 * 24))
+		self.cashcontents.set(tempstr)
 		
 		# Empty the message stack to the user.
 		while len(self._messages) > 0:
