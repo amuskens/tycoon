@@ -7,6 +7,7 @@ from database import *
 import game
 
 global refresh_flag
+refresh_flag = False
 
 class Store():
     def __init__(self,parent,inventory,database):
@@ -75,11 +76,11 @@ class Store():
 
 
         # Select items
-        self.itemselector = Listbox(self.frame,height=20,width=20,selectmode=SINGLE)
+        self.itemselector = Listbox(self.frame,height=40,selectmode=SINGLE)
         self.itemselector.pack(side='top',padx=20,pady=10)
         self.refresh_descrip_sel()
 
-        self.inv_select = Listbox(self.sideframe,height=20,width=20,selectmode=BROWSE)
+        self.inv_select = Listbox(self.sideframe,height=40,selectmode=BROWSE)
         self.inv_select.pack(side='top',padx=20,pady=10)
         self.refresh_descrip_inv()
         self.refresh_inv()
