@@ -102,6 +102,9 @@ class Store():
         self.v.trace("w", lambda name, index, mode: self.refresh_catlist())
         self.refresh_catlist()
 
+        # Standby
+        self.standby()
+
     def refresh_catlist(self):
         self.itemselector.delete(0, END)
 
@@ -224,6 +227,8 @@ class Store():
         if refresh_flag:
             self.refresh_inv()
             refresh_flag = False
+            
+        self.root.after(500,self.standby)
         
         
 
