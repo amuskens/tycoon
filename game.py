@@ -56,6 +56,7 @@ class Game:
 		# which will display at turns.
 		self._messages = []
 		self.inventory = []
+		self.cash = 10000000
 		
 		# let us modify the value of the global gui variable
 		global gui
@@ -73,7 +74,6 @@ class Game:
 
 		self.economy = LEVEL1_map.level1_setup(self)
 		
-		
 		# Initialize message stack
 		self._messages = []
 
@@ -82,7 +82,6 @@ class Game:
 		action_q = []
 
 		# Initialize game parameters:
-		self.cash = 1000000
 		self.inventory = []
 		self.loans = []
 		self.turn = 1
@@ -358,7 +357,7 @@ class Game:
 			# ...
 			return
 
-		if action[0] == 'addnode':
+		elif action[0] == 'addnode':
 			coord = action[1][0]
 			name = action[1][1]
 			# add the node
@@ -366,7 +365,7 @@ class Game:
 			self.NewNodeCanvas(node)
 			return
 
-		if action[0] == 'addlink':
+		elif action[0] == 'addlink':
 			node = action[1][0]
 			pt = action[1][1]
 			dist = 200
@@ -387,6 +386,9 @@ class Game:
 				self.NewEdgeCanvas((node,closestNode))
 				return
 
+		elif action[0] == 'subtractcash':
+			self.cash = self.cash - action[1][0]
+			return
 
 			
 

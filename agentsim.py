@@ -178,11 +178,6 @@ class GUI():
         self._l1.pack(anchor='w', fill='y')
         self._cash_label = Label(self._topframe)
         self._cash_label.pack(anchor='nw', fill='y')
-        
-        self._messageButtonPop = Button(self._topframe,
-            text='Pop Message',
-            command=self._do_popmessage
-            )
 
         self._b1 = Button(self._frame,
             text='Reset',
@@ -191,19 +186,23 @@ class GUI():
 
         self._b1.pack(anchor='w', fill='x')
 
+        """
         self._b2 = Button(self._frame,
             text='Step',
             command=self._do_onestep
             )
 
         self._b2.pack(anchor='w', fill='x')
+        """
 
+        """
         self._b3 = Button(self._frame,
             text='Play',
             command=self._do_run
             )
 
         self._b3.pack(anchor='w', fill='x')
+        """
 
         self._b4 = Button(self._frame,
             text='Pause',
@@ -213,14 +212,20 @@ class GUI():
         self._b4.pack(anchor='w', fill='x')
 
         self._b5 = Button(self._frame,
-            text='View Store',
+            text='View Store /  \n Manage Inventory',
             command=self._goto_store
             )
 
         self._b5.pack(anchor='w', fill='x')
 
-        self._list = Listbox(self._frame)
-        self._list.pack(anchor='w', fill='x')
+        self.inv_lbl =Label(self._frame,text='Inventory:',
+                                   font=appHighlightFont,justify='left')
+                         
+        self.inv_lbl.pack(anchor='w',fill='x')
+
+        # THis listbox contains a display of the inventory
+        self.list = Listbox(self._frame,selectmode=EXTENDED,height=30)
+        self.list.pack(anchor='w', fill='x')
 
         def on_speed_change(v):
             self._speed = int(v)
@@ -269,6 +274,7 @@ class GUI():
     def start(self):
         if self._init_fn != None: 
             self._init_fn()
+            self._do_run()
         self._root.mainloop()
 
     # actions attached to buttons are prefixed with _do_
@@ -288,12 +294,11 @@ class GUI():
         if self._step_fn != None:
             self._step_fn()
 
-    def _do_popmessage(self):
-        pass
-
     def _do_pause(self):
         self._running = 0
         self._cancel_next_simulation()
+        messagebox.showinfo('Pause','Game paused')
+        self._do_run()
 
     def _do_run(self):
         if not self._running:
@@ -302,15 +307,19 @@ class GUI():
 
     def _goto_store(self):
         store = Store(self._root,self.inventory,self.database)
-
     # needs to be own function, not part of _do_run, 
     # because it reschedules itself
     def _run(self):
         if self._running:
             if self._step_fn != None:
                 self._step_fn()
+                # Update the inventory listbox.
+                self.list.delete(0, END)
+                for item in self.inventory:
+                    self.list.insert(END,item.GetName())
+
                 # queue a new event to be executed after some time
-                id = self._root.after(150 - self._speed, self._run)
+                id = self._root.after(200 - self._speed, self._run)
 
     def _cancel_next_simulation(self):
         """ 

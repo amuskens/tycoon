@@ -266,6 +266,9 @@ class PointToPoint(Network):
         # Maximum length of a point to point connection before a repeater is needed.
         self.max_length = max_length
 
+    def GetMaxLength(self):
+        return self.max_length
+
 class Radio(PointToPoint):
     def __init__(self,inList):
         (name,cost,rel,icon,lifespan,maintenance,sug_maint,max_capacity,target_capacity,power,max_length,radio_type,radio_frequency,freq_lo,freq_hi) = inList

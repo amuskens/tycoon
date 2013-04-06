@@ -4,6 +4,7 @@ from tkinter import ttk
 
 from capital import *
 from database import *
+import game
 
 class Store():
     def __init__(self,parent,inventory,database):
@@ -76,15 +77,21 @@ class Store():
         self.itemselector.pack(side='top',padx=20,pady=10)
         self.refresh_descrip_sel()
 
-        self.inv_select = Listbox(self.sideframe,height=20,width=20)
+        self.inv_select = Listbox(self.sideframe,height=20,width=20,selectmode=BROWSE)
         self.inv_select.pack(side='top',padx=20,pady=10)
         self.refresh_descrip_inv()
+        self.refresh_inv()
 
         self.button_add = Button(self.bottomFrame,text='Add... >',command=self.do_add)
         self.button_add.pack(side='top',fill='x')
 
-        self.button_remove = Button(self.bottomFrame,text='Remove from inventory...')
+        self.button_remove = Button(self.bottomFrame,text='Remove from inventory...',
+                                    command=self.do_remove)
         self.button_remove.pack(side='top',fill='x')
+
+        self.button_ref = Button(self.bottomFrame,text='Refresh Inventory',
+                                    command=self.refresh_inv)
+        self.button_ref.pack(side='top',fill='x')
 
         self.button_close = Button(self.bottomFrame,text='Close',command=self.close)
         self.button_close.pack(side='right',fill='x')
@@ -150,14 +157,27 @@ class Store():
                 tempstr = tempstr + '\nBuild slots: ' + str(item.slots)
                 self.sel_item = item
                 self.des.set(tempstr)
+
+            elif self.v.get() == 'radio':
+                item = self.database.GetRadio(sel)
+                tempstr = 'Item Description: \n' + 'Name: ' + item.GetName()
+                tempstr = tempstr + '\nCost: $ ' + "%0.2f" % item.GetCost()
+                tempstr = tempstr + '\nSuggested maintenance budget: $ %0.2f'% (item.SugMaintenance() * 24 * 7) + ' per week'
+                tempstr = tempstr + '\nProjected Lifespan: %0.2f' % (item.GetLifespan() / 365 / 24) + ' years'
+                tempstr = tempstr + '\nMaximum Capacity: %0.2f' % (float(item.GetMaxCapacity()) / 1000000) + ' megabits per second'
+                tempstr = tempstr + '\nMaximum Link Length: ' + str(item.GetMaxLength()) + ' km'
+                tempstr = tempstr + '\nFrequency Range: %0.2f' % (float(item.GetFreqRange()[0])) + ' MHz to %0.2f' % (float(item.GetFreqRange()[1])) + ' MHz'
+                tempstr = tempstr + '\nRadio Type: ' + item.RadioGetType()
+                self.sel_item = item
+                self.des.set(tempstr)
                 
         self.itemselector.after(250,self.refresh_descrip_sel)
 
     def refresh_descrip_inv(self):
         if self.inv_select.curselection():
-            sel = int(self.inv_select.curselection()[0])
+            self.inv_sel = int(self.inv_select.curselection()[0])
 
-            item = self.inventory[sel]
+            item = self.inventory[self.inv_sel]
 
             tempstr = 'Item Description: \n' + 'Name: ' + item.GetName()
             tempstr = tempstr + '\nCost: $ ' + "%0.2f" % item.GetCost()
@@ -167,12 +187,29 @@ class Store():
 
             self.des.set(tempstr)
 
-        self.inv_select.after(250,self.refresh_descrip_inv)
+        self.inv_select.after(200,self.refresh_descrip_inv)
         
     def do_add(self):
         if self.sel_item:
             self.inventory.append(self.sel_item)
+            cost = self.sel_item.GetCost()
+            if self.sel_item.type() == 'Structure':
+                cost = cost + float(self.sel_item.GetFoundationCost())
+            game.action_q.append(['subtractcash',[cost]])
             self.refresh_inv()
+
+    def do_remove(self):
+        if self.inv_select.curselection():
+            self.inv_sel = int(self.inv_select.curselection()[0])
+            answer = messagebox.askquestion('Question',
+                                   'Are you sure you wish to remove this item from the inventory? You cannot recover the cost.')
+
+            if answer: 
+                self.inventory.pop(self.inv_sel)
+                self.refresh_inv()
+            
+            
+
     def Ok(self):
         self.close()
 

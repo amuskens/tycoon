@@ -8,14 +8,16 @@ import random
 from game import *
 
 global action_stack
+global playinggame
 
 arg_debug = 0
 
 def main():
     global action_stack
     action_stack = []
-    game = Game(title="Telecom Network Tycoon")
-    game.start()
+    global playinggame
+    playinggame = Game(title="Telecom Network Tycoon")
+    playinggame.start()
 
 
 if __name__ == "__main__":
