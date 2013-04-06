@@ -2,6 +2,8 @@
 # Contains classes which represent mathematical equations of curves.
 import math
 
+from distfuncs import *
+
 # This class defines a "line equation" object, which represents
 # the equation: y = mx + b
 # Line equations will be used to represent supply and demand curves
@@ -136,8 +138,8 @@ class QuadraticBezier():
 
     # Evaluate for a point at t
     def evaluate(self,t):
-        x = (1-t)**2 * self.P0[0] + 2*(t-1)*t*self.P1[0] + t**2 * self.P2[0]
-        y = (1-t)**2 * self.P0[1] + 2*(t-1)*t*self.P1[1] + t**2 * self.P2[1]
+        x = math.pow(1-t,2) * self.P0[0] + 2*(t-1)*t*self.P1[0] + math.pow(t,2) * self.P2[0]
+        y = math.pow(1-t,2) * self.P0[1] + 2*(t-1)*t*self.P1[1] + math.pow(t,2) * self.P2[1]
 
         return (x,y)
     
@@ -165,12 +167,47 @@ class QuadraticBezier():
 
         return solutions
 
-# Find the intersection between two bezier curves
+# Find the intersection between two bezier curves numerically. TODO: Algebraic method
 def Bez_intersect(bez1,bez2):
-    pass
-        
+    # Iterate through the curve
 
+    """
+    Tests:
 
+    >>> bez1 = QuadraticBezier((0,1),(1,0),(2,2))
+    >>> bez2 = QuadraticBezier((0,2),(1,1),(2,0))
+    >>> a = Bez_intersect(bez1,bez2)
+    >>> a
+
+    >>> bez2.evaluate(a[0][1])
+
+    """
+
+    ir = 200
+    thr = 0.003
+
+    bez1_pts = []
+    for t in range(0,ir):
+        bez1_pts.append(bez1.evaluate(t/ir))
+
+    bez2_pts = []
+    for t in range(0,ir):
+        bez2_pts.append(bez2.evaluate(t/ir))
+
+    solutions = []
+    val = []
+    
+    for i in range(0,ir):
+        for j in range(0,ir):
+            distance =  dist(bez1_pts[i][0],bez1_pts[i][1],bez2_pts[j][0],bez2_pts[j][1])
+            # if distance < 0.07: print(distance)
+            a = round(distance,3)
+            if a < thr and a not in val:
+                solutions.append((i/ir,j/ir))
+                val.append(a)
+
+    return solutions
+            
 if __name__ == "__main__":
         import doctest
         doctest.testmod()
