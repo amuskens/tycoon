@@ -21,6 +21,7 @@ class Store():
         self.root.rowconfigure(0, weight=1)
         self.root.resizable(FALSE,FALSE)
 
+        # Deine frames for layout
         self.topFrameRoot = Frame(self.root)
         self.topFrameRoot.pack(side='top')
 
@@ -42,12 +43,15 @@ class Store():
         self.bottomFrame = Frame(self.root)
         self.bottomFrame.pack(side='bottom')
 
+        # Define labels
         self.title_lbl = Label(self.topFrame,text='Telecom Equipment Store:',anchor='w')
         self.title_lbl.pack(anchor='w')
 
         self.cat_lbl = Label(self.topFrame,text='Category:',anchor='w')
         self.cat_lbl.pack(anchor='w')
 
+
+        # Define object type radio buttons
         self.v = StringVar()
         self.v.set("tower") # initialize
 
@@ -60,12 +64,13 @@ class Store():
         self.rad3.pack(side='top',fill='x',padx=20)
         self.rad4 = Radiobutton(self.topFrame,text='Radios',variable=self.v,value='radio',anchor='w')
         self.rad4.pack(side='top',fill='x',padx=20)
-        self.rad5 = Radiobutton(self.topFrame,text='Wired Point to Point',variable=self.v,value='wired',anchor='w')
+        self.rad5 = Radiobutton(self.topFrame,text='Wired Point to Point',variable=self.v,value='wire',anchor='w')
         self.rad5.pack(side='top',fill='x',padx=20)
 
+        # Define object description label
         self.des = StringVar()
         self.des.set('Item description:\n\n\n\n\n\n')
-        self.des_lbl = Label(self.topFrame3,text='Item Description:',textvariable=self.des,anchor='w')
+        self.des_lbl = Label(self.topFrame3,text='Item Description:',textvariable=self.des,anchor='w',justify=LEFT)
         self.des_lbl.pack(side='left',anchor='w')
 
         self.catsel_lbl = Label(self.frame,text='Items in Category:',anchor='w')
@@ -75,16 +80,17 @@ class Store():
         self.invsel_lbl.pack(anchor='w',pady=10)
 
 
-        # Select items
-        self.itemselector = Listbox(self.frame,height=40,selectmode=SINGLE)
+        # Select item list boxes
+        self.itemselector = Listbox(self.frame,height=40,width=40,selectmode=SINGLE)
         self.itemselector.pack(side='top',padx=20,pady=10)
         self.refresh_descrip_sel()
 
-        self.inv_select = Listbox(self.sideframe,height=40,selectmode=BROWSE)
+        self.inv_select = Listbox(self.sideframe,height=40,width=40,selectmode=BROWSE)
         self.inv_select.pack(side='top',padx=20,pady=10)
         self.refresh_descrip_inv()
         self.refresh_inv()
 
+        # Action buttons
         self.button_add = Button(self.bottomFrame,text='Add... >',command=self.do_add)
         self.button_add.pack(side='top',fill='x')
 
@@ -174,6 +180,20 @@ class Store():
                 tempstr = tempstr + '\nMaximum Link Length: ' + str(item.GetMaxLength()) + ' km'
                 tempstr = tempstr + '\nFrequency Range: %0.2f' % (float(item.GetFreqRange()[0])) + ' MHz to %0.2f' % (float(item.GetFreqRange()[1])) + ' MHz'
                 tempstr = tempstr + '\nRadio Type: ' + item.RadioGetType()
+                self.sel_item = item
+                self.des.set(tempstr)
+
+            elif self.v.get() == 'wire':
+                item = self.database.GetWired(sel)
+                tempstr = 'Item Description: \n' + 'Name: ' + item.GetName()
+                tempstr = tempstr + '\nCost per km: $ ' + "%0.2f" % item.GetCost() + ' / km'
+                tempstr = tempstr + '\nSuggested maintenance budget: $ %0.2f'% (item.SugMaintenance() * 24 * 7) + ' per week'
+                tempstr = tempstr + '\nProjected Lifespan: %0.2f' % (item.GetLifespan() / 365 / 24) + ' years'
+                tempstr = tempstr + '\nOptimal Maximum Capacity: %0.2f' % (float(item.GetMaxCapacity()) / 1000000) + ' megabits per second'
+                tempstr = tempstr + '\nMaximum Link Length: ' + str(item.GetMaxLength()) + ' km'
+                tempstr = tempstr + '\nCapacity for 1 km: %0.2f' % (float(item.DistCapacity(1) / 1000000)) + ' megabits per second'
+                tempstr = tempstr + '\nAttenuation: %0.2f' % (float(item.GetAttenuation()) / 100) + ' dB'
+                tempstr = tempstr + '\nType: ' + item.WiredGetType()
                 self.sel_item = item
                 self.des.set(tempstr)
                 

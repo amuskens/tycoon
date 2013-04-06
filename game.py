@@ -117,6 +117,7 @@ class Game:
 
 		# Initialize a dictionary of lines objects
 		self.E_lines = { }
+		self.E_text = {}
 		self.E_direction_marker = { }
 		for edge in self.gameNetwork.GetEdges():
 			self.NewEdgeCanvas(edge)
@@ -184,6 +185,14 @@ class Game:
 									 mid2_x + 10 * math.cos(math.atan2(y2-y1,x2-x1) - 3.5 * math.pi/4),
 									 mid2_y + 10 * math.sin(math.atan2(y2-y1,x2-x1) - 3.5 * math.pi/4),
 									 fill='blue',width=2)
+
+		"""
+		# Draw distances at edges
+		self.E_text[edge] = self._canvas.create_text(mid_x + 10 * math.cos(math.atan2(y2-y1,x2-x1) - math.pi / 2),
+							     mid_y + 10 * math.sin(math.atan2(y2-y1,x2-x1) - math.pi / 2),
+							     anchor='center',text=('%0.2f' % (dist(x1,y1,x2,y2) / 4) + ' km'),
+							     fill='white') """
+							     
 		# Attach mouse events:
 		self._canvas.tag_bind(self.E_lines[edge],"<ButtonRelease-3>", lambda x: self.submenuLink(edge))
 
@@ -238,7 +247,7 @@ class Game:
 
 		# Don't open a submenu on top of a node or edge one.
 		distance = dist(self._canvas.canvasx(lastx),self._canvas.canvasy(lasty),self.submenu.x,self.submenu.y)
-		if distance > 100:
+		if distance > 10:
 			self.submenu.close()
 			del self.submenu
 			self.submenu = CanvasSubMenu(self._canvas.canvasx(lastx),

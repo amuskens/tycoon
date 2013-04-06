@@ -230,8 +230,8 @@ class Network(Item):
     def __init__(self,inList):
         (name,cost,rel,icon,lifespan,maintenance,sug_maint,max_capacity,target_capacity,power) = inList
         super(Network,self).__init__((name,cost,rel,icon,lifespan,maintenance,sug_maint))
-        self.max_capacity = max_capacity
-        self.target_capacity = target_capacity
+        self.max_capacity = float(max_capacity)
+        self.target_capacity = float(target_capacity)
         self.power_consumption = power
 
     # Get currently set capacity
@@ -264,7 +264,7 @@ class PointToPoint(Network):
         (name,cost,rel,icon,lifespan,maintenance,sug_maint,max_capacity,target_capacity,power,max_length) = inList
         super(PointToPoint,self).__init__((name,cost,rel,icon,lifespan,maintenance,sug_maint,max_capacity,target_capacity,power))
         # Maximum length of a point to point connection before a repeater is needed.
-        self.max_length = max_length
+        self.max_length = float(max_length)
 
     def GetMaxLength(self):
         return self.max_length
@@ -275,10 +275,10 @@ class Radio(PointToPoint):
         super(Radio,self).__init__((name,cost,rel,icon,lifespan,maintenance,sug_maint,max_capacity,target_capacity,power,max_length))
         # Radio types are ...
         self.radio_type = radio_type
-        self.frequency = radio_frequency
+        self.frequency = float(radio_frequency)
 
         # Allowed frequencies is a range in a tuple. E.g. (2000,10000)
-        self.allowed_freq = (freq_lo,freq_hi)
+        self.allowed_freq = (float(freq_lo),float(freq_hi))
 
     def type(self):
         return("Radio")
@@ -299,7 +299,7 @@ class Radio(PointToPoint):
     # Set the radio broadcast frequency
     def SetFreq(self,freq):
         if self.FreqAllowed(freq):
-            self.radio_frequency = freq
+            self.radio_frequency = float(freq)
             return True
         else:
             return False
@@ -319,9 +319,9 @@ class Wired(PointToPoint):
         # Wire types are ...
         self.wire_type = wire_type
 
-        # Signal attenuation constant on wire. Between 1 and 100. 100 is the worst.
-        self.attenuation = attenuation
-        self.cur_max_capacity = max_capacity
+        # Signal attenuation constant on wire. Between 1 and 1000. 1000 is the worst.
+        self.attenuation = float(attenuation)
+        self.cur_max_capacity = float(max_capacity)
 
     def type(self):
         return("Wired")
@@ -329,10 +329,13 @@ class Wired(PointToPoint):
     def WiredGetType(self):
         return self.wire_type
 
+    def GetAttenuation(self):
+        return self.attenuation
+
     # Returns the maximum bandwidth at a certain distance as determined
     # by the attenuation of the wire
     def DistCapacity(self,dist):
-        return self.max_capacity / (dist / self.max_length * self.attenuation)
+        return self.max_capacity - 100000 * (dist / (self.max_length / self.attenuation))
 
     # Set the target capacity of the wire
     def SetCapacity(self,cap):

@@ -41,7 +41,7 @@ class CapitalDatabase():
             # Load equipment configurations
             self.Towers = self.loadDict("gameconfig/towers.cfg")
             self.Radios = self.loadDict("gameconfig/radios.cfg")
-            self.WiredConnections = self.loadDict("gameconfig/wired.cfg")
+            self.Wired = self.loadDict("gameconfig/wired.cfg")
             self.Routers = self.loadDict("gameconfig/routers.cfg")
             self.Buildings = self.loadDict("gameconfig/buildings.cfg")
         except:
@@ -78,7 +78,7 @@ class CapitalDatabase():
         return Radio(self.Radios[id])
 
     def GetWired(self,id):
-        return WiredConnections(self.WiredConnections[id])
+        return Wired(self.Wired[id])
 
     def GetRouter(self,id):
         return Router(self.Routers[id])
