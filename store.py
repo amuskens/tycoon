@@ -18,13 +18,16 @@ class Store():
         self.root.resizable(FALSE,FALSE)
 
         self.topFrameRoot = Frame(self.root)
-        self.topFrameRoot.pack()
+        self.topFrameRoot.pack(side='top')
 
         self.topFrame = Frame(self.topFrameRoot)
         self.topFrame.pack(side='left')
 
         self.topFrame2 = Frame(self.topFrameRoot)
         self.topFrame2.pack(side='right')
+
+        self.topFrame3 = Frame(self.topFrame2,relief='sunken',border=1,width=300)
+        self.topFrame3.pack(side='top')
 
         self.frame = Frame(self.root)
         self.frame.pack(side='left')
@@ -42,7 +45,7 @@ class Store():
         self.cat_lbl.pack(anchor='w')
 
         self.v = StringVar()
-        self.v.set("L") # initialize
+        self.v.set("tower") # initialize
 
         self.rad1 = Radiobutton(self.topFrame,text='Towers',variable=self.v,value='tower',anchor='w')
         self.rad1.pack(side='top',fill='x',padx=20)
@@ -56,22 +59,31 @@ class Store():
         self.rad5 = Radiobutton(self.topFrame,text='Wired Point to Point',variable=self.v,value='wired',anchor='w')
         self.rad5.pack(side='top',fill='x',padx=20)
 
+        self.des = StringVar()
+        self.des.set('Item description:\n\n\n\n\n\n')
+        self.des_lbl = Label(self.topFrame3,text='Item Description:',textvariable=self.des,anchor='w')
+        self.des_lbl.pack(side='left',anchor='w')
+
         self.catsel_lbl = Label(self.frame,text='Items in Category:',anchor='w')
         self.catsel_lbl.pack(anchor='w',pady=10)
 
         self.invsel_lbl = Label(self.sideframe,text='Items in Inventory:',anchor='w')
         self.invsel_lbl.pack(anchor='w',pady=10)
 
-        self.itemselector = Listbox(self.frame,height=20,width=20)
+
+        # Select items
+        self.itemselector = Listbox(self.frame,height=20,width=20,selectmode=SINGLE)
         self.itemselector.pack(side='top',padx=20,pady=10)
+        self.refresh_descrip_sel()
 
         self.inv_select = Listbox(self.sideframe,height=20,width=20)
         self.inv_select.pack(side='top',padx=20,pady=10)
+        self.refresh_descrip_inv()
 
-        self.button_add = Button(self.bottomFrame,text='Add...',command=self.refresh_catlist)
+        self.button_add = Button(self.bottomFrame,text='Add... >',command=self.do_add)
         self.button_add.pack(side='top',fill='x')
 
-        self.button_remove = Button(self.bottomFrame,text='Remove')
+        self.button_remove = Button(self.bottomFrame,text='Remove from inventory...')
         self.button_remove.pack(side='top',fill='x')
 
         self.button_close = Button(self.bottomFrame,text='Close',command=self.close)
@@ -87,19 +99,80 @@ class Store():
         # Check to see what was changed.
         if self.v.get() == 'tower':
             for item in self.database.Towers.keys():
-                self.itemselector.insert(END,self.database.GetTower(item).GetName() + '\t\t\t $  ' + str(self.database.GetTower(item).GetCost()))
+                self.itemselector.insert(END,self.database.GetTower(item).GetName())
 
         elif self.v.get() == 'building':
             for item in self.database.Buildings.keys():
-                self.itemselector.insert(END,self.database.GetBuilding(item).GetName())
+                self.itemselector.insert(END,self.database.Buildings[item][0])
 
         elif self.v.get() == 'radio':
             for item in self.database.Radios.keys():
                 self.itemselector.insert(END,self.database.GetRadio(item).GetName())
 
-    def refresh_inv(self):
-        pass
+        elif self.v.get() == 'router':
+            for item in self.database.Routers.keys():
+                self.itemselector.insert(END,self.database.GetRouter(item).GetName())
 
+        elif self.v.get() == 'wire':
+            for item in self.database.Wired.keys():
+                self.itemselector.insert(END,self.database.GetWired(item).GetName())
+
+    def refresh_inv(self):
+        self.inv_select.delete(0, END)
+        for item in self.inventory:
+            self.inv_select.insert(END,item.GetName())
+
+    def refresh_descrip_sel(self):
+        if self.itemselector.curselection():
+            sel = int(self.itemselector.curselection()[0])
+
+            # Handle each object type differently
+            if self.v.get() == 'tower':
+                item = self.database.GetTower(sel)
+                tempstr = 'Item Description: \n' + 'Name: ' + item.GetName()
+                tempstr = tempstr + '\nCost: $ ' + "%0.2f" % item.GetCost()
+                tempstr = tempstr + '\nFoundation Cost: $ %0.2f' % float(item.GetFoundationCost())
+                tempstr = tempstr + '\nSuggested maintenance budget: $ %0.2f'% (item.SugMaintenance() * 24 * 7) + ' per week'
+                tempstr = tempstr + '\nProjected Lifespan: %0.2f' % (item.GetLifespan() / 365 / 24) + ' years'
+                tempstr = tempstr + '\nTower Type: ' + item.GetTowerType()
+                tempstr = tempstr + '\nTower Height: ' + item.GetTowerHeight() + ' m'
+                tempstr = tempstr + '\nBuild slots: ' + str(item.slots)
+                
+                self.sel_item = item
+                self.des.set(tempstr)
+            elif self.v.get() == 'building':
+                item = self.database.GetBuilding(sel)
+                tempstr = 'Item Description: \n' + 'Name: ' + item.GetName()
+                tempstr = tempstr + '\nCost: $ ' + "%0.2f" % item.GetCost()
+                tempstr = tempstr + '\nFoundation Cost: $ %0.2f' % float(item.GetFoundationCost())
+                tempstr = tempstr + '\nSuggested maintenance budget: $ %0.2f'% (item.SugMaintenance() * 24 * 7) + ' per week'
+                tempstr = tempstr + '\nProjected Lifespan: %0.2f' % (item.GetLifespan() / 365 / 24) + ' years'
+                tempstr = tempstr + '\nBuild slots: ' + str(item.slots)
+                self.sel_item = item
+                self.des.set(tempstr)
+                
+        self.itemselector.after(250,self.refresh_descrip_sel)
+
+    def refresh_descrip_inv(self):
+        if self.inv_select.curselection():
+            sel = int(self.inv_select.curselection()[0])
+
+            item = self.inventory[sel]
+
+            tempstr = 'Item Description: \n' + 'Name: ' + item.GetName()
+            tempstr = tempstr + '\nCost: $ ' + "%0.2f" % item.GetCost()
+            tempstr = tempstr + '\nSuggested maintenance budget: $ %0.2f'% (item.SugMaintenance() * 24 * 7) + ' per week'
+            tempstr = tempstr + '\nProjected Lifespan: %0.2f' % (item.GetLifespan() / 365 / 24) + ' years'
+            tempstr = tempstr + '\nAge: %0.0f' % (item.GetAge()) + ' hours, or %0.2f' % (item.GetAge() / 365 / 24) + ' years'
+
+            self.des.set(tempstr)
+
+        self.inv_select.after(250,self.refresh_descrip_inv)
+        
+    def do_add(self):
+        if self.sel_item:
+            self.inventory.append(self.sel_item)
+            self.refresh_inv()
     def Ok(self):
         self.close()
 

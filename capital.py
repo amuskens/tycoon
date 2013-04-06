@@ -37,6 +37,10 @@ class Item:
     def GetCost(self):
         return self.cost
 
+    # Get lifespan
+    def GetLifespan(self):
+        return self.lifespan
+
     # Check operating status
     def Operating(self):
         return self.operating
@@ -149,6 +153,9 @@ class Structure(Item):
         self.Inventory = []
         # Slots are the max number of items you can have in the structure.
         self.slots = slots
+
+    def GetFoundationCost(self):
+        return self.foundation_cost
     
     # Returns false if the item was not added.
     def AddItem(self, ObjectToAdd):

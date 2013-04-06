@@ -168,6 +168,8 @@ class QuadraticBezier():
         return solutions
 
 # Find the intersection between two bezier curves numerically. TODO: Algebraic method
+
+# THIS FUNCTION DOES NOT WORK YET
 def Bez_intersect(bez1,bez2):
     # Iterate through the curve
 

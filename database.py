@@ -6,8 +6,6 @@ from tkinter import font
 # Import all the different types of items.
 from capital import *
 
-
-
 """
 The idea is to load the item specs from the config files into the overall template database.
 
@@ -46,7 +44,6 @@ class CapitalDatabase():
             self.WiredConnections = self.loadDict("gameconfig/wired.cfg")
             self.Routers = self.loadDict("gameconfig/routers.cfg")
             self.Buildings = self.loadDict("gameconfig/buildings.cfg")
-
         except:
             print("Failed to initialize capital database.")
             quit()

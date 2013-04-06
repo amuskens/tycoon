@@ -338,7 +338,7 @@ class Game:
 		self.cash = self.cash - total_maintCost + revenue
 		self.turn = self.turn + 1
 
-		self.cashcontents.set(' $ ' + str(self.cash))
+		self.cashcontents.set(' $ %0.2f' % self.cash)
 		
 		# Empty the message stack to the user.
 		while len(self._messages) > 0:
