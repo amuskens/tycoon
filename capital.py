@@ -149,14 +149,17 @@ class Structure(Item):
 
     """
     def __init__(self,inList):
-        (name,cost,rel,icon,lifespan,maintenance,sug_maint,foundation_cost,slots) = inList
+        (name,cost,rel,icon,lifespan,maintenance,sug_maint,foundation_cost,slots,linkslots) = inList
         super(Structure,self).__init__((name,cost,rel,icon,lifespan,maintenance,sug_maint))
         # Set the cost of the structure's foundation..
         self.foundation_cost = foundation_cost
         # This is the list of objects at a structure.
         self.Inventory = []
-        # Slots are the max number of items you can have in the structure.
-        self.slots = slots
+        # Slots are the max number of physical items you can have in the structure.
+        self.slots = int(slots)
+        # Link slots are for items in edges.
+        self.link_slots = int(linkslots)
+        self.filled_link_slots = 0
 
     def GetFoundationCost(self):
         return self.foundation_cost
@@ -184,10 +187,26 @@ class Structure(Item):
     def type(self):
         return("Structure")
 
+    # Add a link
+    def AddLink():
+        if self.filled_link_slots < self.link_slots:
+            self.link_slots = self.link_slots + 1
+            return True
+        else:
+            return False
+
+    # Remove a link
+    def RemoveLink():
+        if self.fille_link_slots > 0:
+            self.link_slots = self.link_slots - 1
+            return True
+        else:
+            return False
+
 class Building(Structure):
     def __init(self,inList):
-        (name,cost,rel,icon,lifespan,maintenance,sug_maint,foundation_cost,slots) = inList
-        super(Building,self).__init__((name,cost,rel,icon,lifespan,maintenance,sug_maint,foundation_cost,slots))
+        (name,cost,rel,icon,lifespan,maintenance,sug_maint,foundation_cost,slots,linkslots) = inList
+        super(Building,self).__init__((name,cost,rel,icon,lifespan,maintenance,sug_maint,foundation_cost,slots,linkslots))
 
     def StructType(self):
         return 'Building'
@@ -197,7 +216,8 @@ class Building(Structure):
 class Tower(Structure):
     def __init__(self,inList):
         (name,cost,rel,icon,lifespan,maintenance,sug_maint,foundation_cost,slots,tower_type,tower_height) = inList
-        super(Tower,self).__init__((name,cost,rel,icon,lifespan,maintenance,sug_maint,foundation_cost,slots))
+        # Towers generally have 0 item slots, but have link slots.
+        super(Tower,self).__init__((name,cost,rel,icon,lifespan,maintenance,sug_maint,foundation_cost,0,slots))
         self.tower_height = tower_height
         self.tower_type = tower_type
 

@@ -43,7 +43,7 @@ class EditNode():
         self.bottomFrame.pack(side='bottom')
 
         # Make an inventory list
-        self.inv_title = Label(self.sideFrame,text='Eligible Inventory',anchor='w',
+        self.inv_title = Label(self.sideFrame,text='Inventory',anchor='w',
                                justify=LEFT)
         self.inv_title.pack(side='top',anchor='w')
 
