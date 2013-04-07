@@ -1,6 +1,7 @@
 
 from tkinter import *
 from tkinter import ttk
+import copy
 
 from capital import *
 from database import *
@@ -191,7 +192,7 @@ class Store():
         
     def do_add(self):
         if self.sel_item:
-            self.inventory.append(self.sel_item)
+            self.inventory.append(copy.deepcopy(self.sel_item))
             cost = self.sel_item.GetCost()
             if self.sel_item.type() == 'Structure':
                 cost = cost + float(self.sel_item.GetFoundationCost())

@@ -188,6 +188,13 @@ class Structure(Item):
         else:
             return None
 
+    def BandwidthAvailable(self):
+        temp = 0
+        for item in self.Inventory:
+            temp = temp + item.GetMaxCapacity()
+
+        return temp
+
     def type(self):
         return("Structure")
 
@@ -312,9 +319,10 @@ class Network(Item):
 
 class Router(Network):
     def __init__(self,inList):
-        (name,cost,rel,icon,lifespan,maintenance,sug_maint,max_capacity,target_capacity,power,service_range) = inList
+        (name,cost,rel,icon,lifespan,maintenance,sug_maint,max_capacity,target_capacity,power,service_range,router_type) = inList
         super(Router,self).__init__((name,cost,rel,icon,lifespan,maintenance,sug_maint,max_capacity,target_capacity,power))
         self.service_range = service_range
+        self.router_type = router_type
 
     def type(self):
         return("Router")
@@ -326,6 +334,9 @@ class Router(Network):
         tempstr = tempstr + '\nSuggested maintenance budget: $ %0.2f'% (item.SugMaintenance() * 24 * 7) + ' per week'
         tempstr = tempstr + '\nProjected Lifespan: %0.2f' % (item.GetLifespan() / 365 / 24) + ' years'
         tempstr = tempstr + '\nMaximum Capacity: %0.2f' % (float(item.GetMaxCapacity()) / 1000000) + ' megabits per second'
+        tempstr = tempstr + '\nType: ' + self.router_type
+        if self.router_type == 'Cecllular Base Station':
+            tempstr = tempstr + 'Service Radius: ' + str(self.service_range) + ' km'
         tempstr = tempstr + '\nAge: %0.2f' % (item.GetAge() / 24) + ' days'
         tempstr = tempstr + '\nOperational: ' + str(self.Operating())
         return tempstr

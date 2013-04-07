@@ -126,7 +126,7 @@ class EditNode():
                 selected = int(sel)
                 if self.inventory[selected].type() == 'Structure':
                     if len(self.network.V_items[self.node]) < self.network.GetMaxSlots():
-                        self.network.V_items[self.node].append(self.inventory[selected])
+                        self.network.V_items[self.node].append(copy.deepcopy(self.inventory[selected]))
                         self.inventory.pop(selected)
                         game.action_q.append(['inv',self.inventory])
                         self.refresh_site()
@@ -142,7 +142,7 @@ class EditNode():
         if self.site_list.curselection():
             for sel in self.site_list.curselection():
                 selected = int(sel)
-                item = copy.copy(self.network.V_items[self.node].pop(selected))
+                item = copy.deepcopy(self.network.V_items[self.node].pop(selected))
                 self.inventory.append(item)
                 game.action_q.append(['inv',copy.deepcopy(self.inventory)])
                 self.refresh_site()

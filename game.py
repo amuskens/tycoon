@@ -59,7 +59,7 @@ class Game:
 		# which will display at turns.
 		self._messages = []
 		self.inventory = []
-		self.cash = 10000000
+		self.cash = 1000000
 		
 		# let us modify the value of the global gui variable
 		global gui
@@ -189,12 +189,11 @@ class Game:
 									 mid2_y + 10 * math.sin(math.atan2(y2-y1,x2-x1) - 3.5 * math.pi/4),
 									 fill='blue',width=2)
 
-		"""
 		# Draw distances at edges
-		self.E_text[edge] = self._canvas.create_text(mid_x + 10 * math.cos(math.atan2(y2-y1,x2-x1) - math.pi / 2),
-							     mid_y + 10 * math.sin(math.atan2(y2-y1,x2-x1) - math.pi / 2),
+		self.E_text[edge] = self._canvas.create_text(mid_x + 20 * math.cos(math.atan2(y2-y1,x2-x1) - math.pi / 2),
+							     mid_y + 20 * math.sin(math.atan2(y2-y1,x2-x1) - math.pi / 2),
 							     anchor='center',text=('%0.2f' % (dist(x1,y1,x2,y2) / 4) + ' km'),
-							     fill='white') """
+							     fill='white')
 							     
 		# Attach mouse events:
 		self._canvas.tag_bind(self.E_lines[edge],"<ButtonRelease-3>", lambda x: self.submenuLink(edge))

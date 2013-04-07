@@ -34,9 +34,9 @@ class NodeDisplay():
         self.slot_dict = { }
         self.slot_maint_dict = { }
 
-        Font1 = font.Font(family='Arial', size=14, weight='bold')
-        Font2 = font.Font(family='Arial', size=8, weight='bold')
-        Font3 = font.Font(family='Arial', size=8)
+        self.Font1 = font.Font(family='Arial', size=14, weight='bold')
+        self.Font2 = font.Font(family='Arial', size=8, weight='bold')
+        self.Font3 = font.Font(family='Arial', size=8)
 
         # Start by drawing the interface
         self.window = self.canvas.create_image(x-5,y-5,image=imagedict['backpane'],anchor='nw',tags=str(self.id))
@@ -46,7 +46,7 @@ class NodeDisplay():
         self.titles = []
         self.titles.append( self.canvas.create_text(x+5,y+3,
                                                     text=self.network.V_name[self.node],
-                                                    fill='black',anchor='nw',font=Font1,
+                                                    fill='black',anchor='nw',font=self.Font1,
                                                     tags=str(self.id)))
 
         self.titles.append(self.canvas.create_line(x,y+20,x + self.width,
@@ -55,7 +55,8 @@ class NodeDisplay():
 
         self.titles.append(self.canvas.create_text(x+5,y+25,
                                                    text="Slots:",
-                                                   fill='black',anchor='nw',font=Font2,tags=(str(self.id))))
+                                                   fill='black',anchor='nw',font=self.Font2,tags=(str(self.id))))
+        
         self.slot_text = []
         self.slot_obj = []
 
@@ -65,10 +66,15 @@ class NodeDisplay():
         for item  in self.network.V_items[self.node]:
             self.slot_obj.append(self.canvas.create_rectangle(x,y + 45 + voffset,x + self.width,y + 82 + voffset,
                                                               fill='gray',outline='gray',tags=str(self.id)))
+
+            cap_avail = 0
+
             if item.Operating(): 
                 fillcolor = 'green'
+                cap_avail = item.BandwidthAvailable()
             else: 
                 fillcolor = 'red'
+                cap_avail = 0
 
             self.slot_obj.append(self.canvas.create_rectangle(x+2,y+46+voffset,
                                                               x + 12,y + 55 + voffset,
@@ -82,7 +88,7 @@ class NodeDisplay():
                                          fill='black',
                                          activefill='blue',
                                          anchor='nw',
-                                         font=Font2,
+                                         font=self.Font2,
                                          tags=str(self.id)))
 
             self.slot_text.append(a)
@@ -98,13 +104,20 @@ class NodeDisplay():
                                                           text=temp,
                                                           fill='black',
                                                           anchor='nw',
-                                                          font=Font3,
+                                                          font=self.Font3,
+                                                          tags=str(self.id)))
+
+            self.slot_text.append(self.canvas.create_text(x+15, y + 66 + voffset,
+                                                          text='%0.3f' % (cap_avail // 1000000) + ' Mbps Capacity',
+                                                          fill='black',
+                                                          anchor='nw',
+                                                          font=self.Font3,
                                                           tags=str(self.id)))
 
             # Special for attaching mouse event
             maint = self.canvas.create_text(x+180,y + 45 + voffset,
                                             text=('Maintennace Budget / week:   $%0.2f ' %(item.GetMaintenance() * 24 * 7)),
-                                            fill='black',activefill='blue',anchor='nw',font=Font3,tags=str(self.id))
+                                            fill='black',activefill='blue',anchor='nw',font=self.Font3,tags=str(self.id))
             
             self.slot_text.append(maint)
             self.bindMouseRelease(maint,item)
@@ -112,7 +125,7 @@ class NodeDisplay():
                 
             self.slot_text.append(self.canvas.create_text(x+180,y + 57 + voffset,
                                                           text=('Suggested  Budget: $%0.2f' % (item.SugMaintenance() * 7 * 24)),
-                                                          fill='black',anchor='nw',font=Font3,tags=str(self.id)))
+                                                          fill='black',anchor='nw',font=self.Font3,tags=str(self.id)))
 
             # Test age
             if item.OverLifespan():
@@ -124,11 +137,13 @@ class NodeDisplay():
 
             self.slot_text.append(self.canvas.create_text(x+380,y + 45 + voffset,
                                                               text='Age: ' + str(item.GetAge() // 24) + ' days',
-                                                              fill=fillcolor,anchor='nw',font=Font2,tags=str(self.id)))
+                                                              fill=fillcolor,anchor='nw',font=self.Font2,tags=str(self.id)))
             self.slot_text.append(self.canvas.create_text(x+380,y + 57 + voffset,
                                                               text=temp,
-                                                              fill=fillcolor,anchor='nw',font=Font2,tags=str(self.id)))
+                                                              fill=fillcolor,anchor='nw',font=self.Font2,tags=str(self.id)))
             voffset = voffset + 42
+
+            
 
 
         # Draw an add button
@@ -146,6 +161,7 @@ class NodeDisplay():
                                                     activeimage=self.imagedict['close_active'],tags=str(self.id))
 
         self.canvas.tag_bind(self.closebutton,"<Button-1>", lambda x: self.close())
+
     # Close
     def close(self):
         self.canvas.delete(self.closebutton)
