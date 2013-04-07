@@ -108,7 +108,7 @@ class EditNode():
         for item in self.inventory:
             temp = item.GetName()
             if not item.Operating():
-                temp = '[BROKEN]' + temp
+                temp = '[BROKEN] ' + temp
             self.inv_list.insert(END,temp)
 
     def refresh_site(self):
@@ -116,7 +116,7 @@ class EditNode():
         for item  in self.network.V_items[self.node]:
             temp = item.GetName()
             if not item.Operating():
-                temp = '[BROKEN]' + temp
+                temp = '[BROKEN] ' + temp
             self.site_list.insert(END,temp)
 
     def do_add(self):

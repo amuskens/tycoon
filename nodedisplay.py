@@ -170,8 +170,8 @@ class NodeDisplay():
         pass
 
     # Select items in subslot
-    def subslots(self,node):
-        display  = SubslotDisplay(self.network.V_items[node])
+    def subslots(self,item):
+        self.subslot_display  = EditSubslot(self.parent,self.inventory,self.node,self.network)
 
     def GetMaint(self,item):
         self.msg_box('Set maintenance budget for\n' + item.GetName() + ' at ' +  self.network.V_name[self.node] + '\n on a per week basis')
