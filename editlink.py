@@ -41,6 +41,11 @@ class EditLink():
         self.sideFrame2 = Frame(self.Frame)
         self.sideFrame2.pack(side='right',fill='x')
 
+        # Display link length
+        self.len_lbl = Label(self.sideFrame,text='Link length: %0.2f' % self.network.E_lengths[edge] + ' km',
+                             anchor='w',justify=LEFT)
+        self.len_lbl.pack(side='top',anchor='w',fill='x')
+        
         # DIsplay capacity of the link
         self.cap = StringVar()
         self.cap.set('Max Capacity of Link:')
@@ -52,7 +57,7 @@ class EditLink():
                                justify=LEFT)
         self.inv_title.pack(side='top',anchor='w',fill='x')
         self.inv_list = Listbox(self.sideFrame,height=30,width=60,selectmode='ExTENDED')
-        self.inv_list.bind('<ButtonPress-1>', lambda x: self.get_maint())
+        
         self.inv_list.pack(side='left',padx=0,pady=10,fill='x')
         self.inv_scroll = Scrollbar(self.sideFrame,orient=VERTICAL,
                                      command=self.inv_list.yview,width=20)
@@ -87,11 +92,11 @@ class EditLink():
                                justify=LEFT)
         self.linkslots_title.pack(side='top',anchor='w',fill='x')
 
-        self.slots = StringVar()
-        self.slots.set('Link slots: \n\n')
-        self.slots_title = Label(self.sideFrame2,textvariable=self.slots,anchor='w',
+        self.wireslots = StringVar()
+        self.wireslots.set('Link slots: \n\n')
+        self.wireslots_title = Label(self.sideFrame2,textvariable=self.wireslots,anchor='w',
                                justify=LEFT)
-        self.slots_title.pack(side='top',anchor='w',fill='x')
+        self.wireslots_title.pack(side='top',anchor='w',fill='x')
 
         self.slots_list = Listbox(self.sideFrame2,height=15,width=40,selectmode='SINGLE')
         self.slots_list.pack(side='top',padx=20,pady=10)
@@ -115,6 +120,7 @@ class EditLink():
 
 
         # Standby
+        self.inv_list.bind('<ButtonPress-1>', lambda x: self.get_maint())
         self.refresh_des()
         self.refresh_item()
         self.do_item_change()
@@ -161,8 +167,22 @@ class EditLink():
         self.root.after(200,self.refresh_des)
 
     def do_item_change(self):
-        # self.links.set('Link slots: ' + str(self.item.GetCurLinkSlots()) + ' / ' + str(self.item.GetMaxLinkSlots()))
-        # self.slots.set('Build slots: ' + str(len(self.item.GetInventory())) + ' / ' + str(self.item.slots) + '\n\nItems in build slots:')
+        st = self.network.NodeLinkSlots(self.edge[0])
+        en = self.network.NodeLinkSlots(self.edge[1])
+
+        # Concantante a long string to set
+        str1 = 'Radio Link slots: ' + '\n at ' + self.network.V_name[self.edge[0]]
+        str1 = str1 + '  ' + str(st[0]) + ' / ' + str(st[2])
+        str1 = str1 + '\n at ' + self.network.V_name[self.edge[1]]
+        str1 = str1 + '  ' + str(en[0]) + ' / ' + str(en[2])
+
+        str2 = 'Wired Connection Link slots: ' + '\n at ' + self.network.V_name[self.edge[0]]
+        str2 = str2 + '  ' + str(st[1]) + ' / ' + str(st[3])
+        str2 = str2 + '\n at ' + self.network.V_name[self.edge[1]]
+        str2 = str2 + '  ' + str(en[1]) + ' / ' + str(en[3])
+
+        self.wireslots.set(str2)
+        self.links.set(str1)
         self.refresh_item()
         self.refresh_inv()
         
@@ -172,15 +192,29 @@ class EditLink():
             self.sel = int(self.inv_list.curselection()[0])
             item_toadd = self.inventory[self.sel]
             if item_toadd.type() == 'Radio' or item_toadd.type() == 'Wired':
-                self.network.E_items[self.edge].append(copy.deepcopy(item_toadd))
-                self.inventory.pop(self.sel)
+                added = self.network.AddItemToEdge(self.edge,item_toadd)
+                if added:
+                    self.inventory.pop(self.sel)
+                    game.action_q.append(['inv',copy.deepcopy(self.inventory)])
+                    self.do_item_change()
+                else:
+                    messagebox.showwarning('Warning',
+                                           'Item was not added. There were no available slots at either the start or end node',
+                                           parent=self.root)
+            else:
+                messagebox.showwarning('Warning','You cannot add this type of item to a link. You must add either Radio or wired communication equipment to a link.',parent=self.root)
+
+    def do_remove(self):
+        if self.slots_list.curselection():
+            self.sel = int(self.slots_list.curselection()[0])
+            rem_item = self.network.RemoveItemFromEdge(self.edge,self.sel)
+            if rem_item:
+                # Item removal was successful
+                self.inventory.append(copy.deepcopy(rem_item))
                 game.action_q.append(['inv',copy.deepcopy(self.inventory)])
                 self.do_item_change()
             else:
-                messagebox.showwarning('Warning','You cannot add this type of item to a link. You must add either Radio or wired communication equipment to a link.',parent=self.parent)
-
-    def do_remove(self):
-        pass
+                messagebox.showwarning('Warning.','Invalid request',parent=self.root)
 
     def new_maint(self):
         # Check which item is selected

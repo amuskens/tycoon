@@ -192,8 +192,8 @@ class Game:
 
 		# Draw distances at edges
 		self.E_text[edge] = self._canvas.create_text(mid_x + 20 * math.cos(math.atan2(y2-y1,x2-x1) - math.pi / 2),
-							     mid_y + 20 * math.sin(math.atan2(y2-y1,x2-x1) - math.pi / 2),
-							     anchor='center',text=('%0.2f' % (dist(x1,y1,x2,y2) / 4) + ' km'),
+							     mid_y + 30 * math.sin(math.atan2(y2-y1,x2-x1) - math.pi / 2),
+							     anchor='center',text=('%0.2f' % (self.gameNetwork.E_lengths[edge]) + ' km'),
 							     fill='white')
 							     
 		# Attach mouse events:

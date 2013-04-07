@@ -64,7 +64,7 @@ class NodeDisplay():
         
         # Add the items from the slots.
         for item  in self.network.V_items[self.node]:
-            self.slot_obj.append(self.canvas.create_rectangle(x,y + 45 + voffset,x + self.width,y + 82 + voffset,
+            self.slot_obj.append(self.canvas.create_rectangle(x,y + 45 + voffset,x + self.width,y + 92 + voffset,
                                                               fill='gray',outline='gray',tags=str(self.id)))
 
             cap_avail = 0
@@ -96,7 +96,7 @@ class NodeDisplay():
 
 
             if item.StructType() == 'Tower':
-                temp = str(item.GetTowerType()) + ' Tower' + '\n' + str(item.GetTowerHeight()) + ' m'
+                temp = str(item.GetTowerType()) + ' Tower' + '\n\n' + str(item.GetTowerHeight()) + ' m'
             else:
                 temp = item.StructType()
 
@@ -141,7 +141,7 @@ class NodeDisplay():
             self.slot_text.append(self.canvas.create_text(x+380,y + 57 + voffset,
                                                               text=temp,
                                                               fill=fillcolor,anchor='nw',font=self.Font2,tags=str(self.id)))
-            voffset = voffset + 42
+            voffset = voffset + 52
 
             
 

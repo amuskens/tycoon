@@ -206,20 +206,33 @@ class Structure(Item):
         return self.filled_link_slots
 
     # Add a link
-    def AddLink():
+    def AddLink(self):
         if self.filled_link_slots < self.link_slots:
-            self.link_slots = self.link_slots + 1
+            self.filled_link_slots = self.filled_link_slots + 1
             return True
         else:
             return False
 
     # Remove a link
-    def RemoveLink():
-        if self.fille_link_slots > 0:
-            self.link_slots = self.link_slots - 1
+    def RemoveLink(self):
+        if self.filled_link_slots > 0:
+            self.filled_link_slots = self.filled_link_slots - 1
             return True
         else:
             return False
+
+    # Max links? Return true if all link slots are full.
+    def MaxLinks(self):
+        if self.filled_link_slots == self.link_slots:
+            return True
+        else:
+            return False
+
+    # No links?
+    def NoLinks(self):
+        if self.filled_link_slots == 0:
+            return True
+        return False
 
 class Building(Structure):
     def __init(self,inList):
@@ -237,6 +250,7 @@ class Building(Structure):
         tempstr = tempstr + '\nSuggested maintenance budget: $ %0.2f'% (item.SugMaintenance() * 24 * 7) + ' per week'
         tempstr = tempstr + '\nProjected Lifespan: %0.2f' % (item.GetLifespan() / 365 / 24) + ' years'
         tempstr = tempstr + '\nBuild slots: ' + str(item.slots)
+        tempstr = tempstr + '\nNetwork Link Slots: ' + str(self.link_slots)
         tempstr = tempstr + '\nAge: %0.2f' % (item.GetAge() / 24) + ' days'
         tempstr = tempstr + '\nOperational: ' + str(self.Operating())
         return tempstr
@@ -268,7 +282,8 @@ class Tower(Structure):
         tempstr = tempstr + '\nProjected Lifespan: %0.2f' % (item.GetLifespan() / 365 / 24) + ' years'
         tempstr = tempstr + '\nTower Type: ' + item.GetTowerType()
         tempstr = tempstr + '\nTower Height: ' + item.GetTowerHeight() + ' m'
-        tempstr = tempstr + '\nBuild slots: ' + str(item.slots)
+        tempstr = tempstr + '\nBase Station Build slots: ' + str(item.slots)
+        tempstr = tempstr + '\nNetwork Link Slots: ' + str(self.link_slots)
         tempstr = tempstr + '\nAge: %0.2f' % (item.GetAge() / 24) + ' days'
         tempstr = tempstr + '\nOperational: ' + str(self.Operating())
         return tempstr

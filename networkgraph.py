@@ -13,6 +13,7 @@ class NetworkGraph:
 		self.graph = Digraph()
 		self.vertex_counter = 1
 		self.max_slots = 3
+		self.scale_factor = 1 / 4
 		
 		# This dictionary will contain the coordinates of
 		# vertices in the graph
@@ -25,6 +26,9 @@ class NetworkGraph:
 		# located at specific vertices and edges
 		self.V_items = { }
 		self.E_items = { }
+
+		# Figure out the link distances beforehand, and cache them
+		self.E_lengths = { }
 
 		# Add the info for the origin node
 		self.graph.add_vertex(0)
@@ -94,31 +98,89 @@ class NetworkGraph:
 	def ItemsAtNode(self,node_num):
 		return str(len(self.V_items[node_num]))
 
-	# Add the edge to the graph. Note st_node and end_node are
-	# the names of the nodes; not ID's
-	def AddEdge(self,st_node,end_node,items):
-		e = (rev_lookup(self.V_name,st_node),rev_lookup(self.V_name,end_node))
-		self.graph.add_edge(e)
-		self.E_items[e] = items
-
 	# Add an edge by ID
 	def AddEdgeID(self,st_node,end_node,items):
 		e = (st_node,end_node)
 		self.graph.add_edge(e)
 		self.E_items[e] = items
+		(x1 ,y1) = self.V_coord[e[0]]
+		(x2, y2) = self.V_coord[e[1]]
+		self.E_lengths[e] = dist(x1 ,y1, x2, y2) * self.scale_factor
+
+	# Add the edge to the graph. Note st_node and end_node are
+	# the names of the nodes; not ID's
+	def AddEdge(self,st_node,end_node,items):
+		e = (rev_lookup(self.V_name,st_node),rev_lookup(self.V_name,end_node))
+		self.AddEdgeID(e[0],e[1],items)
 
 	# Add items to a pre-existing node
 	def AddItemsToNode(self,node_name,items):
 		for item in items:
 			if len(self.V_items[rev_lookup(self.V_name,node_name)]) <= self.max_slots:
 				self.V_items[rev_lookup(self.V_name,node_name)].append(item)
+	
 
 	# Add items to a pre-existing edge. Note these should only be point to point type items.
-	def AddItemsToEdge(self,st_node,end_node,items):
-		e = (rev_lookup(self.V_name,st_node),rev_lookup(self.V_name,end_node))
-		for item in items:
-			if len(self.E_items[e]) <= self.max_slots:
-				self.E_items[e].append(item)
+	def AddItemToEdge(self,edge,item):
+		if item.type() == 'Radio':
+			# Deal with the start. Find the first non full tower.
+			# We need to make sure there is a tower available at the
+			# start and end node
+			st_tower = None
+			for itema in self.V_items[edge[0]]:
+				if itema.MaxLinks():
+					continue
+				elif itema.StructType() == 'Tower':
+					st_tower = itema
+					break
+			en_tower = None
+			for itema in self.V_items[edge[1]]:
+				print(itema)
+				if itema.MaxLinks():
+					continue
+				elif itema.StructType() == 'Tower':
+					en_tower = itema
+					break
+
+			if st_tower and en_tower:
+				# We're good. A position is available,
+				# since a link slot is available at both
+				# the start and end
+				st_tower.AddLink()
+				en_tower.AddLink()
+				self.E_items[edge].append(item)
+				return True
+			else:
+				return False
+
+		elif item.type() == 'Wired':
+			# Same idea
+			st_build = None
+			for itema in self.V_items[edge[0]]:
+				if itema.MaxLinks():
+					continue
+				elif itema.StructType() == 'Building':
+					st_build = itema
+					break
+			en_build = None
+			for itema in self.V_items[edge[1]]:
+				if itema.MaxLinks():
+					continue
+				elif itema.StructType() == 'Building':
+					en_build = itema
+					break
+
+			if st_build and en_build:
+				# We're good. A position is available,
+				# since a link slot is available at both
+				# the start and end
+				st_build.AddLink()
+				en_build.AddLink()
+				self.E_items[edge].append(item)
+				return True
+			else:
+				return False
+		return False
 
 	# Removes items in the list from a node
 	def RemoveItemsFromNode(self,node_name,items):
@@ -127,11 +189,50 @@ class NetworkGraph:
 				self.V_items[rev_lookup(self.V_name,node_name)].remove(i)
 
 	# Removes items in the list from a node
-	def RemoveItemsFromEdge(self,st_node,end_node,items):
-		e = (rev_lookup(self.V_name,st_node),rev_lookup(self.V_name,end_node))
-		for i in items:
-			if i in self.E_items[e]:
-				self.V_items[e].remove(i)
+	def RemoveItemFromEdge(self,edge,index):
+		if self.E_items[edge][index] == 'Radio':
+			# FInd first start and end towers
+			# Make sure we find one that has links
+			st_tower = None
+			for item in self.V_items[edge[0]]:
+				if item.StructType() == 'Tower' and not item.NoLinks():
+					st_tower = item
+					break
+			en_tower = None
+			for item in self.V_items[edge[1]] and not item.NoLinks():
+				if item.StructType() == 'Tower':
+					en_tower = item
+					break
+
+			if st_tower and en_tower:
+				# We found the towers. Now we can remove the item.
+				st_tower.RemoveLink()
+				en_tower.RemoveLink()
+				return self.V_items[edge].pop(index)
+			return None
+
+		elif self.E_items[edge][index] == 'Wired':
+			# FInd first start and end towers
+			# Make sure we find one that has links
+			st = None
+			for item in self.V_items[edge[0]]:
+				if item.StructType() == 'Building' and not item.NoLinks():
+					st = item
+					break
+			en = None
+			for item in self.V_items[edge[1]] and not item.NoLinks():
+				if item.StructType() == 'Building':
+					en = item
+					break
+
+			if st and en:
+				# We found the towers. Now we can remove the item.
+				st.RemoveLink()
+				en.RemoveLink()
+				return self.V_items[edge].pop(index)
+			return None
+		return None
+
 
 	# Determine an edge's operational status
 	def EdgeOperational(self,e):
@@ -147,6 +248,26 @@ class NetworkGraph:
 				for subitem in item.GetInventory():
 					if not subitem.Operating(): return False
 		return True
+
+	# Return the number of link slots at a node
+	def NodeLinkSlots(self,node):
+		radio_linkslots = 0
+		wired_linkslots = 0
+		maxradio_linkslots = 0
+		maxwired_linkslots = 0
+		for item in self.V_items[node]:
+			if item.StructType() == 'Tower':
+				radio_linkslots = radio_linkslots +  item.GetCurLinkSlots()
+				maxradio_linkslots = maxradio_linkslots +  item.GetMaxLinkSlots()
+
+			elif item.StructType() == 'Building':
+				wired_linkslots = wired_linkslots +  item.GetCurLinkSlots()
+				maxwired_linkslots = maxwired_linkslots +  item.GetMaxLinkSlots()
+
+		return (radio_linkslots,
+			wired_linkslots,
+			maxradio_linkslots,
+			maxwired_linkslots)
 				
 	# Temp Cost function
 	def cost(self,e):
