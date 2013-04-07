@@ -1,71 +1,76 @@
+# This class allows you to edit building sub slots
 
 from tkinter import *
 from tkinter import ttk
+import copy
 
 from capital import *
+from networkgraph import *
+import game
 
-class SubslotDisplay():
-    def __init__(self,items):
-        # List of items comes in
-        self.item_list = items
+global refresh_flag
+refresh_flag = False
+
+class EditSubslot():
+    def __init__(self,parent,inventory,nodeid,gamenetwork,item):
+        self.inventory = inventory
+        self.elig_inv = []
+        self.node = nodeid
+        self.network = gamenetwork
 
         # Create window
-        self.root = Toplevel()
-        self.root.wm_title('Edit slots...')
-        self.root.columnconfigure(0, weight=1)
-        self.root.rowconfigure(0, weight=1)
+        self.root = Toplevel(parent)
+        self.root.wm_title('Edit ' + item.GetName() + ' build slots')
+        self.root.resizable(FALSE,FALSE)
 
-        self.frame = Frame(self.root,relief='sunken',
-                           bd=5,width=640,height=480)
+        # Deine frames for layout
+        self.Frame = Frame(self.root)
+        self.Frame.pack(side='top')
 
-        self.frame.grid(column=0, row=0, columnspan=6, rowspan=15)
+        self.title_lbl = Label(self.Frame,text='Edit build slots: ',anchor='w')
+        self.title_lbl.pack(anchor='w')
 
-        self.title2_lbl = Label(self.frame,text='Select a component:',anchor='w')
-        self.title2_lbl.grid(column=1,row=1,columnspan=1,rowspan=1)
+        # Make frames on the sides
+        self.sideFrame = Frame(self.Frame)
+        self.sideFrame.pack(side='left')
 
-        self.button_ok = Button(self.frame,text='OK',command=self.Ok)
-        self.button_ok.grid(column=4,row=15,columnspan=2,rowspan=1)
-
-        self.button_cancel = Button(self.frame,text='Cancel',command=self.close)
-        self.button_cancel.grid(column=6,row=15,columnspan=2,rowspan=1)
-
-        # Initialize the list box with items.
-        phone = StringVar()
+        self.sideFrame2 = Frame(self.Frame)
+        self.sideFrame2.pack(side='right')
         
-        text = []
-        i = 0
-        # Get text strings
-        while i < 3:
-            try:
-                text.append(self.item_list[i].GetName())
-            except:
-                text.append('Empty Slot ' + str(i))
-            i = i + 1
-
-        print(text)
-
-        self.slot1 = ttk.Radiobutton(self.frame, text=text[0], variable=phone, value='1')
-        self.slot1.grid(column=0,row=2,columnspan=1,rowspan=1)
-        self.slot2 = ttk.Radiobutton(self.frame, text=text[1], variable=phone, value='2')
-        self.slot2.grid(column=0,row=3,columnspan=1,rowspan=1)
-        self.slot3 = ttk.Radiobutton(self.frame, text=text[2], variable=phone, value='3')
-        self.slot3.grid(column=0,row=4,columnspan=1,rowspan=1)
+        # Bottom frame for buttons
+        self.bottomFrame = Frame(self.Frame)
+        self.bottomFrame.pack(side='bottom')
         
-        self.itemselector = Listbox(self.frame,height=10)
-        self.itemselector.grid(column=0,row=5,columnspan=2,rowspan=8)
+        # Make an inventory list
+        self.inv_title = Label(self.sideFrame,text='Inventory',anchor='w',
+                               justify=LEFT)
+        self.inv_title.pack(side='top',anchor='w',fill='x')
 
-        self.button_add = Button(self.frame,text='Add...')
-        self.button_add.grid(column=0,row=14,columnspan=1,rowspan=1)
+        self.inv_list = Listbox(self.sideFrame,height=40,width=40,selectmode='ExTENDED')
+        self.inv_list.pack(side='top',padx=20,pady=10)
+        self.refresh_inv()
 
-        self.button_remove = Button(self.frame,text='Remove')
-        self.button_remove.grid(column=1,row=14,columnspan=1,rowspan=1)
+        # Site object selector
+        self.linkslots_title = Label(self.sideFrame,text='Build Slots',anchor='w',
+                               justify=LEFT)
+        self.linkslots_title.pack(side='top',anchor='w',fill='x')
 
-    def Ok(self):
-        self.close()
+        self.slots_title = Label(self.sideFrame,text='Build Slots',anchor='w',
+                               justify=LEFT)
+        self.slots_title.pack(side='top',anchor='w',fill='x')
 
-    def close(self):
-        self.root.destroy()
-        
+        self.slots_list = Listbox(self.sideFrame,height=15,width=40,selectmode='ExTENDED')
+        self.slots_list.pack(side='top',padx=20,pady=10)
 
 
-        
+
+
+
+    def refresh_inv(self):
+        self.inv_list.delete(0, END)
+        # Fill the inventory list with eligible items
+        for item in self.inventory:
+            temp = item.GetName()
+            if not item.Operating():
+                temp = '[BROKEN]' + temp
+            self.inv_list.insert(END,temp)

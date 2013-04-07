@@ -47,42 +47,58 @@ class EditNode():
                                justify=LEFT)
         self.inv_title.pack(side='top',anchor='w')
 
-        self.inv_list = Listbox(self.sideFrame,height=40,width=40,selectmode='ExTENDED')
-        self.inv_list.pack(side='top',padx=20,pady=10)
+        self.inv_list = Listbox(self.sideFrame,height=30,width=40,selectmode='ExTENDED')
+        self.inv_list.pack(side='left',padx=5,pady=10)
         self.refresh_inv()
 
+        self.scrollbar = Scrollbar(self.sideFrame,orient=VERTICAL,
+                                   command=self.inv_list.yview)
+        self.inv_list.configure(yscrollcommand=self.scrollbar.set)
+        self.scrollbar.pack(side='right',fill='y')
+
         # List of site objects
-        self.site_title = Label(self.sideFrame2,text='Assets at SIte',anchor='w',
-                               justify=LEFT)
+        self.site_title = Label(self.sideFrame2,
+                                text='Assets at SIte' + '\n' + str(self.network.GetMaxSlots()) + ' total slots.',
+                                anchor='w',
+                                justify=LEFT)
         self.site_title.pack(side='top',anchor='w')
 
-        self.site_list = Listbox(self.sideFrame2,height=40,width=40,selectmode='EXTENDED')
+        self.subframe = Frame(self.sideFrame2,relief='sunken',border=1)
+        self.subframe.pack(side='top',fill='x')
+        
+        self.des = StringVar()
+        self.des.set('Item description:\n\n\n\n\n\n')
+        self.des_lbl = Label(self.subframe,text='Item Description:',textvariable=self.des,anchor='w',justify=LEFT)
+        self.des_lbl.pack(side='top',anchor='w',fill='both')
+
+        self.site_list = Listbox(self.sideFrame2,height=10,width=40,selectmode='EXTENDED')
         self.site_list.pack(side='top',padx=20,pady=10)
         self.refresh_site()
 
         # Add and remove buttons
-        self.button_refresh = Button(self.bottomFrame,
+        self.button_refresh = Button(self.sideFrame2,
                                      text='Refresh Inventory',
                                      command=self.refresh_inv)
         self.button_refresh.pack(side='top',fill='x')
 
-        self.button_add = Button(self.bottomFrame,
+        self.button_add = Button(self.sideFrame2,
                                  text='Add from Inventory to Site',
                                  command=self.do_add)
         self.button_add.pack(side='top',fill='x')
 
-        self.button_remove = Button(self.bottomFrame,
+        self.button_remove = Button(self.sideFrame2,
                                     text='Remove from Site to Inventory',
                                     command=self.do_remove)
         self.button_remove.pack(side='top',fill='x')
 
         # Close button
-        self.button_close = Button(self.bottomFrame,
+        self.button_close = Button(self.sideFrame2,
                                     text='Close',
                                     command=self.close)
         self.button_close.pack(side='top',fill='x')
 
         # Standby
+        self.refresh_des()
         self.standby()
     
 
@@ -115,9 +131,10 @@ class EditNode():
                         self.refresh_site()
                         self.refresh_inv()
                     else:
-                        messagebox.showinfo('Warning','You cannot add more than ' + str(self.network.GetMaxSlots()) + ' items to this node.')
+                        messagebox.showinfo('Warning','You cannot add more than ' + str(self.network.GetMaxSlots()) + ' items to this node.',
+                                            parent=self.root)
                 else:
-                    messagebox.showinfo('Warning','Only strucutral items, such as buildings or towers can be added to a node.')
+                    messagebox.showinfo('Warning','Only strucutral items, such as buildings or towers can be added to a node.',parent=self.root)
                                       
     
     def do_remove(self):
@@ -134,6 +151,19 @@ class EditNode():
     def close(self):
         self.root.destroy()
 
+
+    def refresh_des(self):
+        if self.inv_list.curselection():
+            self.sel = int(self.inv_list.curselection()[0])
+            item = self.inventory[self.sel]
+            self.des.set(item.GetInfo())
+        elif self.site_list.curselection():
+            self.sel = int(self.site_list.curselection()[0])
+            item = self.network.V_items[self.sel]
+            self.des.set(item.GetInfo())
+
+        self.root.after(200,self.refresh_des)
+        
     def standby(self):
         global refresh_flag
         if refresh_flag:

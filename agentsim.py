@@ -66,6 +66,7 @@ that may be after quite some time!
 """
 
 import random
+import copy
 from tkinter import *
 from tkinter import font
 from bitflag import BitFlag
@@ -320,7 +321,7 @@ class GUI():
         except:
             pass
 
-        self.store = Store(self._root,self.inventory,self.database)
+        self.store = Store(self._root,copy.copy(self.inventory),self.database)
     # needs to be own function, not part of _do_run, 
     # because it reschedules itself
     def _run(self):

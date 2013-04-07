@@ -107,6 +107,9 @@ class Item:
     # Print out the item
     def print(self):
         print(self.name + " object.")
+        
+    def GetInfo(self):
+        return ''
 
 # Structural Types
 
@@ -187,6 +190,13 @@ class Structure(Item):
     def type(self):
         return("Structure")
 
+    # Accessors:
+    def GetMaxLinkSlots(self):
+        return self.link_slots
+
+    def GetCurLinkSlots(self):
+        return self.filled_link_slots
+
     # Add a link
     def AddLink():
         if self.filled_link_slots < self.link_slots:
@@ -210,7 +220,17 @@ class Building(Structure):
 
     def StructType(self):
         return 'Building'
-    
+
+    def GetInfo(self):
+        item = self
+        tempstr = 'Item Description: \n' + 'Name: ' + item.GetName()
+        tempstr = tempstr + '\nCost: $ ' + "%0.2f" % item.GetCost()
+        tempstr = tempstr + '\nFoundation Cost: $ %0.2f' % float(item.GetFoundationCost())
+        tempstr = tempstr + '\nSuggested maintenance budget: $ %0.2f'% (item.SugMaintenance() * 24 * 7) + ' per week'
+        tempstr = tempstr + '\nProjected Lifespan: %0.2f' % (item.GetLifespan() / 365 / 24) + ' years'
+        tempstr = tempstr + '\nBuild slots: ' + str(item.slots)
+        tempstr = tempstr + '\nAge: ' + str(item.GetAge())
+        return tempstr
 
 
 class Tower(Structure):
@@ -229,6 +249,19 @@ class Tower(Structure):
 
     def GetTowerHeight(self):
         return self.tower_height
+
+    def GetInfo(self):
+        item = self
+        tempstr = 'Item Description: \n' + 'Name: ' + item.GetName()
+        tempstr = tempstr + '\nCost: $ ' + "%0.2f" % item.GetCost()
+        tempstr = tempstr + '\nFoundation Cost: $ %0.2f' % float(item.GetFoundationCost())
+        tempstr = tempstr + '\nSuggested maintenance budget: $ %0.2f'% (item.SugMaintenance() * 24 * 7) + ' per week'
+        tempstr = tempstr + '\nProjected Lifespan: %0.2f' % (item.GetLifespan() / 365 / 24) + ' years'
+        tempstr = tempstr + '\nTower Type: ' + item.GetTowerType()
+        tempstr = tempstr + '\nTower Height: ' + item.GetTowerHeight() + ' m'
+        tempstr = tempstr + '\nBuild slots: ' + str(item.slots)
+        tempstr = tempstr + '\nAge: ' + str(item.GetAge())
+        return tempstr
 	
 
 
@@ -283,6 +316,16 @@ class Router(Network):
     def type(self):
         return("Router")
 
+    def GetInfo(self):
+        item = self
+        tempstr = 'Item Description: \n' + 'Name: ' + item.GetName()
+        tempstr = tempstr + '\nCost: $ ' + "%0.2f" % item.GetCost()
+        tempstr = tempstr + '\nSuggested maintenance budget: $ %0.2f'% (item.SugMaintenance() * 24 * 7) + ' per week'
+        tempstr = tempstr + '\nProjected Lifespan: %0.2f' % (item.GetLifespan() / 365 / 24) + ' years'
+        tempstr = tempstr + '\nMaximum Capacity: %0.2f' % (float(item.GetMaxCapacity()) / 1000000) + ' megabits per second'
+        tempstr = tempstr + '\nAge: ' + str(item.GetAge())
+        return tempstr
+
 class PointToPoint(Network):
     def __init__(self,inList):
         (name,cost,rel,icon,lifespan,maintenance,sug_maint,max_capacity,target_capacity,power,max_length) = inList
@@ -328,6 +371,20 @@ class Radio(PointToPoint):
         else:
             return False
 
+    # Info
+    def GetInfo(self):
+        item = self
+        tempstr = 'Item Description: \n' + 'Name: ' + item.GetName()
+        tempstr = tempstr + '\nCost: $ ' + "%0.2f" % item.GetCost()
+        tempstr = tempstr + '\nSuggested maintenance budget: $ %0.2f'% (item.SugMaintenance() * 24 * 7) + ' per week'
+        tempstr = tempstr + '\nProjected Lifespan: %0.2f' % (item.GetLifespan() / 365 / 24) + ' years'
+        tempstr = tempstr + '\nMaximum Capacity: %0.2f' % (float(item.GetMaxCapacity()) / 1000000) + ' megabits per second'
+        tempstr = tempstr + '\nMaximum Link Length: ' + str(item.GetMaxLength()) + ' km'
+        tempstr = tempstr + '\nFrequency Range: %0.2f' % (float(item.GetFreqRange()[0])) + ' MHz to %0.2f' % (float(item.GetFreqRange()[1])) + ' MHz'
+        tempstr = tempstr + '\nRadio Type: ' + item.RadioGetType()
+        tempstr = tempstr + '\nAge: ' + str(item.GetAge())
+        return tempstr
+
     """
     Note: Terrain and weather should affect radio connection reliability.
     This to be implemented later.
@@ -372,6 +429,20 @@ class Wired(PointToPoint):
     # Set the current max capacity of the wire based on distance and attenuation
     def SetWireMaxCapacity(self,dist):
         self.cur_max_capacity = self.DistCapacity(dist)
+
+    def GetInfo(self):
+        item = self
+        tempstr = 'Item Description: \n' + 'Name: ' + item.GetName()
+        tempstr = tempstr + '\nCost per km: $ ' + "%0.2f" % item.GetCost() + ' / km'
+        tempstr = tempstr + '\nSuggested maintenance budget: $ %0.2f'% (item.SugMaintenance() * 24 * 7) + ' per week'
+        tempstr = tempstr + '\nProjected Lifespan: %0.2f' % (item.GetLifespan() / 365 / 24) + ' years'
+        tempstr = tempstr + '\nOptimal Maximum Capacity: %0.2f' % (float(item.GetMaxCapacity()) / 1000000) + ' megabits per second'
+        tempstr = tempstr + '\nMaximum Link Length: ' + str(item.GetMaxLength()) + ' km'
+        tempstr = tempstr + '\nCapacity for 1 km: %0.2f' % (float(item.DistCapacity(1) / 1000000)) + ' megabits per second'
+        tempstr = tempstr + '\nAttenuation: %0.2f' % (float(item.GetAttenuation()) / 100) + ' dB'
+        tempstr = tempstr + '\nType: ' + item.WiredGetType()
+        tempstr = tempstr + '\nAge: ' + str(item.GetAge())
+        return tempstr
         
 
 if __name__ == "__main__":
