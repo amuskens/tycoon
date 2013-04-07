@@ -1,5 +1,6 @@
 import random
 import math
+import copy
 
 class Item:
     """
@@ -171,7 +172,7 @@ class Structure(Item):
     def AddItem(self, ObjectToAdd):
         # Note that 0 counts as a slot in the inventory list
         if len(self.Inventory) < self.slots:
-            self.Inventory.append(ObjectToAdd)
+            self.Inventory.append(copy.deepcopy(ObjectToAdd))
             return True
         else:
             return False

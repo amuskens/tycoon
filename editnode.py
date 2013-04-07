@@ -7,6 +7,7 @@ import copy
 
 from capital import *
 from networkgraph import *
+from subslotedit import *
 import game
 
 global refresh_flag
@@ -47,7 +48,7 @@ class EditNode():
                                justify=LEFT)
         self.inv_title.pack(side='top',anchor='w')
 
-        self.inv_list = Listbox(self.sideFrame,height=30,width=40,selectmode='ExTENDED')
+        self.inv_list = Listbox(self.sideFrame,height=30,width=60,selectmode='ExTENDED')
         self.inv_list.pack(side='left',padx=5,pady=10)
         self.refresh_inv()
 
@@ -76,10 +77,6 @@ class EditNode():
         self.refresh_site()
 
         # Add and remove buttons
-        self.button_refresh = Button(self.sideFrame2,
-                                     text='Refresh Inventory',
-                                     command=self.refresh_inv)
-        self.button_refresh.pack(side='top',fill='x')
 
         self.button_add = Button(self.sideFrame2,
                                  text='Add from Inventory to Site',
@@ -109,6 +106,8 @@ class EditNode():
             temp = item.GetName()
             if not item.Operating():
                 temp = '[BROKEN] ' + temp
+            if not item.type() == 'Structure':
+                temp = temp + '  [INELIGIBLE ITEM]'
             self.inv_list.insert(END,temp)
 
     def refresh_site(self):
@@ -117,6 +116,8 @@ class EditNode():
             temp = item.GetName()
             if not item.Operating():
                 temp = '[BROKEN] ' + temp
+            if not item.type() == 'Structure':
+                temp = temp + '  [INELIGIBLE ITEM]'
             self.site_list.insert(END,temp)
 
     def do_add(self):
@@ -159,7 +160,7 @@ class EditNode():
             self.des.set(item.GetInfo())
         elif self.site_list.curselection():
             self.sel = int(self.site_list.curselection()[0])
-            item = self.network.V_items[self.sel]
+            item = self.network.V_items[self.node][self.sel]
             self.des.set(item.GetInfo())
 
         self.root.after(200,self.refresh_des)

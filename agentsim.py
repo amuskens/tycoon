@@ -279,6 +279,7 @@ class GUI():
             pass
 
         self._canvas.bind( "<Configure>", _do_resize)
+        self._canvas.bind('<MouseWheel>', lambda event: self.rollWheel(event))
 
     # public method to start the simulation
     def start(self):
@@ -400,3 +401,12 @@ class GUI():
 
         # now we also have to move all the objects that are off the canvas
         # into it, or they are in lala land.
+
+    # Allow mouse scrolling
+    def rollWheel(event):
+        direction = 0
+        if event.num == 5 or event.delta == -120:
+            direction = 1
+            if event.num == 4 or event.delta == 120:
+                direction = -1
+                self.canvas.yview_scroll(direction, UNITS)
