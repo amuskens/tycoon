@@ -192,15 +192,20 @@ class EditLink():
             self.sel = int(self.inv_list.curselection()[0])
             item_toadd = self.inventory[self.sel]
             if item_toadd.type() == 'Radio' or item_toadd.type() == 'Wired':
-                added = self.network.AddItemToEdge(self.edge,item_toadd)
-                if added:
-                    self.inventory.pop(self.sel)
-                    game.action_q.append(['inv',copy.deepcopy(self.inventory)])
-                    self.do_item_change()
+                if item_toadd.GetMaxLength() <= self.network.E_lengths[self.edge]:
+                    added = self.network.AddItemToEdge(self.edge,item_toadd)
+                    if added:
+                        self.inventory.pop(self.sel)
+                        game.action_q.append(['inv',copy.deepcopy(self.inventory)])
+                        self.do_item_change()
+                    else:
+                        messagebox.showwarning('Warning',
+                                               'Item was not added. There were no available slots at either the start or end node',
+                                               parent=self.root)
                 else:
                     messagebox.showwarning('Warning',
-                                           'Item was not added. There were no available slots at either the start or end node',
-                                           parent=self.root)
+                                               'Item was not added. The maximum distance ' +  item_toadd.GetName() + ' can transmit is %0.2f' % item_toadd.GetMaxLength() + ' km. This link is %0.2f' % self.network.E_lengths[self.edge] + ' km long.',
+                                               parent=self.root)
             else:
                 messagebox.showwarning('Warning','You cannot add this type of item to a link. You must add either Radio or wired communication equipment to a link.',parent=self.root)
 

@@ -24,10 +24,10 @@ class Economic():
         return self.cities
 
     # Step functions
-    def Update(self):
+    def Update(self,turn):
         # This function is called once per step. It updates the system.
         for city in self.cities:
-            city.Update()
+            city.Update(turn)
 
     def GetDemand(self,x,y):
         # Given a coordinate point, this function returns the demand

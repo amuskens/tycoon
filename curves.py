@@ -37,7 +37,9 @@ def lines_intersect(line1,line2):
 
     return (x,y)
 
-
+def line_inversect_vline(line1,vline_x):
+    # Just evaluate at a point
+    return line1.evaluate(vline_x)
 
 # This class represents a quadratic equaion in the form:
 # y = ax^2 + bx + c
@@ -46,6 +48,10 @@ class Quadratic():
         self.a = a
         self.b = b
         self.c = c
+
+        # Avoid divide by 0
+        if self.a == 0:
+            self.a = 0.00000000000001
 
     # Evaluates the equation at a point
     def evaluate(self,x):
@@ -75,19 +81,25 @@ class Quadratic():
 
         x = (-b +/- sqrt(b^2 - 4ac)) / (2a)
 
+        Tests:
+        >>> b = Quadratic(1,5,6)
+        >>> b.roots() == {-3,-2}
+        True
         """
 
         # Test for complex roots. We don't want to deal with these
         if (self.b**2 - 4 * self.a * self.c) < 0:
             return []
-        
-        root1 = (-self.b + math.sqrt(self.b**2 - 4 * self.a * self.c)) / (self.a * 2)
-        root2 = (-self.b - math.sqrt(self.b**2 - 4 * self.a * self.c)) / (self.a * 2)
 
-        if root1 == root2:
-            return [root1]
-        else:
-            return [root1, root2]
+        solutions = set()
+        solutions.add((-self.b + math.sqrt(self.b**2 - 4 * self.a * self.c)) / (self.a * 2))
+        solutions.add((-self.b - math.sqrt(self.b**2 - 4 * self.a * self.c)) / (self.a * 2))
+
+        return solutions
+
+    def print(self):
+        tempstr = '%0.3fx^2' % self.a + ' + %0.3fx' % self.b + ' + %0.3f' % self.c
+        print(tempstr)
 
 # Returns the point of intersection between a quadratic and a line
 def quad_line_intersect(quad,line):
@@ -167,23 +179,39 @@ class QuadraticBezier():
 
         return solutions
 
+# Bezier intersecting vertical line
+def Bez_intersect_vline(bez,x):
+    """
+    Tests:
+
+    >>> bez1 = QuadraticBezier((0,1),(2,0),(3,2))
+    >>> print(Bez_intersect_vline(bez1,1))
+    
+
+    """
+    # This is an easy problem. Define a quadratic
+    quad = Quadratic(bez.P0[0]-2*bez.P1[0]+bez.P2[0],-2*bez.P0[0]+2*bez.P1[0],bez.P0[0] - x)
+    quad.print()
+    
+    # Find the roots, so basically solve for t
+    t = quad.roots()
+    print(t)
+
+    # Throw out roots that are out of bounds
+
+    solutions = set()
+    for root in t:
+        # if root > 0 and root < 1:
+        solutions.add(bez.evaluate(root))
+    
+    # Return solution set of intersection points
+    return solutions
+
 # Find the intersection between two bezier curves numerically. TODO: Algebraic method
 
 # THIS FUNCTION DOES NOT WORK YET
 def Bez_intersect(bez1,bez2):
     # Iterate through the curve
-
-    """
-    Tests:
-
-    >>> bez1 = QuadraticBezier((0,1),(1,0),(2,2))
-    >>> bez2 = QuadraticBezier((0,2),(1,1),(2,0))
-    >>> a = Bez_intersect(bez1,bez2)
-    >>> a
-
-    >>> bez2.evaluate(a[0][1])
-
-    """
 
     ir = 200
     thr = 0.003

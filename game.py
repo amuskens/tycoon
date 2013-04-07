@@ -50,7 +50,7 @@ def xy(event):
 	clicked = True
 
 class Game:
-	def __init__(self,title="Telecom Simulation"):
+	def __init__(self,title="Telecom Network Tycoon"):
 
 		# Load up teh item database
 		self.ItemDatabase = CapitalDatabase()
@@ -66,7 +66,7 @@ class Game:
 		global gui
 		gui = GUI(copy.copy(self.inventory),self.ItemDatabase,
 			  init_fn=self.do_init, step_fn=self.do_turn, 
-			  xmax=1600,ymax=1400,title=title)
+			  xmax=2600,ymax=2400,title=title)
 
 	def start(self):
 		gui.start()
@@ -319,6 +319,10 @@ class Game:
 
 		# Updat all of the items at nides for a turn.
 		for nodeKey in self.gameNetwork.V_items.keys():
+
+			# Pay rent per step. This amounts to $1000 a month
+			total_maintCost = total_maintCost + 1.38
+
 			if not self.gameNetwork.NodeOperational(nodeKey):
 				try: 
 					self.V_notify[nodeKey]
@@ -373,6 +377,8 @@ class Game:
 		# Update how much money to make:
 		revenue = 0
 
+		# start up updating the economic system
+		self.economy.Update(self.turn)
 		# Needs to be implemented here.....
 
 
