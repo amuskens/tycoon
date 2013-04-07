@@ -3,6 +3,7 @@
 
 import random
 import math
+import copy
 from tkinter import messagebox
 from agentsim import GUI
 
@@ -15,6 +16,8 @@ from canvassubmenu import *
 from economic import *
 from city import *
 from distfuncs import *
+import store
+import editnode
 
 import LEVEL1_map
 
@@ -60,7 +63,7 @@ class Game:
 		
 		# let us modify the value of the global gui variable
 		global gui
-		gui = GUI(self.inventory,self.ItemDatabase,
+		gui = GUI(copy.copy(self.inventory),self.ItemDatabase,
 			  init_fn=self.do_init, step_fn=self.do_turn, 
 			  xmax=1600,ymax=1400,title=title)
 
@@ -216,9 +219,11 @@ class Game:
 		self.subwindows.append(NodeDisplay(self._canvas.canvasx(lastx),
 						   self._canvas.canvasy(lasty),
 						   self._canvas,
-						   node,self.gameNetwork,
+						   node,
+						   self.gameNetwork,
 						   self.icons,
-						   gui.GetRoot()))
+						   gui.GetRoot(),
+						   self.inventory))
 
 	# Display a right-click submenu on the canvas
 	def submenuNode(self,node):
@@ -309,20 +314,27 @@ class Game:
 
 		# Updat all of the items at nides for a turn.
 		for nodeKey in self.gameNetwork.V_items.keys():
+			if not self.gameNetwork.NodeOperational(nodeKey):
+				try: 
+					self.V_notify[nodeKey]
+				except:
+					self.V_notify[nodeKey] = self._canvas.create_image(self.gameNetwork.V_coord[nodeKey][0] - 8,
+											   self.gameNetwork.V_coord[nodeKey ][1] - 16,
+											   image=self.icons['notify'],
+											   anchor='se')
+			else:
+				try: self._canvas.delete(self.V_notify[nodeKey])
+				except: pass
+				
 			for item in self.gameNetwork.V_items[nodeKey]:
 				fail = item.Update()
 				# Add a message telling what failed and where, if it did.
 				if fail == True:
-					self._messages.append(item.GetName() + " failed at " + self.gameNetwork.V_name[nodeKey])
-					self.V_notify[nodeKey ] = self._canvas.create_image(self.gameNetwork.V_coord[nodeKey][0] - 8,
-											   self.gameNetwork.V_coord[nodeKey ][1] - 16,
-											   image=self.icons['notify'],
-											   anchor='se')
-								  
-				else:
+					self._messages.append(item.GetName() + " failed at " + self.gameNetwork.V_name[nodeKey])	  
+				if item.Operating():
 					# Record maintennace cost
 					total_maintCost = total_maintCost + item.GetMaintenance()
-					
+	
 		# Update items at edges
 		for edgekey in self.gameNetwork.E_items.keys():
 			for item in self.gameNetwork.E_items[edgekey]:
@@ -352,7 +364,7 @@ class Game:
 		tempstr = tempstr + '  Weekly Revenue: $%0.2f' % (revenue * 24 * 7)
 		tempstr = tempstr + '  Net Profit per week: $ %0.2f' % ((-total_maintCost + revenue) * 7 * 24)
 		tempstr = tempstr + '\nTime: %02d' % (self.turn % 24) + ':00'
-		tempstr = tempstr + '  Day: ' + str(self.turn //  24)
+		tempstr = tempstr + '  Day: ' + str(self.turn // 24 % 365)
 		tempstr = tempstr + ' Year: ' + str(self.turn  //  (365 * 24))
 		self.cashcontents.set(tempstr)
 		
@@ -406,6 +418,22 @@ class Game:
 		elif action[0] == 'subtractcash':
 			self.cash = self.cash - action[1][0]
 			return
+
+		# Change the inventory to the incoming inventory.
+		elif action[0] == 'inv':
+			"""
+			# Clear the inventory
+			while len(self.inventory) > 0:
+				self.inventory.pop()
+				
+			for item in action[1]:
+				self.inventory.append(copy.copy(item))
+				store.refresh_flag = True
+				editnode.refresh_flag = True
+			"""
+			self.inventory = copy.deepcopy(action[1])
+			global gui
+			gui.inventory = self.inventory
 
 			
 

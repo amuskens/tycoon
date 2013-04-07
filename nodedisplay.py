@@ -10,11 +10,12 @@ from database import *
 from networkgraph import *
 from subslotedit import *
 from getvaluedialog import *
+from editnode import *
 
 import random
 
 class NodeDisplay():
-    def __init__(self,x,y,canvas,node_num,networkgraph,imagedict,parent):
+    def __init__(self,x,y,canvas,node_num,networkgraph,imagedict,parent,inventory):
         # Set initial parameters
         self.x = x
         self.y = y
@@ -26,6 +27,7 @@ class NodeDisplay():
         self.id = random.randint(1,1000)
         self.parent = parent
         self.imagedict = imagedict
+        self.inventory = inventory
         self.closed = False
 
         # Use a dictionary to get slot index from ID
@@ -33,8 +35,8 @@ class NodeDisplay():
         self.slot_maint_dict = { }
 
         Font1 = font.Font(family='Arial', size=14, weight='bold')
-        Font2 = font.Font(family='Helvetica', size=12, weight='bold')
-        Font3 = font.Font(family='Arial', size=12)
+        Font2 = font.Font(family='Arial', size=8, weight='bold')
+        Font3 = font.Font(family='Arial', size=8)
 
         # Start by drawing the interface
         self.window = self.canvas.create_image(x-5,y-5,image=imagedict['backpane'],anchor='nw',tags=str(self.id))
@@ -101,7 +103,7 @@ class NodeDisplay():
 
             # Special for attaching mouse event
             maint = self.canvas.create_text(x+180,y + 45 + voffset,
-                                            text=('Maintennace Budget:   $ ' + str(item.GetMaintenance())),
+                                            text=('Maintennace Budget / week:   $%0.2f ' %(item.GetMaintenance() * 24 * 7)),
                                             fill='black',activefill='blue',anchor='nw',font=Font3,tags=str(self.id))
             
             self.slot_text.append(maint)
@@ -109,7 +111,7 @@ class NodeDisplay():
 
                 
             self.slot_text.append(self.canvas.create_text(x+180,y + 57 + voffset,
-                                                          text=('Suggested  Budget: $ ' + str(item.SugMaintenance())),
+                                                          text=('Suggested  Budget: $%0.2f' % (item.SugMaintenance() * 7 * 24)),
                                                           fill='black',anchor='nw',font=Font3,tags=str(self.id)))
 
             # Test age
@@ -121,7 +123,7 @@ class NodeDisplay():
                 fillcolor='green'
 
             self.slot_text.append(self.canvas.create_text(x+380,y + 45 + voffset,
-                                                              text='Age: ' + str(item.GetAge()),
+                                                              text='Age: ' + str(item.GetAge() // 24) + ' days',
                                                               fill=fillcolor,anchor='nw',font=Font2,tags=str(self.id)))
             self.slot_text.append(self.canvas.create_text(x+380,y + 57 + voffset,
                                                               text=temp,
@@ -135,7 +137,7 @@ class NodeDisplay():
                                                     image=imagedict['addbutton'],
                                                     activeimage=self.imagedict['addbutton_active'],tags=str(self.id))
 
-        self.canvas.tag_bind(self.addbutton,"<Button-1>", lambda x: self.close())
+        self.canvas.tag_bind(self.addbutton,"<Button-1>", lambda x: self.edit_slots())
 
         # Draw close button and attach event
         self.closebutton = self.canvas.create_image(x + self.width - 16,
@@ -157,7 +159,7 @@ class NodeDisplay():
     # Refresh ,x,y,canvas,node_num,networkgraph,imagedict,parent):
     def refresh(self):
         self.close()
-        self.__init__(self.x,self.y,self.canvas,self.node,self.network,self.imagedict,self.parent)
+        self.__init__(self.x,self.y,self.canvas,self.node,self.network,self.imagedict,self.parent,self.inventory)
         self.closed = False
 
     def Closed(self):
@@ -172,25 +174,25 @@ class NodeDisplay():
         display  = SubslotDisplay(self.network.V_items[node])
 
     def GetMaint(self,item):
-        self.msg_box('Set maintenance budget for ' + item.GetName() + '\nat ' +  self.network.V_name[self.node])
+        self.msg_box('Set maintenance budget for\n' + item.GetName() + ' at ' +  self.network.V_name[self.node] + '\n on a per week basis')
         self.item_to_change = item
 
     def msg_box(self, msg='?', extra=True):
         top = self.top = Toplevel(self.parent)
         top.resizable(FALSE,FALSE)
-        label0 = Label(top, text=msg)
-        label0.grid(column=0,row=0,columnspan=2,rowspan=2)
+        label0 = Label(top, text=msg,justify='center')
+        label0.pack()
 
         if extra:
             self.entry0 = Entry(top)
-            self.entry0.grid(column=0,row=2,rowspan=1,columnspan=3)
+            self.entry0.pack()
 
             button2 = Button(top, text='Set', command=self.submit_name)
-            button2.grid(column=0,row=3,rowspan=1,columnspan=1)
+            button2.pack()
 
         button3 = Button(top, text='Cancel',
                                 command=lambda: self.top.destroy())
-        button3.grid(column=2,row=3,rowspan=1,columnspan=1)
+        button3.pack()
 
     def bindMouseRelease(self,shape,item):
         self.canvas.tag_bind(shape,"<ButtonPress-1>", lambda x: self.GetMaint(item))
@@ -198,9 +200,13 @@ class NodeDisplay():
     def submit_name(self):
         data = self.entry0.get()
         if data:
-            self.item_to_change.SetMaintenance(data)
+            self.item_to_change.SetMaintenance(float(data) / 24 / 7)
             self.top.destroy()
             self.refresh()
+
+    def edit_slots(self):
+        self.edit = EditNode(self.parent,self.inventory,self.node,self.network)
+        
 
         
         

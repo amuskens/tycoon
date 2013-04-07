@@ -62,7 +62,11 @@ class Item:
 
     # Set the maintenance budget
     def SetMaintenance(self,num):
-        self.maintenance_budget = float(num)
+        if num > 0:
+            self.maintenance_budget = float(num)
+        else:
+            self.maintenance_budget = 0.000001
+        
 
     # Get maintennace budget
     def GetMaintenance(self):

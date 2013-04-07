@@ -17,8 +17,6 @@ class Store():
         # Create window
         self.root = Toplevel(parent)
         self.root.wm_title('Store')
-        self.root.columnconfigure(0, weight=1)
-        self.root.rowconfigure(0, weight=1)
         self.root.resizable(FALSE,FALSE)
 
         # Deine frames for layout
@@ -139,7 +137,10 @@ class Store():
     def refresh_inv(self):
         self.inv_select.delete(0, END)
         for item in self.inventory:
-            self.inv_select.insert(END,item.GetName())
+            temp = item.GetName()
+            if not item.Operating():
+                temp = '[BROKEN]' + temp
+            self.inv_select.insert(END,temp)
 
     def refresh_descrip_sel(self):
         if self.itemselector.curselection():
@@ -231,6 +232,8 @@ class Store():
             cost = self.sel_item.GetCost()
             if self.sel_item.type() == 'Structure':
                 cost = cost + float(self.sel_item.GetFoundationCost())
+
+            game.action_q.append(['inv',self.inventory])
             game.action_q.append(['subtractcash',[cost]])
             self.refresh_inv()
 
@@ -242,6 +245,7 @@ class Store():
 
             if answer: 
                 self.inventory.pop(self.inv_sel)
+                game.action_q.append(['inv',self.inventory])
                 self.refresh_inv()
             
             

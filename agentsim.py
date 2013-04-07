@@ -72,6 +72,7 @@ from bitflag import BitFlag
 from store import *
 
 
+
 # Singleton GUI instance, only one allowed to be created, remember it for
 # global access.
 # These are module level variables, on the grounds that the module is the
@@ -314,15 +315,20 @@ class GUI():
             self._run()
 
     def _goto_store(self):
-        store = Store(self._root,self.inventory,self.database)
+        try:
+            del self.store
+        except:
+            pass
+
+        self.store = Store(self._root,self.inventory,self.database)
     # needs to be own function, not part of _do_run, 
     # because it reschedules itself
     def _run(self):
         if self._running:
             if self._step_fn != None:
                 self._step_fn()
-                # Update the inventory listbox.
-                self.list.delete(0, END)
+
+                self.list.delete(0,END)
                 for item in self.inventory:
                     self.list.insert(END,item.GetName())
 
