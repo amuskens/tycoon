@@ -354,6 +354,8 @@ class Game:
 		for edgekey in self.gameNetwork.E_items.keys():
 			if len(self.gameNetwork.E_items[edgekey]) > 0:
 				self._canvas.itemconfigure(self.E_lines[edgekey],fill='green')
+			else:
+				self._canvas.itemconfigure(self.E_lines[edgekey],fill='black')
 			for item in self.gameNetwork.E_items[edgekey]:
 				fail = item.Update()
 				# Add a message telling what failed and where, if it did.

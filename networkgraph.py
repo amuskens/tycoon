@@ -135,7 +135,6 @@ class NetworkGraph:
 					break
 			en_tower = None
 			for itema in self.V_items[edge[1]]:
-				print(itema)
 				if itema.MaxLinks():
 					continue
 				elif itema.StructType() == 'Tower':
@@ -190,48 +189,65 @@ class NetworkGraph:
 
 	# Removes items in the list from a node
 	def RemoveItemFromEdge(self,edge,index):
-		if self.E_items[edge][index] == 'Radio':
-			# FInd first start and end towers
-			# Make sure we find one that has links
+		item = self.E_items[edge][index]
+		if item.type() == 'Radio':
+			# Deal with the start. Find the first non full tower.
+			# We need to make sure there is a tower available at the
+			# start and end node
 			st_tower = None
-			for item in self.V_items[edge[0]]:
-				if item.StructType() == 'Tower' and not item.NoLinks():
-					st_tower = item
+			for itema in self.V_items[edge[0]]:
+				if itema.NoLinks():
+					continue
+				elif itema.StructType() == 'Tower':
+					st_tower = itema
 					break
 			en_tower = None
-			for item in self.V_items[edge[1]] and not item.NoLinks():
-				if item.StructType() == 'Tower':
-					en_tower = item
+			for itema in self.V_items[edge[1]]:
+				if itema.NoLinks():
+					continue
+				elif itema.StructType() == 'Tower':
+					en_tower = itema
 					break
 
 			if st_tower and en_tower:
-				# We found the towers. Now we can remove the item.
+				# We're good. A position is available,
+				# since a link slot is available at both
+				# the start and end
 				st_tower.RemoveLink()
 				en_tower.RemoveLink()
-				return self.V_items[edge].pop(index)
-			return None
+				self.E_items[edge].pop(index)
+				return True
+			else:
+				return False
 
-		elif self.E_items[edge][index] == 'Wired':
-			# FInd first start and end towers
-			# Make sure we find one that has links
-			st = None
-			for item in self.V_items[edge[0]]:
-				if item.StructType() == 'Building' and not item.NoLinks():
-					st = item
+		elif item.type() == 'Wired':
+			# Same idea
+			st_build = None
+			for itema in self.V_items[edge[0]]:
+				if itema.NoLinks():
+					continue
+				elif itema.StructType() == 'Building':
+					st_build = itema
 					break
-			en = None
-			for item in self.V_items[edge[1]] and not item.NoLinks():
-				if item.StructType() == 'Building':
-					en = item
+			en_build = None
+			for itema in self.V_items[edge[1]]:
+				if itema.NoLinks():
+					continue
+				elif itema.StructType() == 'Building':
+					en_build = itema
 					break
 
-			if st and en:
-				# We found the towers. Now we can remove the item.
-				st.RemoveLink()
-				en.RemoveLink()
-				return self.V_items[edge].pop(index)
-			return None
-		return None
+			if st_build and en_build:
+				# We're good. A position is available,
+				# since a link slot is available at both
+				# the start and end
+				st_build.RemoveLink()
+				en_build.RemoveLink()
+				self.E_items[edge].pop(index)
+				return True
+			else:
+				return False
+		return False		
 
 
 	# Determine an edge's operational status

@@ -207,8 +207,9 @@ class EditLink():
     def do_remove(self):
         if self.slots_list.curselection():
             self.sel = int(self.slots_list.curselection()[0])
-            rem_item = self.network.RemoveItemFromEdge(self.edge,self.sel)
-            if rem_item:
+            rem_item = self.network.E_items[self.edge][self.sel]
+            rem = self.network.RemoveItemFromEdge(self.edge,self.sel)
+            if rem:
                 # Item removal was successful
                 self.inventory.append(copy.deepcopy(rem_item))
                 game.action_q.append(['inv',copy.deepcopy(self.inventory)])
