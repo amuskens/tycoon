@@ -334,6 +334,16 @@ class Game:
 				if item.Operating():
 					# Record maintennace cost
 					total_maintCost = total_maintCost + item.GetMaintenance()
+
+					# Service items that are within node items.
+					for subitem in item.GetInventory():
+						fail_subitem = subitem.Update()
+						# Add a message telling what failed and where, if it did.
+						if fail_subitem == True:
+							self._messages.append(subitem.GetName() + " failed at " + self.gameNetwork.V_name[nodeKey])	  
+						if subitem.Operating():
+							# Record maintennace cost
+							total_maintCost = total_maintCost + subitem.GetMaintenance()
 	
 		# Update items at edges
 		for edgekey in self.gameNetwork.E_items.keys():

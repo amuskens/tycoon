@@ -46,6 +46,7 @@ class EditSubslot():
                                justify=LEFT)
         self.inv_title.pack(side='top',anchor='w',fill='x')
         self.inv_list = Listbox(self.sideFrame,height=30,width=60,selectmode='ExTENDED')
+        self.inv_list.bind('<ButtonPress-1>', lambda x: self.get_maint())
         self.inv_list.pack(side='left',padx=0,pady=10,fill='x')
         self.inv_scroll = Scrollbar(self.sideFrame,orient=VERTICAL,
                                      command=self.inv_list.yview,width=20)
@@ -76,6 +77,16 @@ class EditSubslot():
         self.des_lbl = Label(self.subframe,text='Item Description:',textvariable=self.des,anchor='w',justify=LEFT)
         self.des_lbl.pack(side='top',anchor='w',fill='both')
 
+        # Allow setting of maintenance budget for items.
+        self.budget = StringVar()
+        self.maint_label = Label(self.subframe,text='Current Weekly Maintenance Budget:  $',anchor='w',justify=LEFT)
+        self.maint_label.pack(side='left',anchor='w',fill='x')
+
+        self.maint_set_button = Button(self.subframe,text='Set',command=self.new_maint)
+        self.maint_set_button.pack(side='right',anchor='w',fill='x')
+
+        self.maint_entry = Entry(self.subframe,textvariable=self.budget)
+        self.maint_entry.pack(side='right',anchor='w',fill='x')
 
         # Site object selector
         self.links = StringVar()
@@ -92,6 +103,7 @@ class EditSubslot():
 
         self.slots_list = Listbox(self.sideFrame2,height=15,width=40,selectmode='ExTENDED')
         self.slots_list.pack(side='top',padx=20,pady=10)
+        self.slots_list.bind('<ButtonPress-1>', lambda x: self.get_maint())
         
         # Buttons
         self.button_add = Button(self.sideFrame2,
@@ -144,12 +156,12 @@ class EditSubslot():
     def refresh_des(self):
         if self.inv_list.curselection():
             self.sel = int(self.inv_list.curselection()[0])
-            item = self.inventory[self.sel]
-            self.des.set(item.GetInfo())
+            self.sel_item = self.inventory[self.sel]
+            self.des.set(self.sel_item.GetInfo())
         elif self.slots_list.curselection():
             self.sel = int(self.slots_list.curselection()[0])
-            item = self.item.GetInventory()[self.sel]
-            self.des.set(item.GetInfo())
+            self.sel_item = self.item.GetInventory()[self.sel]
+            self.des.set(self.sel_item.GetInfo())
 
         self.root.after(200,self.refresh_des)
 
@@ -166,13 +178,14 @@ class EditSubslot():
             self.sel = int(self.inv_list.curselection()[0])
             item_toadd = self.inventory[self.sel]
             if not item_toadd.type() == 'Structure':
-                if not (tem_toadd.type() == 'Wired' or item.toadd.type() = 'Radio'):
+                if not (item_toadd.type() == 'Wired' or item_toadd.type() == 'Radio'):
                     if self.item.AddItem(item_toadd):
                         # Successful add
                         self.inventory.pop(self.sel)
                         self.do_item_change()
                         game.action_q.append(['inv',copy.deepcopy(self.inventory)])
                     else:
+                        # Not so successful. Must be full.
                         messagebox.showwarning('Warning',
                                                self.item.GetName() + ' has a full inventory. You cannot add '+ item_toadd.GetName(),
                                                parent=self.root)
@@ -182,4 +195,25 @@ class EditSubslot():
                 messagebox.showwarning('Warning','You cannot add a structural type, like a building or tower, to an already existing building or tower.',parent=self.root)
 
     def do_remove(self):
-        pass
+        if self.slots_list.curselection():
+            self.sel = int(self.slots_list.curselection()[0])
+            item_toremove = self.item.RemoveItem(self.sel)
+            self.inventory.append(copy.deepcopy(item_toremove))
+            self.do_item_change()
+            game.action_q.append(['inv',copy.deepcopy(self.inventory)])
+
+    def new_maint(self):
+        # Check which item is selected
+            self.sel_item.SetMaintenance(float(self.budget.get()) / 24 / 7)
+            self.get_maint()
+
+    def get_maint(self):
+        # Check which item is selected
+        if self.inv_list.curselection():
+            self.sel = int(self.inv_list.curselection()[0])
+            item = self.inventory[self.sel]
+            self.budget.set('%0.2f' % (item.GetMaintenance() * 24 * 7))
+        elif self.slots_list.curselection():
+            self.sel = int(self.slots_list.curselection()[0])
+            item = self.item.GetInventory()[self.sel]
+            self.budget.set('%0.2f' % (item.GetMaintenance() * 24 * 7))

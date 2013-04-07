@@ -230,7 +230,8 @@ class Building(Structure):
         tempstr = tempstr + '\nSuggested maintenance budget: $ %0.2f'% (item.SugMaintenance() * 24 * 7) + ' per week'
         tempstr = tempstr + '\nProjected Lifespan: %0.2f' % (item.GetLifespan() / 365 / 24) + ' years'
         tempstr = tempstr + '\nBuild slots: ' + str(item.slots)
-        tempstr = tempstr + '\nAge: ' + str(item.GetAge())
+        tempstr = tempstr + '\nAge: %0.2f' % (item.GetAge() / 24) + ' days'
+        tempstr = tempstr + '\nOperational: ' + str(self.Operating())
         return tempstr
 
 
@@ -261,7 +262,8 @@ class Tower(Structure):
         tempstr = tempstr + '\nTower Type: ' + item.GetTowerType()
         tempstr = tempstr + '\nTower Height: ' + item.GetTowerHeight() + ' m'
         tempstr = tempstr + '\nBuild slots: ' + str(item.slots)
-        tempstr = tempstr + '\nAge: ' + str(item.GetAge())
+        tempstr = tempstr + '\nAge: %0.2f' % (item.GetAge() / 24) + ' days'
+        tempstr = tempstr + '\nOperational: ' + str(self.Operating())
         return tempstr
 	
 
@@ -324,7 +326,8 @@ class Router(Network):
         tempstr = tempstr + '\nSuggested maintenance budget: $ %0.2f'% (item.SugMaintenance() * 24 * 7) + ' per week'
         tempstr = tempstr + '\nProjected Lifespan: %0.2f' % (item.GetLifespan() / 365 / 24) + ' years'
         tempstr = tempstr + '\nMaximum Capacity: %0.2f' % (float(item.GetMaxCapacity()) / 1000000) + ' megabits per second'
-        tempstr = tempstr + '\nAge: ' + str(item.GetAge())
+        tempstr = tempstr + '\nAge: %0.2f' % (item.GetAge() / 24) + ' days'
+        tempstr = tempstr + '\nOperational: ' + str(self.Operating())
         return tempstr
 
 class PointToPoint(Network):
@@ -383,7 +386,8 @@ class Radio(PointToPoint):
         tempstr = tempstr + '\nMaximum Link Length: ' + str(item.GetMaxLength()) + ' km'
         tempstr = tempstr + '\nFrequency Range: %0.2f' % (float(item.GetFreqRange()[0])) + ' MHz to %0.2f' % (float(item.GetFreqRange()[1])) + ' MHz'
         tempstr = tempstr + '\nRadio Type: ' + item.RadioGetType()
-        tempstr = tempstr + '\nAge: ' + str(item.GetAge())
+        tempstr = tempstr + '\nAge: %0.2f' % (item.GetAge() / 24) + ' days'
+        tempstr = tempstr + '\nOperational: ' + str(self.Operating())
         return tempstr
 
     """
@@ -442,7 +446,8 @@ class Wired(PointToPoint):
         tempstr = tempstr + '\nCapacity for 1 km: %0.2f' % (float(item.DistCapacity(1) / 1000000)) + ' megabits per second'
         tempstr = tempstr + '\nAttenuation: %0.2f' % (float(item.GetAttenuation()) / 100) + ' dB'
         tempstr = tempstr + '\nType: ' + item.WiredGetType()
-        tempstr = tempstr + '\nAge: ' + str(item.GetAge())
+        tempstr = tempstr + '\nAge: %0.2f' % (item.GetAge() / 24) + ' days'
+        tempstr = tempstr + '\nOperational: ' + str(self.Operating())
         return tempstr
         
 
