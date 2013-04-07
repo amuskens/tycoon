@@ -152,6 +152,14 @@ class NetworkGraph:
 	def cost(self,e):
 		return 1
 
+	# Max capacity available at an edge
+	def MaxCapAtEdge(self,edge):
+		cap = 0
+		for item in self.E_items[edge]:
+			cap = cap + item.GetMaxCapacity()
+
+		return cap
+
 	# Calculate the bandwidth available at a node
 	def BandwidthAtNode(self,node_name):
 		node = rev_lookup(self.V_name,node_name)

@@ -173,9 +173,9 @@ class NodeDisplay():
         self.closed = True
 
     # Refresh ,x,y,canvas,node_num,networkgraph,imagedict,parent):
-    def refresh(self):
+    def refresh(self,inv):
         self.close()
-        self.__init__(self.x,self.y,self.canvas,self.node,self.network,self.imagedict,self.parent,self.inventory)
+        self.__init__(self.x,self.y,self.canvas,self.node,self.network,self.imagedict,self.parent,inv)
         self.closed = False
 
     def Closed(self):

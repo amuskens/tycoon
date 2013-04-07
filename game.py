@@ -15,6 +15,7 @@ from nodedisplay import *
 from canvassubmenu import *
 from economic import *
 from city import *
+from editlink import *
 from distfuncs import *
 import store
 import editnode
@@ -197,6 +198,7 @@ class Game:
 							     
 		# Attach mouse events:
 		self._canvas.tag_bind(self.E_lines[edge],"<ButtonRelease-3>", lambda x: self.submenuLink(edge))
+		self._canvas.tag_bind(self.E_lines[edge],"<ButtonRelease-1>", lambda x: self.editLink(edge))
 
 	# Function adds new node imagery dictionaries and canvas
 	def NewNodeCanvas(self,node):
@@ -223,6 +225,10 @@ class Game:
 						   self.icons,
 						   gui.GetRoot(),
 						   self.inventory))
+
+	# Open the edit link menu
+	def editLink(self,edge):
+		new = EditLink(gui.GetRoot(),self.inventory,edge,self.gameNetwork)
 
 	# Display a right-click submenu on the canvas
 	def submenuNode(self,node):
@@ -307,7 +313,7 @@ class Game:
 		# Refresh ll stat windows, which will be inaccurate
 		for window in self.subwindows:
 			if not window.Closed():
-				window.refresh()
+				window.refresh(self.inventory)
 			else:
 				self.subwindows.remove(window)
 
@@ -346,15 +352,20 @@ class Game:
 	
 		# Update items at edges
 		for edgekey in self.gameNetwork.E_items.keys():
+			if len(self.gameNetwork.E_items[edgekey]) > 0:
+				self._canvas.itemconfigure(self.E_lines[edgekey],fill='green')
 			for item in self.gameNetwork.E_items[edgekey]:
 				fail = item.Update()
 				# Add a message telling what failed and where, if it did.
 				if fail == True:
 					self._messages.append(item.GetName() + " failed ")
-					self._canvas.itemconfigure(self.E_lines[edgekey],fill='red')
+					
 				else:
 					# Record maintennace cost
 					total_maintCost = total_maintCost + item.GetMaintenance()
+
+				if not item.Operating():
+					self._canvas.itemconfigure(self.E_lines[edgekey],fill='red')
 				
 		
 		# Update how much money to make:

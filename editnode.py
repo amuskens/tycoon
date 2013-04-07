@@ -128,7 +128,7 @@ class EditNode():
                     if len(self.network.V_items[self.node]) < self.network.GetMaxSlots():
                         self.network.V_items[self.node].append(copy.deepcopy(self.inventory[selected]))
                         self.inventory.pop(selected)
-                        game.action_q.append(['inv',self.inventory])
+                        game.action_q.append(['inv',copy.deepcopy(self.inventory)])
                         self.refresh_site()
                         self.refresh_inv()
                     else:
