@@ -18,7 +18,7 @@ class Store():
         # Create window
         self.root = Toplevel(parent)
         self.root.wm_title('Store')
-        self.root.resizable(FALSE,FALSE)
+        #self.root.resizable(FALSE,FALSE)
 
         # Deine frames for layout
         self.topFrameRoot = Frame(self.root)
@@ -79,20 +79,20 @@ class Store():
 
 
         # Select item list boxes
-        self.itemselector = Listbox(self.frame,height=40,width=40,selectmode=SINGLE)
+        self.itemselector = Listbox(self.frame,height=20,width=40,selectmode=SINGLE)
         self.itemselector.pack(side='left',padx=1,pady=10)
         self.item_scroll = Scrollbar(self.frame,orient=VERTICAL,
                                      command=self.itemselector.yview)
         self.itemselector.configure(yscrollcommand=self.item_scroll.set)
-        self.item_scroll.pack(side='right',fill='y')
+        self.item_scroll.pack(side='right',fill='both')
         self.refresh_descrip_sel()
 
-        self.inv_select = Listbox(self.sideframe,height=40,width=40,selectmode=BROWSE)
+        self.inv_select = Listbox(self.sideframe,height=20,width=40,selectmode=BROWSE)
         self.inv_select.pack(side='left',padx=1,pady=10)
         self.inv_scroll = Scrollbar(self.sideframe,orient=VERTICAL,
                                      command=self.inv_select.yview)
         self.inv_select.configure(yscrollcommand=self.inv_scroll.set)
-        self.inv_scroll.pack(side='right',fill='y')
+        self.inv_scroll.pack(side='right',fill='both')
         self.refresh_descrip_inv()
         self.refresh_inv()
 
