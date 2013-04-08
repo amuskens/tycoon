@@ -202,6 +202,9 @@ class EditLink():
             item_toadd = self.inventory[self.sel]
             if item_toadd.type() == 'Radio' or item_toadd.type() == 'Wired':
                 if item_toadd.GetMaxLength() >= self.network.E_lengths[self.edge]:
+                    # Deal with attenuation
+                    if item_toadd.type() == 'Wired':
+                        item_toadd.SetWireMaxCapacity(self.network.E_lengths[self.edge])
                     added = self.network.AddItemToEdge(self.edge,item_toadd)
                     if added:
                         self.inventory.pop(self.sel)

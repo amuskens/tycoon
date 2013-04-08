@@ -377,9 +377,17 @@ class Game:
 		# Update how much money to make:
 		revenue = 0
 
-		# start up updating the economic system
+		self.gameNetwork.CapReset()
+		for city in self.economy.GetCities():
+			city.SetSupply(self.gameNetwork.CapAtCoord(city.GetCoord(),self.economy.GetCitiesCoord()))
+			#print(city.GetName() + ': ' + str(city.GetSupply()))
+
+			# Add revenue
+			revenue = revenue + city.Revenue()
+				     
+
+		# Update the economy
 		self.economy.Update(self.turn)
-		# Needs to be implemented here.....
 
 
 		# Update game parameters

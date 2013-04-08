@@ -23,19 +23,15 @@ class Economic():
     def GetCities(self):
         return self.cities
 
+    # Get city coordinates
+    def GetCitiesCoord(self):
+        coord = []
+        for city in self.cities:
+            coord.append(city.GetCoord())
+        return coord
+
     # Step functions
     def Update(self,turn):
         # This function is called once per step. It updates the system.
         for city in self.cities:
-            city.Update(turn)
-
-    def GetDemand(self,x,y):
-        # Given a coordinate point, this function returns the demand
-        # for bandwidth at the location. 
-
-        # It should find the nearest population center, then subtract  a "fade factor"
-        # depending on the distnace from the popualtion center. Shouldn't be negative.
-
-        # Each city should have a demand curve. This function returns 
-        # the curve, which is the downward sloping half of a quadratic.
-        return None
+            city.Update(turn,1,0)

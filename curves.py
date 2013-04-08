@@ -37,9 +37,9 @@ def lines_intersect(line1,line2):
 
     return (x,y)
 
-def line_inversect_vline(line1,vline_x):
+def line_intersect_vline(line1,vline_x):
     # Just evaluate at a point
-    return line1.evaluate(vline_x)
+    return (vline_x,line1.evaluate(vline_x))
 
 # This class represents a quadratic equaion in the form:
 # y = ax^2 + bx + c

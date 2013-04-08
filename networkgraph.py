@@ -354,17 +354,19 @@ class NetworkGraph:
 		# Delete the dictionaries
 		del self.cap_at_node
 		del self.cap_at_edge
+		self.cap_at_node = {}
+		self.cap_at_edge = {}
 
 		# Compile base capacities
-		for n in self.V_items.keys():
+		for n in self.graph.vertices():
 			self.cap_at_node[n] = self.MaxCapAtNode(n)
 
-		for e in self.E_items.keys():
+		for e in self.graph.edges():
 			self.cap_at_edge[e] = self.MaxCapAtEdge(e)
 
 	# Calculate the bandwidth available at a certain coordinate point.
 	# This function will be used to calculate revenue
-	def BandwidthAtCoord(pt,to_pts):
+	def CapAtCoord(self,pt,to_pts):
 		(x, y) = pt
 
 		# Make a list of nodes which are within 100 units of the point.
@@ -378,39 +380,95 @@ class NetworkGraph:
 		# Find the nodes nearest to other cities
 		to_nodes = []
 		for pts in to_pts:
-			n = self.ReturnClosePointThresh(pts)
+			if pts == pt: continue
+			n = self.ReturnClosePointThresh(pts,100)
 			if n:
 				to_nodes.append(n[0])
 
-		# With the distance array sorted, 
 		# we now can calculate the available bandwidth from every city to every other city
-		
-		
 
-		# Now step over the list and find paths
+		# Now step over the list and find paths for the outgoing supply
+		total_outgoing_supply = 0
 		for node in closest:
 			for to_node in to_nodes:
 				if to_node == node: continue
 				
 				# Find the path to the other node
-				path = least_cost_path(self.graph,node,to_node,self.cost)
+				path = dyjkstra.least_cost_path(self.graph,node,to_node,self.cost)
+				if not path:
+					continue
 				
 				# Step through the path and see how much bandwidth is available
-				index = 1
+				index = 0
 				
-				cur_cap = self.CapAtEdge(path[0],path[1])
-				while index < len(path) - 1 or cur_cap <= 0:
+				#print('Outgoing start:')
+				cur_cap = self.cap_at_edge[(path[0],path[1])]
+				#print(cur_cap)
+				while index < len(path) - 1 and cur_cap > 0:
 					# Step through and calculate bandwidth
 					
 					# If we got through a router at a node, it will
 					# cap the capacity at its max.
-					if cur_cap >= self.cap_at_node[index]:
-						cur_cap = self.cap_at_node[index]
+					if cur_cap >= self.cap_at_node[path[index]]:
+						cur_cap = self.cap_at_node[path[index]]
 						
 					# Subtract the target capacity
-					self.cap_at_node[index] = sub_azero(self.cap_at_node[index],cur_cap)
+					self.cap_at_node[index] = sub_azero(self.cap_at_node[path[index]],cur_cap)
 					
-					# Send capacity 
+					# Send capacity over a link and cap it at the max
+					if cur_cap >= self.cap_at_edge[(path[index],path[index + 1])]:
+						cur_cap = self.cap_at_edge[(path[index],path[index + 1])]
+
+					# Subtract the target capacity from the edge
+					self.cap_at_edge[(index,index + 1)] = sub_azero(self.cap_at_edge[(path[index],path[index + 1])],cur_cap)
+
+					index = index + 1
+
+				total_outgoing_supply = total_outgoing_supply + cur_cap
+
+		# Do the same thing for incoming supply
+		total_incoming_supply = 0
+		for node in to_nodes:
+			for to_node in closest:
+				if to_node == node: continue
+				
+				# Find the path to the other node
+				path = dyjkstra.least_cost_path(self.graph,node,to_node,self.cost)
+				if not path:
+					continue
+				
+				# Step through the path and see how much bandwidth is available
+				index = 0
+				#print('Incoming start:')
+				
+				cur_cap = self.cap_at_edge[(path[0],path[1])]
+				#print(cur_cap)
+				while index < len(path) - 1 and cur_cap > 0:
+					# Step through and calculate bandwidth
+					
+					# If we got through a router at a node, it will
+					# cap the capacity at its max.
+					if cur_cap >= self.cap_at_node[path[index]]:
+						cur_cap = self.cap_at_node[path[index]]
+						
+					# Subtract the target capacity
+					self.cap_at_node[index] = sub_azero(self.cap_at_node[path[index]],cur_cap)
+					
+					# Send capacity over a link and cap it at the max
+					if cur_cap >= self.cap_at_edge[(path[index],path[index+1])]:
+						cur_cap = self.cap_at_edge[(path[index],path[index+1])]
+
+					# Subtract the target capacity from the edge
+					self.cap_at_edge[(index,index + 1)] = sub_azero(self.cap_at_edge[(path[index],path[index+1])],cur_cap)
+
+					index = index + 1
+
+				total_incoming_supply = total_incoming_supply + cur_cap
+		
+		# Return the values
+		#print(str(total_outgoing_supply) + ' ' + str(total_incoming_supply))
+		return (total_outgoing_supply,total_incoming_supply)
+		
 				
 		
 

@@ -326,11 +326,14 @@ class Network(Item):
 
     # Sets the capacity allotted to the particular network component. Cannot exceed max.
     def SetCapacity(self,target):
-        self.target_capacity = target
-        if self.target_capacity > self.max_capacity:
-            self.target_capacity = self.max_capacity
+        if target > 0:
+            self.target_capacity = target
+            if self.target_capacity > self.max_capacity:
+                self.target_capacity = self.max_capacity
+                return False
+            return True
+        else:
             return False
-        return True
 
 class Router(Network):
     def __init__(self,inList):
@@ -448,7 +451,7 @@ class Wired(PointToPoint):
     # Returns the maximum bandwidth at a certain distance as determined
     # by the attenuation of the wire
     def DistCapacity(self,dist):
-        return self.max_capacity - 100000 * (dist / (self.max_length / self.attenuation))
+        return self.max_capacity - 10000 * (dist / (self.max_length / self.attenuation))
 
     # Set the target capacity of the wire
     def SetCapacity(self,cap):
