@@ -15,7 +15,7 @@ from editnode import *
 import random
 
 class NodeDisplay():
-    def __init__(self,x,y,canvas,node_num,networkgraph,imagedict,parent,inventory):
+    def __init__(self,x,y,canvas,node_num,networkgraph,imagedict,parent,inventory,cap_fraction):
         # Set initial parameters
         self.x = x
         self.y = y
@@ -30,6 +30,8 @@ class NodeDisplay():
         self.inventory = inventory
         self.closed = False
 
+        print(cap_fraction)
+
         # Use a dictionary to get slot index from ID
         self.slot_dict = { }
         self.slot_maint_dict = { }
@@ -41,6 +43,13 @@ class NodeDisplay():
         # Start by drawing the interface
         self.window = self.canvas.create_image(x-5,y-5,image=imagedict['backpane'],anchor='nw',tags=str(self.id))
         self.canvas.tag_bind(self.window,"<ButtonPress-1>", lambda x: self.close())
+
+        self.cap_display_back = self.canvas.create_rectangle(x + self.width - 125, y + 5, 
+                                                              x + self.width - 25, y + 15,
+                                                              fill='black',outline='white')
+        self.cap_display = self.canvas.create_rectangle(x + self.width - 125, y + 5,
+                                                        x + self.width - 125 + int(100 * cap_fraction),y + 15,
+                                                        fill='red', outline ='white')
         
         # Draw the parameters
         self.titles = []
@@ -165,6 +174,8 @@ class NodeDisplay():
     # Close
     def close(self):
         self.canvas.delete(self.closebutton)
+        self.canvas.delete(self.cap_display_back)
+        self.canvas.delete(self.cap_display)
         for i in self.titles: self.canvas.delete(i)
         for i in self.slot_text: self.canvas.delete(i)
         for i in self.slot_obj: self.canvas.delete(i)
@@ -173,9 +184,9 @@ class NodeDisplay():
         self.closed = True
 
     # Refresh ,x,y,canvas,node_num,networkgraph,imagedict,parent):
-    def refresh(self,inv):
+    def refresh(self,inv,cap_fraction):
         self.close()
-        self.__init__(self.x,self.y,self.canvas,self.node,self.network,self.imagedict,self.parent,inv)
+        self.__init__(self.x,self.y,self.canvas,self.node,self.network,self.imagedict,self.parent,inv,cap_fraction)
         self.closed = False
 
     def Closed(self):

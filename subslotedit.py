@@ -34,6 +34,17 @@ class EditSubslot():
                                anchor='w',font=BoldFont)
         self.title_lbl.pack(anchor='w')
 
+        # Display node cap
+        self.cap = StringVar()
+        self.cap.set('Max Capacity of Node:')
+        self.cap_lbl = Label(self.Frame,textvariable=self.cap,anchor='w',justify=LEFT)
+        self.cap_lbl.pack(side='top',anchor='w',fill='x')
+
+        self.capset = StringVar()
+        self.capset.set('Used Capacity of Node:')
+        self.capset_lbl = Label(self.Frame,textvariable=self.capset,anchor='w',justify=LEFT)
+        self.capset_lbl.pack(side='top',anchor='w',fill='x')
+
         # Make frames on the sides
         self.sideFrame = Frame(self.Frame)
         self.sideFrame.pack(side='left',fill='x')
@@ -55,6 +66,9 @@ class EditSubslot():
         self.refresh_inv()
 
         # Add a combobox to select the item at the node
+        self.sel_title = Label(self.sideFrame2,text='Selectable Node Items:',anchor='w',
+                               justify=LEFT)
+        self.sel_title.pack(side='top',anchor='w',fill='x')
         self.item_sel = StringVar()
         self.item_combobox = ttk.Combobox(self.sideFrame2,textvariable=self.item_sel,state='readonly')
         self.item_combobox.pack(side='top',fill='x')
@@ -162,6 +176,9 @@ class EditSubslot():
             self.sel = int(self.slots_list.curselection()[0])
             self.sel_item = self.item.GetInventory()[self.sel]
             self.des.set(self.sel_item.GetInfo())
+
+        self.cap.set('Maximum capacity available at Node: %0.2f' % (self.network.MaxCapAtNode(self.node) / 1000000) + ' Mbit/s')
+        self.capset.set('Current Used capacity available at node: %0.2f' % (self.network.cap_at_node_cached[self.node] / 1000000) + ' Mbit/s')    
 
         self.root.after(200,self.refresh_des)
 

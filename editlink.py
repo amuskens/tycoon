@@ -51,6 +51,11 @@ class EditLink():
         self.cap.set('Max Capacity of Link:')
         self.cap_lbl = Label(self.sideFrame,textvariable=self.cap,anchor='w',justify=LEFT)
         self.cap_lbl.pack(side='top',anchor='w',fill='x')
+
+        self.capset = StringVar()
+        self.capset.set('Used Capacity of Link:')
+        self.capset_lbl = Label(self.sideFrame,textvariable=self.capset,anchor='w',justify=LEFT)
+        self.capset_lbl.pack(side='top',anchor='w',fill='x')
         
         # Make an inventory list, and set up scrollbar
         self.inv_title = Label(self.sideFrame,text='Inventory',anchor='w',
@@ -171,7 +176,8 @@ class EditLink():
             self.des.set(self.sel_item.GetInfo())
 
         # Refresh max capacity display
-        self.cap.set('Maximum capacity available at link: %0.2f' % (self.network.MaxCapAtEdge(self.edge) / 1000000) + ' Mbps')
+        self.cap.set('Maximum capacity available at link: %0.2f' % (self.network.MaxCapAtEdge(self.edge) / 1000000) + ' Mbit/s')
+        self.capset.set('Current Used capacity available at link: %0.2f' % (self.network.CapAtEdge(self.edge) / 1000000) + ' Mbit/s')
 
         self.root.after(200,self.refresh_des)
 

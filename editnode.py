@@ -32,6 +32,18 @@ class EditNode():
         self.title_lbl = Label(self.Frame,text='Edit Node: ',anchor='w')
         self.title_lbl.pack(anchor='w')
 
+        # Display node cap
+        self.cap = StringVar()
+        self.cap.set('Max Capacity of Node:')
+        self.cap_lbl = Label(self.Frame,textvariable=self.cap,anchor='w',justify=LEFT)
+        self.cap_lbl.pack(side='top',anchor='w',fill='x')
+
+        self.capset = StringVar()
+        self.capset.set('Used Capacity of Node:')
+        self.capset_lbl = Label(self.Frame,textvariable=self.capset,anchor='w',justify=LEFT)
+        self.capset_lbl.pack(side='top',anchor='w',fill='x')
+        
+
         # Make frames on the sides
         self.sideFrame = Frame(self.Frame)
         self.sideFrame.pack(side='left')
@@ -42,7 +54,7 @@ class EditNode():
         # Bottom frame for buttons
         self.bottomFrame = Frame(self.Frame)
         self.bottomFrame.pack(side='bottom')
-
+        
         # Make an inventory list
         self.inv_title = Label(self.sideFrame,text='Inventory',anchor='w',
                                justify=LEFT)
@@ -162,6 +174,10 @@ class EditNode():
             self.sel = int(self.site_list.curselection()[0])
             item = self.network.V_items[self.node][self.sel]
             self.des.set(item.GetInfo())
+
+        
+        self.cap.set('Maximum capacity available at Node: %0.2f' % (self.network.MaxCapAtNode(self.node) / 1000000) + ' Mbit/s')
+        self.capset.set('Current Used capacity available at node: %0.2f' % (self.network.cap_at_node_cached[self.node] / 1000000) + ' Mbit/s')
 
         self.root.after(200,self.refresh_des)
         

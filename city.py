@@ -17,8 +17,8 @@ class City():
         self.growth_factor = growth_factor
         self.highest_price = 10
         # Rate is $ per bit / s
-        self.down_rate = 5.786666667 * math.pow(10,-3)
-        self.up_rate = 5.5555 * math.pow(10,-5)
+        self.down_rate = 0.000000001
+        self.up_rate = 0.000000001
 
         self.insupply = 0
         self.outsupply = 0
@@ -109,7 +109,7 @@ class City():
         # A more realistic way to determine growth is needed.
         # Update population only once a week.
         if turn % 168 == 0:
-            self.population = self.population + 0.5 * self.growth_factor
+            self.population = self.population + (100 - 100 * random.random()) * self.growth_factor
         """
         dm = (0.5 - random.random()) / 1000000 * multiplier
         db = (0.5 - random.random()) / 1000000 + vshift
@@ -124,6 +124,7 @@ class City():
     # Calculate the price and quantity, given supply
     # and the rate per Mbps. Return Revenue
     def Revenue(self):
+        """
         revenue = 0
         iprice = 0
         iquantity = 0
@@ -184,7 +185,12 @@ class City():
         print(oquantity)
         print('$ %0.2f' % oprice)
         
-
+        """
+        # Temp until demand curves are working
+        iquantity = (self.population / math.exp(self.down_rate) * self.insupply / 1000000)
+        oquantity = (self.population / math.exp(self.up_rate) * self.outsupply / 1000000)
+        iprice = self.down_rate
+        oprice = self.up_rate
         revenue = iquantity * iprice + oquantity * oprice
         return revenue
                                      

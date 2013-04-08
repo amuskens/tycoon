@@ -9,11 +9,11 @@ from capital import *
 class NetworkGraph:
 	# A network graph will contain the game's main graph.
 	# There will be an origin node whose coordinates are specified
-	def __init__(self,origin_coord,origin_name,origin_items,origin_startbandwidth):
+	def __init__(self,origin_coord,origin_name,origin_items,origin_startbandwidth,scale_factor = 0.2):
 		self.graph = Digraph()
 		self.vertex_counter = 1
 		self.max_slots = 3
-		self.scale_factor = 1 / 4
+		self.scale_factor = scale_factor
 		
 		# This dictionary will contain the coordinates of
 		# vertices in the graph
@@ -42,6 +42,8 @@ class NetworkGraph:
 		# These are used for calculating capacity
 		self.cap_at_node = {}
 		self.cap_at_edge = {}
+		self.cap_at_node_cached = {}
+		self.cap_at_edge_cached = {}
 
 	# Returns max slots
 	def GetMaxSlots(self):
@@ -350,19 +352,21 @@ class NetworkGraph:
 
 	# Resets the cap at node and cap at edge dictioanries
 	def CapReset(self):
-		
-		# Delete the dictionaries
 		del self.cap_at_node
 		del self.cap_at_edge
 		self.cap_at_node = {}
 		self.cap_at_edge = {}
-
 		# Compile base capacities
 		for n in self.graph.vertices():
 			self.cap_at_node[n] = self.MaxCapAtNode(n)
 
 		for e in self.graph.edges():
 			self.cap_at_edge[e] = self.MaxCapAtEdge(e)
+
+	# Save the capacities so we can recover them for display
+	def CapCache(self):
+		self.cap_at_node_cached = copy.deepcopy(self.cap_at_node)
+		self.cap_at_edge_cached = copy.deepcopy(self.cap_at_node)
 
 	# Calculate the bandwidth available at a certain coordinate point.
 	# This function will be used to calculate revenue

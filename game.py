@@ -60,7 +60,7 @@ class Game:
 		# which will display at turns.
 		self._messages = []
 		self.inventory = []
-		self.cash = 1000000
+		self.cash = 100000
 		
 		# let us modify the value of the global gui variable
 		global gui
@@ -217,6 +217,8 @@ class Game:
 	# Creates an instance of a window to display the node data.
 	def displayNode(self,node):
 		self.V_displays.add(node)
+		maxcap = self.gameNetwork.MaxCapAtNode(node)
+		cap_frac = (maxcap - self.gameNetwork.cap_at_node_cached[node]) / (maxcap + 0.00000001)
 		self.subwindows.append(NodeDisplay(self._canvas.canvasx(lastx),
 						   self._canvas.canvasy(lasty),
 						   self._canvas,
@@ -224,7 +226,8 @@ class Game:
 						   self.gameNetwork,
 						   self.icons,
 						   gui.GetRoot(),
-						   self.inventory))
+						   self.inventory,
+						   cap_frac))
 
 	# Open the edit link menu
 	def editLink(self,edge):
@@ -313,7 +316,11 @@ class Game:
 		# Refresh ll stat windows, which will be inaccurate
 		for window in self.subwindows:
 			if not window.Closed():
-				window.refresh(self.inventory)
+				maxcap = self.gameNetwork.MaxCapAtNode(window.node)
+				cap_frac = (maxcap - self.gameNetwork.cap_at_node_cached[window.node]) / (maxcap + 0.00000001)
+				window.refresh(self.inventory,
+					       cap_frac)
+				# Note avoiding divide by zero error above
 			else:
 				self.subwindows.remove(window)
 
@@ -384,8 +391,9 @@ class Game:
 
 			# Add revenue
 			revenue = revenue + city.Revenue()
-				     
-
+		
+		self.gameNetwork.CapCache()
+		
 		# Update the economy
 		self.economy.Update(self.turn)
 
