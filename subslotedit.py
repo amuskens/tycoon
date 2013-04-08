@@ -12,11 +12,13 @@ global refresh_flag
 refresh_flag = False
 
 class EditSubslot():
-    def __init__(self,parent,inventory,node,gamenetwork):
+    def __init__(self,parent,inventory,node,gamenetwork,item_index):
         self.inventory = inventory
         self.elig_inv = []
         self.node = node
         self.network = gamenetwork
+
+        print(item_index)
 
         # Define fonts
         BoldFont = font.Font(family='Arial', size=14, weight='bold')
@@ -76,9 +78,10 @@ class EditSubslot():
         selectable = []
         for i in self.network.V_items[self.node]:
             selectable.append(i.GetName())
-        
+        if item_index > (len(selectable) - 1):
+            item_index = 0
         self.item_combobox.configure(values = selectable)
-        self.item_sel.set(selectable[0])
+        self.item_sel.set(selectable[item_index])
         self.item = self.network.V_items[self.node][0]
         self.item_combobox.bind('<<ComboboxSelected>>', lambda x: self.do_item_change())
 

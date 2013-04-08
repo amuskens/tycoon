@@ -100,6 +100,11 @@ class EditNode():
                                     command=self.do_remove)
         self.button_remove.pack(side='top',fill='x')
 
+        self.button_add = Button(self.sideFrame2,
+                                 text='Edit Item Build Slots',
+                                 command=self.do_edit)
+        self.button_add.pack(side='top',fill='x')
+
         # Close button
         self.button_close = Button(self.sideFrame2,
                                     text='Close',
@@ -159,6 +164,11 @@ class EditNode():
                 game.action_q.append(['inv',copy.deepcopy(self.inventory)])
                 self.refresh_site()
                 self.refresh_inv()
+
+    def do_edit(self):
+        if self.site_list.curselection():
+            selected = int(self.site_list.curselection()[0])
+            self.subslot_display  = EditSubslot(self.root,self.inventory,self.node,self.network,selected)
                 
 
     def close(self):

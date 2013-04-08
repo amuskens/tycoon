@@ -30,7 +30,7 @@ class NodeDisplay():
         self.inventory = inventory
         self.closed = False
 
-        print(cap_fraction)
+        # print(cap_fraction)
 
         # Use a dictionary to get slot index from ID
         self.slot_dict = { }
@@ -70,6 +70,7 @@ class NodeDisplay():
         self.slot_obj = []
 
         voffset = 0
+        indexer = 0
         
         # Add the items from the slots.
         for item  in self.network.V_items[self.node]:
@@ -101,11 +102,11 @@ class NodeDisplay():
                                          tags=str(self.id)))
 
             self.slot_text.append(a)
-            self.canvas.tag_bind(a,"<ButtonPress-1>", lambda x: self.subslots(item))
+            self.canvas.tag_bind(a,"<ButtonPress-1>", lambda x: self.subslots(copy.copy(indexer)))
 
 
             if item.StructType() == 'Tower':
-                temp = str(item.GetTowerType()) + ' Tower' + '\n\n' + str(item.GetTowerHeight()) + ' m'
+                temp = str(item.GetTowerType()) + ' Tower ' + str(item.GetTowerHeight()) + ' m'
             else:
                 temp = item.StructType()
 
@@ -151,6 +152,7 @@ class NodeDisplay():
                                                               text=temp,
                                                               fill=fillcolor,anchor='nw',font=self.Font2,tags=str(self.id)))
             voffset = voffset + 52
+            indexer = indexer + 1
 
             
 
@@ -197,8 +199,8 @@ class NodeDisplay():
         pass
 
     # Select items in subslot
-    def subslots(self,item):
-        self.subslot_display  = EditSubslot(self.parent,self.inventory,self.node,self.network)
+    def subslots(self,item_index):
+        self.subslot_display  = EditSubslot(self.parent,self.inventory,self.node,self.network,item_index)
 
     def GetMaint(self,item):
         self.msg_box('Set maintenance budget for\n' + item.GetName() + ' at ' +  self.network.V_name[self.node] + '\n on a per week basis')
