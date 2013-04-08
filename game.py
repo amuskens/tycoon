@@ -93,7 +93,7 @@ class Game:
 		self.loans = []
 		self.turn = 1
 
-		self.first_time = True
+		self.first_time = 0
 
 		# Load images
 		self.loadImages()
@@ -152,7 +152,7 @@ class Game:
 		messagebox.showinfo(message='Please select the add node button.')
 		messagebox.showinfo(message='This should be the green plus in the sub-menu.')
 		messagebox.showinfo(message='This NETWORK NODE represents\na bandwidth origin.')
-		self.first_time = False
+		self.first_time = 1
 
 	# Draw cities
 	def DrawCity(self,city):
@@ -315,17 +315,18 @@ class Game:
 		global LeftCounter
 		LeftCounter=1
 		# Message display
-		if RightCounter==3:
+		if self.first_time==1 and self.gameNetwork.vertex_counter==2:
 			messagebox.showinfo(message='You will need to create another\nif your current node\nis not near a city.')
-			
-		if RightCounter==4:
+			self.first_time=2
+		if self.first_time==2 and self.gameNetwork.vertex_counter==3:
 			messagebox.showinfo(message='Right click on your new node\n')
 			messagebox.showinfo(message='Then left click the connection button\n')
 			messagebox.showinfo(message='Again, this should be a green plus\n')
+			self.first_time=3
 			
 		if LeftCounter==2:
 			messagebox.showinfo(message='Now double-click on your\nfirst node to \ncreate a connection.')
-		if self.first_time:
+		if self.first_time==0:
 			if RightCounter==2:
 				self.Tutorial()
 		
