@@ -43,7 +43,19 @@ class Digraph:
             self._fromsets[v] = set()
 
     def del_vertex(self, v):
-        pass
+        """
+        Removes a vertex to the graph.
+        
+        >>> G = Digraph()
+        >>> G.add_vertex(1)
+        >>> G.del_vertex(1)
+        >>> G.vertices() == {1}
+        False
+        """
+        if v in self._tosets:
+            self._tosets.pop(v)
+        elif v in self._fromsets:
+            self._fromsets.pop(v)
 
     def add_edge(self, e):
         """
@@ -70,7 +82,11 @@ class Digraph:
         self._fromsets[e[1]].add(e[0])
 
     def del_edge(self, e):
-        pass
+        for v in e:
+            self.del_vertex(v)
+
+        self._tosets[e[0]].pop(e[1])
+        self._fromsets[e[1]].pop(e[0])
 
     def edges(self):
         """
