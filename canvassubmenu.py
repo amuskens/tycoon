@@ -113,12 +113,9 @@ class CanvasSubMenu():
         self.canvas.delete(self.closebutton)
 
     def do_addlink(self):
-        global LeftCounter
-        LeftCounter=0
         if self.nodeflag:
             # Wait until
             game.clicked = False
-            LeftCounter+=1
             self.canvas.bind("<Double-Button-1>", lambda x: self.returnCoord())
 
                 

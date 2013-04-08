@@ -26,7 +26,6 @@ import LEVEL1_map
 global lastx, lasty
 global mode
 global RightCounter
-global LeftCounter
 global action_q
 action_q = []
 
@@ -255,7 +254,7 @@ class Game:
 					     self._canvas.canvasy(lasty),
 					     self._canvas,node,
 					     self.icons,nodeflag=1)
-
+		
 	# Display a submenu for clicking a link
 	def submenuLink(self,edge):
 		global lastx, lasty
@@ -312,20 +311,18 @@ class Game:
 		self.icons['dellink_inactive']= PhotoImage(file = 'images/canvassubmenu/dellink_inactive.gif')
 
 	def do_turn(self):
-		global LeftCounter
-		LeftCounter=1
 		# Message display
 		if self.first_time==1 and self.gameNetwork.vertex_counter==2:
 			messagebox.showinfo(message='You will need to create another\nif your current node\nis not near a city.')
 			self.first_time=2
+
 		if self.first_time==2 and self.gameNetwork.vertex_counter==3:
 			messagebox.showinfo(message='Right click on your new node\n')
 			messagebox.showinfo(message='Then left click the connection button\n')
 			messagebox.showinfo(message='Again, this should be a green plus\n')
-			self.first_time=3
-			
-		if LeftCounter==2:
-			messagebox.showinfo(message='Now double-click on your\nfirst node to \ncreate a connection.')
+			messagebox.showinfo(message='Double-click on your\nfirst node to \ncreate a connection.')
+			self.first_time = 3
+
 		if self.first_time==0:
 			if RightCounter==2:
 				self.Tutorial()
