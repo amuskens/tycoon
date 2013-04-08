@@ -23,6 +23,9 @@ class Linear():
     def angle(self):
         return math.atan2(self.m,1)
 
+    def print(self):
+        print('%0.12fx' % self.m + '%0.12f' % self.b)
+
 # This function returns the intersection point of two lines
 def lines_intersect(line1,line2):
     # How it works:
