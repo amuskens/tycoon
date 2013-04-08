@@ -40,8 +40,8 @@ class City():
         if turn % 168 == 0:
             self.population = self.population + 0.5 * self.growth_factor
 
-        dm = (0.5 - random.random()) / 1000)
-        db = (0.5 - random.random()) / 100)
+        dm = (0.5 - random.random()) / 1000
+        db = (0.5 - random.random()) / 100
         self.demand_curve.m = self.demand_curve.m + dm
         self.demand_curve.b =  self.highest_price + db
     

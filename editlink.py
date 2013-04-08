@@ -58,7 +58,7 @@ class EditLink():
         self.inv_title.pack(side='top',anchor='w',fill='x')
         self.inv_list = Listbox(self.sideFrame,height=30,width=60,selectmode='ExTENDED')
         
-        self.inv_list.pack(side='left',padx=0,pady=10,fill='x')
+        self.inv_list.pack(side='left',padx=5,pady=10,fill='x')
         self.inv_scroll = Scrollbar(self.sideFrame,orient=VERTICAL,
                                      command=self.inv_list.yview,width=20)
         self.inv_list.configure(yscrollcommand=self.inv_scroll.set)
@@ -77,13 +77,22 @@ class EditLink():
         # Allow setting of maintenance budget for items.
         self.budget = StringVar()
         self.maint_label = Label(self.subframe,text='Current Weekly Maintenance Budget:  $',anchor='w',justify=LEFT)
-        self.maint_label.pack(side='left',anchor='w',fill='x')
-
-        self.maint_set_button = Button(self.subframe,text='Set',command=self.new_maint)
-        self.maint_set_button.pack(side='right',anchor='w',fill='x')
-
         self.maint_entry = Entry(self.subframe,textvariable=self.budget)
-        self.maint_entry.pack(side='right',anchor='w',fill='x')
+        self.maint_set_button = Button(self.subframe,text='Set',command=self.new_maint)
+
+        self.maint_label.pack(side='left',anchor='w',fill='x')
+        self.maint_entry.pack(side='left',anchor='w',fill='x')
+        self.maint_set_button.pack(side='left',anchor='w',fill='x')
+
+        # Set target capacity of the item
+        self.target = StringVar()
+        self.target_label = Label(self.subframe,text='Target Capacity (Mbps) :',anchor='w',justify=LEFT)
+        self.target_set_button = Button(self.subframe,text='Set',command=self.new_target)
+        self.target_entry = Entry(self.subframe,textvariable=self.target)
+
+        self.target_set_button.pack(side='right',anchor='w',fill='x')
+        self.target_entry.pack(side='right',anchor='w',fill='x')
+        self.target_label.pack(side='right',anchor='w',fill='x')
 
         # Site object selector
         self.links = StringVar()
@@ -98,14 +107,14 @@ class EditLink():
                                justify=LEFT)
         self.wireslots_title.pack(side='top',anchor='w',fill='x')
 
-        self.slots_list = Listbox(self.sideFrame2,height=15,width=40,selectmode='SINGLE')
-        self.slots_list.pack(side='top',padx=20,pady=10)
+        self.slots_list = Listbox(self.sideFrame2,height=15,selectmode='SINGLE')
+        self.slots_list.pack(side='top',padx=20,pady=10,fill='both')
         self.slots_list.bind('<ButtonPress-1>', lambda x: self.get_maint())
         
         # Buttons
         self.button_add = Button(self.sideFrame2,
                                  text='Add from Inventory to Link',
-                                 command=self.do_add)
+                                command=self.do_add)
         self.button_add.pack(side='top',fill='x')
 
         self.button_remove = Button(self.sideFrame2,
@@ -192,7 +201,7 @@ class EditLink():
             self.sel = int(self.inv_list.curselection()[0])
             item_toadd = self.inventory[self.sel]
             if item_toadd.type() == 'Radio' or item_toadd.type() == 'Wired':
-                if item_toadd.GetMaxLength() <= self.network.E_lengths[self.edge]:
+                if item_toadd.GetMaxLength() >= self.network.E_lengths[self.edge]:
                     added = self.network.AddItemToEdge(self.edge,item_toadd)
                     if added:
                         self.inventory.pop(self.sel)
@@ -224,8 +233,15 @@ class EditLink():
 
     def new_maint(self):
         # Check which item is selected
-            self.sel_item.SetMaintenance(float(self.budget.get()) / 24 / 7)
-            self.get_maint()
+        self.sel_item.SetMaintenance(float(self.budget.get()) / 24 / 7)
+        self.get_maint()
+
+    def new_target(self):
+        # Check which item is selected
+        if self.sel_item.type() == 'Radio' or self.sel_item.type() == 'Wired':
+            self.sel_item.SetCapacity(float(self.target.get()) * 1000000)
+            self.des.set(self.sel_item.GetInfo())
+            
 
     def get_maint(self):
         # Check which item is selected

@@ -39,6 +39,10 @@ class NetworkGraph:
 		# Set the start bandwidth at the origin
 		self.origin_bandwidth = origin_startbandwidth
 
+		# These are used for calculating capacity
+		self.cap_at_node = {}
+		self.cap_at_edge = {}
+
 	# Returns max slots
 	def GetMaxSlots(self):
 		return self.max_slots
@@ -289,6 +293,14 @@ class NetworkGraph:
 	def cost(self,e):
 		return 1
 
+	# Max capacity at a node
+	def MaxCapAtNode(self,node):
+		cap = 0
+		for item in self.V_items[node]:
+			for subitem in item.GetInventory():
+				cap = cap + subitem.GetMaxCapacity()
+		return cap
+
 	# Max capacity available at an edge
 	def MaxCapAtEdge(self,edge):
 		cap = 0
@@ -297,12 +309,13 @@ class NetworkGraph:
 
 		return cap
 
-	# Calculate the bandwidth available at a node
-	def BandwidthAtNode(self,node_name):
-		node = rev_lookup(self.V_name,node_name)
-		path = least_cost_path(self.graph,0,node,self.cost)
-		if path == None: return 0
-		# Calculate.... NOt done yet   
+	# Returns the traffic engineered capacity at the edge
+	def CapAtEdge(self,edge):
+		cap = 0
+		for item in self.E_items[edge]:
+			cap = cap + item.GetCapacity()
+
+		return cap
 
 	# Returns the node closest to the point
 	def ReturnClosePoint(self,pt):
@@ -311,14 +324,95 @@ class NetworkGraph:
 		for ids in self.V_items.keys():
 			# Populate a list of distances to the start point
 			dist_array.append((ids,
-					   dist(x,
-						y,
+					   dist(x,y,
 						self.V_coord[ids][0],
 						self.V_coord[ids][1])))
 		# The smallest element is closest
 		(id,dist1) = min(dist_array, key=lambda x: x[1])
 		return (id,dist1)
 
+	# Returns a close point within the threshhold
+	def ReturnClosePointThresh(self,pt,thresh):
+		(x,y) = pt
+		dist_array = []
+		for ids in self.V_items.keys():
+			# Populate a list of distances to the start point
+			distance = dist(x,y,self.V_coord[ids][0],self.V_coord[ids][1])
+			if distance < thresh:
+				dist_array.append((ids,distance))
+
+		# The smallest element is closest
+		if dist_array:
+			(id,dist1) = min(dist_array, key=lambda x: x[1])
+			return (id,dist1)
+		else:
+			return None
+
+	# Resets the cap at node and cap at edge dictioanries
+	def CapReset(self):
+		
+		# Delete the dictionaries
+		del self.cap_at_node
+		del self.cap_at_edge
+
+		# Compile base capacities
+		for n in self.V_items.keys():
+			self.cap_at_node[n] = self.MaxCapAtNode(n)
+
+		for e in self.E_items.keys():
+			self.cap_at_edge[e] = self.MaxCapAtEdge(e)
+
+	# Calculate the bandwidth available at a certain coordinate point.
+	# This function will be used to calculate revenue
+	def BandwidthAtCoord(pt,to_pts):
+		(x, y) = pt
+
+		# Make a list of nodes which are within 100 units of the point.
+		closest = []
+		for ids in self.V_items.keys():
+			# Populate a list of distances to the start point
+			distance = dist(x,y,self.V_coord[ids][0],self.V_coord[ids][1])
+			if distance < 100: 
+					closest.append(ids)
+
+		# Find the nodes nearest to other cities
+		to_nodes = []
+		for pts in to_pts:
+			n = self.ReturnClosePointThresh(pts)
+			if n:
+				to_nodes.append(n[0])
+
+		# With the distance array sorted, 
+		# we now can calculate the available bandwidth from every city to every other city
+		
+		
+
+		# Now step over the list and find paths
+		for node in closest:
+			for to_node in to_nodes:
+				if to_node == node: continue
+				
+				# Find the path to the other node
+				path = least_cost_path(self.graph,node,to_node,self.cost)
+				
+				# Step through the path and see how much bandwidth is available
+				index = 1
+				
+				cur_cap = self.CapAtEdge(path[0],path[1])
+				while index < len(path) - 1 or cur_cap <= 0:
+					# Step through and calculate bandwidth
+					
+					# If we got through a router at a node, it will
+					# cap the capacity at its max.
+					if cur_cap >= self.cap_at_node[index]:
+						cur_cap = self.cap_at_node[index]
+						
+					# Subtract the target capacity
+					self.cap_at_node[index] = sub_azero(self.cap_at_node[index],cur_cap)
+					
+					# Send capacity 
+				
+		
 
 def rev_lookup(dict,item):
 	"""
@@ -336,6 +430,14 @@ def rev_lookup(dict,item):
 			return key
 
 	return None
+
+# Subtraction, but not below zero
+def sub_azero(a,b):
+	c = a - b
+	if c < 0:
+		c = 0
+	return c
+
 
 if __name__ == "__main__":
 	import doctest
