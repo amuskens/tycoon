@@ -214,6 +214,8 @@ class EditLink():
                     added = self.network.AddItemToEdge(self.edge,item_toadd)
                     if added:
                         self.inventory.pop(self.sel)
+                        if item_toadd.type() == 'Wired':
+                            game.action_q.append(['subtractcash',[-item_toadd.GetCost() + item_toadd.GetCost() * self.network.E_lengths[edge]]])
                         game.action_q.append(['inv',copy.deepcopy(self.inventory)])
                         self.do_item_change()
                     else:

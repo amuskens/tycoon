@@ -359,6 +359,9 @@ class Router(Network):
         tempstr = tempstr + '\nOperational: ' + str(self.Operating())
         return tempstr
 
+    def RouterType(self):
+        return self.router_type
+
 class PointToPoint(Network):
     def __init__(self,inList):
         (name,cost,rel,icon,lifespan,maintenance,sug_maint,max_capacity,target_capacity,power,max_length) = inList
