@@ -148,10 +148,11 @@ class Game:
 		
 	def Tutorial(self):
 		global RightCounter
-		RightCounter=3
+		RightCounter+=1
 		messagebox.showinfo(message='Please select the add node button.')
 		messagebox.showinfo(message='This should be the green plus in the sub-menu.')
-		messagebox.showinfo(message='This node represents a city to supply/supply with bandwidth.')	
+		messagebox.showinfo(message='This NETWORK NODE represents\na bandwidth origin.')
+		self.first_time = False
 
 	# Draw cities
 	def DrawCity(self,city):
@@ -312,19 +313,25 @@ class Game:
 
 	def do_turn(self):
 		global LeftCounter
-		
+		LeftCounter=1
 		# Message display
-		if self.gameNetwork.vertex_counter == 2 and self.first_time == True:
-			 messagebox.showinfo(message='Right click on your new city\n')
-			 messagebox.showinfo(message='Then left click the connection button\n')
-			 messagebox.showinfo(message='Again, this should be a green plus\n')
-		if LeftCounter==1:
-			 messagebox.showinfo(message='Now double-click root\nto create a connection.')
-			 self.first_time = False
+		if RightCounter==3:
+			messagebox.showinfo(message='You will need to create another\nif your current node\nis not near a city.')
+			
+		if RightCounter==4:
+			messagebox.showinfo(message='Right click on your new node\n')
+			messagebox.showinfo(message='Then left click the connection button\n')
+			messagebox.showinfo(message='Again, this should be a green plus\n')
+			
+		if LeftCounter==2:
+			messagebox.showinfo(message='Now double-click on your\nfirst node to \ncreate a connection.')
 		if self.first_time:
 			if RightCounter==2:
 				self.Tutorial()
 		
+		if self.cash < -50000:
+			messagebox.showinfo(message='YOU LOSE\nGAME OVER')
+			quit()
 		# Deal with action queue.
 		global action_q
 		
