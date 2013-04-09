@@ -54,7 +54,7 @@ class Digraph:
         """
         if v in self._tosets:
             self._tosets.pop(v)
-        elif v in self._fromsets:
+        if v in self._fromsets:
             self._fromsets.pop(v)
 
     def add_edge(self, e):

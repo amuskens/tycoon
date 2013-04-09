@@ -125,9 +125,9 @@ class CanvasSubMenu():
         self.close()
 
     def do_dellink(self):
-        pass
+        if self.linkflag:
+            game.action_q.append(['dellink',[self.link]])
             
-
     def do_addnode(self):
         if self.nodeflag:
             return

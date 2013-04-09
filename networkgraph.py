@@ -31,10 +31,12 @@ class NetworkGraph:
 		self.E_lengths = { }
 
 		# Add the info for the origin node
+		"""
 		self.graph.add_vertex(0)
 		self.V_coord[0] = origin_coord
 		self.V_name[0] = origin_name
 		self.V_items[0] = origin_items
+		"""
 
 		# Set the start bandwidth at the origin
 		self.origin_bandwidth = origin_startbandwidth
@@ -98,7 +100,35 @@ class NetworkGraph:
 		# Return the node ID
 		return node
 
+	# Delete a network node
+	def DelNode(self,node):
+		items_at_node = []
+
+		if node in self.graph.vertices():
+			self.graph.del_node(node)
+			items_at_node = V_items[node]
 		
+			# Delete the node from dictionaries
+		
+			del V_items[node]
+			del V_coord[node]
+			del V_name[node]
+
+		return items_at_node
+
+	# Delete a network link
+	def DelLink(self,edge):
+		items_at_edge = []
+
+		if edge in self.graph.edges():
+			self.graph.del_edge(edge)
+			items_at_edge = E_items[edge]
+
+			# Delete
+			del E_items[edge]
+			del E_lengths[edge]
+		
+		return items_at_edge
 
 	# Get the number of items at the node
 	def ItemsAtNode(self,node_num):
