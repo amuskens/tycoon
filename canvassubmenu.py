@@ -12,6 +12,8 @@ from subslotedit import *
 from getvaluedialog import *
 from distfuncs import dist
 
+global LeftCounter
+
 class CanvasSubMenu():
     def __init__(self,x,y,canvas,nodeorlink,imagedict,nodeflag=0,linkflag=0):
         self.canvas = canvas
@@ -111,9 +113,12 @@ class CanvasSubMenu():
         self.canvas.delete(self.closebutton)
 
     def do_addlink(self):
-       if self.nodeflag:
+        global LeftCounter
+        LeftCounter=0
+        if self.nodeflag:
             # Wait until
             game.clicked = False
+            LeftCounter+=1
             self.canvas.bind("<Double-Button-1>", lambda x: self.returnCoord())
 
                 
