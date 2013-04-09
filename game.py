@@ -26,6 +26,7 @@ import LEVEL1_map
 global lastx, lasty
 global mode
 global RightCounter
+global LeftCounter
 global action_q
 action_q = []
 
@@ -145,12 +146,9 @@ class Game:
 		messagebox.showinfo('Welcome to Telecom Tycoon',message = 'Lets get started, shall we?')
 		messagebox.showinfo(message='Right click anywhere to begin')
 		
-		if self.first_time:
-			if RightCounter==2:
-				self.Tutorial()
-		
 	def Tutorial(self):
-		
+		global RightCounter
+		RightCounter=3
 		messagebox.showinfo(message='Please select the add node button.')
 		messagebox.showinfo(message='This should be the green plus in the sub-menu.')
 		messagebox.showinfo(message='This node represents a city to supply/supply with bandwidth.')	
@@ -313,10 +311,12 @@ class Game:
 			 messagebox.showinfo(message='Right click on your new city\n')
 			 messagebox.showinfo(message='Then left click the connection button\n')
 			 messagebox.showinfo(message='Again, this should be a green plus\n')
+		if LeftCounter==1:
 			 messagebox.showinfo(message='Now double-click root\nto create a connection.')
-			 
 			 self.first_time = False
-		
+		if self.first_time:
+			if RightCounter==2:
+				self.Tutorial()
 		
 		# Deal with action queue.
 		global action_q
