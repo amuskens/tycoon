@@ -105,14 +105,14 @@ class NetworkGraph:
 		items_at_node = []
 
 		if node in self.graph.vertices():
-			self.graph.del_node(node)
-			items_at_node = V_items[node]
+			self.graph.del_vertex(node)
+			items_at_node = self.V_items[node]
 		
 			# Delete the node from dictionaries
 		
-			del V_items[node]
-			del V_coord[node]
-			del V_name[node]
+			del self.V_items[node]
+			del self.V_coord[node]
+			del self.V_name[node]
 
 		return items_at_node
 
@@ -122,11 +122,11 @@ class NetworkGraph:
 
 		if edge in self.graph.edges():
 			self.graph.del_edge(edge)
-			items_at_edge = E_items[edge]
+			items_at_edge = self.E_items[edge]
 
 			# Delete
-			del E_items[edge]
-			del E_lengths[edge]
+			del self.E_items[edge]
+			del self.E_lengths[edge]
 		
 		return items_at_edge
 
@@ -336,7 +336,7 @@ class NetworkGraph:
 				# Give a bonus for different router types
 				if subitem.type() == 'Router':
 					if subitem.RouterType() == 'Multiplexer':
-						cap = cap + subitem.GetMaxCapacity() * connections
+						cap = cap + subitem.GetMaxCapacity() / 10 * connections
 		return cap
 
 	# Max capacity available at an edge

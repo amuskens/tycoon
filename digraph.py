@@ -85,8 +85,8 @@ class Digraph:
         for v in e:
             self.del_vertex(v)
 
-        self._tosets[e[0]].pop(e[1])
-        self._fromsets[e[1]].pop(e[0])
+        self._tosets[e[0]].remove(e[0])
+        self._fromsets[e[1]].remove(e[1])
 
     def edges(self):
         """

@@ -206,6 +206,12 @@ class Game:
 		self._canvas.tag_bind(self.E_lines[edge],"<ButtonRelease-3>", lambda x: self.submenuLink(edge))
 		self._canvas.tag_bind(self.E_lines[edge],"<ButtonRelease-1>", lambda x: self.editLink(edge))
 
+	# Delete a link from the canvas
+	def DelLinkCanvas(self,link):
+		self._canvas.delete(self.E_lines[link])
+		for i in self.E_direction_marker[link]: self._canvas.delete(i)
+		self._canvas.delete(self.E_text[link])
+
 	# Function adds new node imagery dictionaries and canvas
 	def NewNodeCanvas(self,node):
 		(x,y) = self.gameNetwork.V_coord[node]
@@ -445,18 +451,9 @@ class Game:
 
 	# Process individual action from the action stack
 	def processAction(self,action):
-		if action[0] == 'delnode':
-			node = action[1][0]
+		print(action)
 
-			# Move all of the items from the node back to the inventory
-			for item in self.gameNetwork.V_items[node]:
-				self.inventory.append(item)
-
-			# Delete the node
-			# ...
-			return
-
-		elif action[0] == 'addnode':
+		if action[0] == 'addnode':
 			coord = action[1][0]
 			name = action[1][1]
 			# add the node
@@ -487,14 +484,21 @@ class Game:
 
 		elif action[0] == 'delnode':
 			node_to_del = action[1][0]
-			answer = messagebox.askyesno('Warning','Are you sure you want to delete ' + self.gameNetowrk.V_name[node_to_del] + '?')
+			answer = messagebox.askyesno('Warning',
+						     'Are you sure you want to delete ' + self.gameNetwork.V_name[node_to_del] + ' and all of its contents?')
 			
 			if answer:
 				new_inv = self.gameNetwork.DelNode(node_to_del)
 				self.DelNodeCanvas(node_to_del)
-				self.inventory.append(new_inv)
-				global gui
-				gui.inventory = self.inventory
+				return
+
+		elif action[0] == 'dellink':
+			link_to_del = action[1][0]
+			answer = messagebox.askyesno('Warning',
+						     'Are you sure you want to delete this link and all of its contents?')
+			if answer:
+				self.gameNetwork.DelLink(link_to_del)
+				self.DelLinkCanvas(link_to_del)
 				return
 			
 
