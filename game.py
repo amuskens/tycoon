@@ -220,6 +220,11 @@ class Game:
 		self._canvas.tag_bind(self.V_images[node],"<ButtonRelease-1>", lambda x: self.displayNode(node))
 		self._canvas.tag_bind(self.V_images[node],"<ButtonRelease-3>", lambda x: self.submenuNode(node))
 
+	# Delete a node from canvas
+	def DelNodeCanvas(self,node):
+		self._canvas.delete(self.V_images[node])
+		self._canvas.delete(self.V_text[node])
+
 	# Creates an instance of a window to display the node data.
 	def displayNode(self,node):
 		self.V_displays.add(node)
@@ -306,6 +311,8 @@ class Game:
 		self.icons['dellink_inactive']= PhotoImage(file = 'images/canvassubmenu/dellink_inactive.gif')
 
 	def do_turn(self):
+		global LeftCounter
+		
 		# Message display
 		if self.gameNetwork.vertex_counter == 2 and self.first_time == True:
 			 messagebox.showinfo(message='Right click on your new city\n')
@@ -472,6 +479,19 @@ class Game:
 				self.gameNetwork.AddEdgeID(node,closestNode,[])
 				self.NewEdgeCanvas((node,closestNode))
 				return
+
+		elif action[0] == 'delnode':
+			node_to_del = action[1][0]
+			answer = messagebox.askyesno('Warning','Are you sure you want to delete ' + self.gameNetowrk.V_name[node_to_del] + '?')
+			
+			if answer:
+				new_inv = self.gameNetwork.DelNode(node_to_del)
+				self.DelNodeCanvas(node_to_del)
+				self.inventory.append(new_inv)
+				global gui
+				gui.inventory = self.inventory
+				return
+			
 
 		elif action[0] == 'subtractcash':
 			self.cash = self.cash - action[1][0]
