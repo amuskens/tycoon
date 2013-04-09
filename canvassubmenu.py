@@ -143,6 +143,9 @@ class CanvasSubMenu():
     def do_delnode(self):
         if self.nodeflag:
             game.action_q.append(['delnode',[self.node]])
+            self.close()
+        else:
+            return
 
     # Display a message box for input
     def msg_box_name(self, msg, extra=True):
