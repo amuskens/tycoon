@@ -25,6 +25,7 @@ import LEVEL1_map
 # Globals for mouse clicks.
 global lastx, lasty
 global mode
+global RightCounter
 global action_q
 action_q = []
 
@@ -73,7 +74,8 @@ class Game:
 
 	def do_init(self):
 		global lastx, lasty
-		
+		global RightCounter
+		RightCounter=1
 		self.gameNetwork = NetworkGraph((800,800),"Root",[],100000)
 
 		self.economy = LEVEL1_map.level1_setup(self)
@@ -140,12 +142,18 @@ class Game:
 			      self.icons)
 
 		#Tutorial beginings
-		messagebox.showinfo('Welcome to Telecom Tycoon',message = 'Lets get started\n Please select the add node button.\n')
+		messagebox.showinfo('Welcome to Telecom Tycoon',message = 'Lets get started, shall we?')
+		messagebox.showinfo(message='Right click anywhere to begin')
+		
+		if self.first_time:
+			if RightCounter==2:
+				self.Tutorial()
+		
+	def Tutorial(self):
+		
+		messagebox.showinfo(message='Please select the add node button.')
 		messagebox.showinfo(message='This should be the green plus in the sub-menu.')
-		messagebox.showinfo(message='This node represents a city to supply with bandwidth.')
-		messagebox.showinfo(message='Once you name your new city, press Step.')
-		messagebox.showinfo(message='Once you have entered a name for your city, please press OK')
-		messagebox.showinfo(message='Press Step in the menu, then OK')
+		messagebox.showinfo(message='This node represents a city to supply/supply with bandwidth.')	
 
 	# Draw cities
 	def DrawCity(self,city):
@@ -257,7 +265,8 @@ class Game:
 	# Display submenu for other clicks
 	def submenuother(self):
 		global lastx, lasty
-
+		global RightCounter
+		RightCounter=2
 		# Don't open a submenu on top of a node or edge one.
 		distance = dist(self._canvas.canvasx(lastx),self._canvas.canvasy(lasty),self.submenu.x,self.submenu.y)
 		if distance > 10:
@@ -267,7 +276,6 @@ class Game:
 						     self._canvas.canvasy(lasty),
 						     self._canvas,0,
 						     self.icons)
-		
 	# Loads a dictionary of imags
 	def loadImages(self):
 		self.icons = { }
@@ -301,9 +309,15 @@ class Game:
 
 	def do_turn(self):
 		# Message display
-		if  self.gameNetwork.vertex_counter == 2 and self.first_time == True:
-			 messagebox.showinfo(message='Press Step in the menu, then OK')
+		if self.gameNetwork.vertex_counter == 2 and self.first_time == True:
+			 messagebox.showinfo(message='Right click on your new city\n')
+			 messagebox.showinfo(message='Then left click the connection button\n')
+			 messagebox.showinfo(message='Again, this should be a green plus\n')
+			 messagebox.showinfo(message='Now double-click root\nto create a connection.')
+			 
 			 self.first_time = False
+		
+		
 		# Deal with action queue.
 		global action_q
 		
