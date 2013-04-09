@@ -328,9 +328,15 @@ class NetworkGraph:
 	# Max capacity at a node
 	def MaxCapAtNode(self,node):
 		cap = 0
+		connections = len(self.graph.adj_to(node))
 		for item in self.V_items[node]:
 			for subitem in item.GetInventory():
 				cap = cap + subitem.GetMaxCapacity()
+
+				# Give a bonus for different router types
+				if subitem.type() == 'Router':
+					if subitem.RouterType() == 'Multiplexer'
+					cap = cap + subitem.GetMaxCapacity() * connections
 		return cap
 
 	# Max capacity available at an edge
