@@ -537,6 +537,8 @@ def rev_lookup(dict,item):
 
 # Subtraction, but not below zero
 def sub_azero(a,b):
+	if a < 0: 
+		a = 0
 	c = a - b
 	if c < 0:
 		c = 0
