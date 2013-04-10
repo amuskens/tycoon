@@ -187,14 +187,14 @@ class Game:
 
 		# Draw indicator for bidirectional links
 		(mid2_x,mid2_y) = midpoint((mid_x,mid_y),(x2,y2))
-		self.E_direction_marker[edge] = self._canvas.create_line(mid2_x,mid2_y,
+		self.E_direction_marker[edge] = [self._canvas.create_line(mid2_x,mid2_y,
 									 mid2_x + 10 * math.cos(math.atan2(y2-y1,x2-x1) + 3.5 * math.pi/4),
 									 mid2_y + 10 * math.sin(math.atan2(y2-y1,x2-x1) + 3.5 * math.pi/4),
-									 fill='blue',width=2)
-		self.E_direction_marker[edge] = self._canvas.create_line(mid2_x,mid2_y,
-									 mid2_x + 10 * math.cos(math.atan2(y2-y1,x2-x1) - 3.5 * math.pi/4),
-									 mid2_y + 10 * math.sin(math.atan2(y2-y1,x2-x1) - 3.5 * math.pi/4),
-									 fill='blue',width=2)
+									 fill='blue',width=2),
+						 self._canvas.create_line(mid2_x,mid2_y,
+									  mid2_x + 10 * math.cos(math.atan2(y2-y1,x2-x1) - 3.5 * math.pi/4),
+									  mid2_y + 10 * math.sin(math.atan2(y2-y1,x2-x1) - 3.5 * math.pi/4),
+									  fill='blue',width=2)]
 
 		# Draw distances at edges
 		self.E_text[edge] = self._canvas.create_text(mid_x + 20 * math.cos(math.atan2(y2-y1,x2-x1) - math.pi / 2),
@@ -451,7 +451,9 @@ class Game:
 
 	# Process individual action from the action stack
 	def processAction(self,action):
-		print(action)
+		# print(action)
+
+		# DIfferent actions are possible based on the item at index 0.
 
 		if action[0] == 'addnode':
 			coord = action[1][0]

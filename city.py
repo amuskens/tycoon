@@ -76,8 +76,8 @@ class City():
 
         self.odemand_curve = Linear(m,b)
 
-        self.idemand_curve.print()
-        self.odemand_curve.print()
+        # self.idemand_curve.print()
+        #  elf.odemand_curve.print()
 
     # Accessor functions
     def GetName(self):
