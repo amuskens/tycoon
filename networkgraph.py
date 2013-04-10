@@ -342,7 +342,7 @@ class NetworkGraph:
 				# Give a bonus for different router types
 				if subitem.type() == 'Router':
 					if subitem.RouterType() == 'Multiplexer':
-						cap = cap + (subitem.GetMaxCapacity() / 2) * connections / (math.log10(connections) + 0.0000000001)
+						cap = cap + (subitem.GetMaxCapacity()) * 10 * connections / (math.log10(connections) + 0.0000000001)
 		return cap
 
 	# Max capacity available at an edge
