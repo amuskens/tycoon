@@ -415,7 +415,7 @@ class NetworkGraph:
 		for ids in self.V_items.keys():
 			# Populate a list of distances to the start point
 			distance = dist(x,y,self.V_coord[ids][0],self.V_coord[ids][1])
-			if distance < 100: 
+			if distance < 200: 
 					closest.append(ids)
 
 		# Find the nodes nearest to other cities

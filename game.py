@@ -158,6 +158,8 @@ class Game:
 		# Get the coordinates of the city.
 		(x,y) = city.GetCoord()
 
+		self._canvas.create_oval(x-100,y-100,x+100,y+100,outline='blue')
+
 		# Draw different pictures for different populations
 		vspace = 0
 		if city.GetPopulation() >= 1000000:
@@ -185,6 +187,8 @@ class Game:
 		self.city_text[city.GetName()] = self._canvas.create_text(x,y + vspace,
 							     text=city.GetName(),
 							     anchor='center',fill='white')
+
+	
 
 		# Attach event binding
 		self._canvas.tag_bind(self.city_images[city.GetName()],"<ButtonRelease-1>", lambda x: self.DispCity(city))
