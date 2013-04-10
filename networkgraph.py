@@ -323,8 +323,12 @@ class NetworkGraph:
 			maxwired_linkslots)
 				
 	# Cost is determined by the greatest available capacity at a link
+	# Cost is inversely proportional 
 	def cost(self,e):
-		return 1/self.CapAtEdge(e)
+		cost = self.cap_at_edge[e]
+		if cost == 0: return 0
+
+		return 1/cost
 		
 
 	# Max capacity at a node
