@@ -196,7 +196,7 @@ class Game:
 	# Display city data
 	def DispCity(self,city):
 		(i,o) = city.GetSupply()
-		messagebox.showinfo('City Info','Population:  %0.0f' % city.GetPopulation() + '\nDownlink Supply: %0.0f' %(i / 1000000) + ' Mbit/s' + '\nUplink Supply: %0.0f' %(o / 1000000) + ' Mbit/s')
+		messagebox.showinfo('City Info','Population:  %0.0f' % city.GetPopulation() + '\nDownlink Supply: %0.0f' %(o / 1000000) + ' Mbit/s' + '\nUplink Supply: %0.0f' %(i / 1000000) + ' Mbit/s')
 		
 	def NewEdgeCanvas(self,edge):
 		(x1,y1) = self.gameNetwork.V_coord[edge[0]]
