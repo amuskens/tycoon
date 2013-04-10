@@ -181,12 +181,14 @@ class GUI():
         self._cash_label = Label(self._topframe,justify=LEFT)
         self._cash_label.pack(anchor='nw', fill='y')
 
+        """
         self._b1 = Button(self._frame,
             text='Reset',
             command=self._do_reset
             )
 
         self._b1.pack(anchor='w', fill='x')
+        """
 
         """
         self._b2 = Button(self._frame,
@@ -234,7 +236,7 @@ class GUI():
         self.inv_lbl =Label(self._frame,text='Inventory:',
                                    font=appHighlightFont,justify='left')
                          
-        self.inv_lbl.pack(anchor='w',fill='x')
+        self.inv_lbl.pack(anchor='w',fill='both')
 
         # This listbox contains a display of the inventory
         self.list = Listbox(self._frame,selectmode=EXTENDED,height=30)

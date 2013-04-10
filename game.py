@@ -158,13 +158,42 @@ class Game:
 		# Get the coordinates of the city.
 		(x,y) = city.GetCoord()
 
-		self.city_images[city.GetName()] =  self._canvas.create_image(x,y,
-									      image=self.icons['city'],
-									      activeimage=self.icons['city_active'],
-									      anchor='center')
-		self.city_text[city.GetName()] = self._canvas.create_text(x,y + 70,
+		# Draw different pictures for different populations
+		vspace = 0
+		if city.GetPopulation() >= 1000000:
+			self.city_images[city.GetName()] =  self._canvas.create_image(x,y,
+										      image=self.icons['big_city'],
+										      activeimage=self.icons['big_city_active'],
+										      anchor='center')
+			vspace = 80
+
+		elif 50000 <= city.GetPopulation() < 1000000:
+			self.city_images[city.GetName()] =  self._canvas.create_image(x,y,
+										      image=self.icons['city'],
+										      activeimage=self.icons['city_active'],
+										      anchor='center')
+			vspace = 70
+
+		elif city.GetPopulation() < 50000:
+			self.city_images[city.GetName()] =  self._canvas.create_image(x,y,
+										      image=self.icons['town'],
+										      activeimage=self.icons['town_active'],
+										      anchor='center')
+			vspace = 50
+
+		
+		self.city_text[city.GetName()] = self._canvas.create_text(x,y + vspace,
 							     text=city.GetName(),
 							     anchor='center',fill='white')
+
+		# Attach event binding
+		self._canvas.tag_bind(self.city_images[city.GetName()],"<ButtonRelease-1>", lambda x: self.DispCity(city))
+
+	# Display city data
+	def DispCity(self,city):
+		(i,o) = city.GetSupply()
+		messagebox.showinfo('City Info','Population:  %0.0f' % city.GetPopulation() + '\nDownlink Supply: %0.0f' %(i / 1000000) + ' Mbit/s' + '\nUplink Supply: %0.0f' %(o / 1000000) + ' Mbit/s')
+		
 	def NewEdgeCanvas(self,edge):
 		(x1,y1) = self.gameNetwork.V_coord[edge[0]]
 		(x2,y2) = self.gameNetwork.V_coord[edge[1]]
@@ -301,6 +330,10 @@ class Game:
 		self.icons['backpane']= PhotoImage(file = 'images/backpane.gif')
 		self.icons['city']= PhotoImage(file = 'images/city-icon.gif')
 		self.icons['city_active']= PhotoImage(file = 'images/city-icon_active.gif')
+		self.icons['big_city']= PhotoImage(file = 'images/big_city.gif')
+		self.icons['big_city_active']= PhotoImage(file = 'images/big_city_active.gif')
+		self.icons['town']= PhotoImage(file = 'images/town.gif')
+		self.icons['town_active']= PhotoImage(file = 'images/town_active.gif')
 
 		# Canvas submenu
 		self.icons['addnode']= PhotoImage(file = 'images/canvassubmenu/addnode.gif')
