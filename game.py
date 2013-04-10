@@ -61,7 +61,7 @@ class Game:
 		# which will display at turns.
 		self._messages = []
 		self.inventory = []
-		self.cash = 100000
+		self.cash = 500000
 		
 		# let us modify the value of the global gui variable
 		global gui
@@ -333,8 +333,9 @@ class Game:
 			if RightCounter==2:
 				self.Tutorial()
 		
-		if self.cash < -50000:
-			messagebox.showinfo(message='YOU LOSE\nGAME OVER')
+		# Tried playing. Setting -50000 was too hard.
+		if self.cash < -100000:
+			messagebox.showinfo(message='YOU LOSE. YOU WENT TOO FAR INTO DEBT.\nGAME OVER')
 			quit()
 		# Deal with action queue.
 		global action_q

@@ -118,7 +118,7 @@ class CanvasSubMenu():
             game.clicked = False
             self.canvas.bind("<Double-Button-1>", lambda x: self.returnCoord())
             self.close()
-            self.selected = self.canvas.create_oval(self.x -10,self.y -10,self.x + 10,self.y + 10,
+            self.selected = self.canvas.create_oval(self.x -30,self.y -30,self.x + 30,self.y + 30,
                                        outline='red',width=3)
 
                 

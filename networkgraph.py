@@ -3,6 +3,7 @@ from distfuncs import *
 
 from digraph import Digraph
 import dyjkstra
+import math
 
 from capital import *
 
@@ -336,7 +337,7 @@ class NetworkGraph:
 				# Give a bonus for different router types
 				if subitem.type() == 'Router':
 					if subitem.RouterType() == 'Multiplexer':
-						cap = cap + subitem.GetMaxCapacity() / 10 * connections
+						cap = cap + (subitem.GetMaxCapacity() / 2) * connections / math.log10(connections)
 		return cap
 
 	# Max capacity available at an edge

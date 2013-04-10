@@ -166,14 +166,18 @@ class EditLink():
             self.slots_list.insert(END,temp)
 
     def refresh_des(self):
-        if self.inv_list.curselection():
-            self.sel = int(self.inv_list.curselection()[0])
-            self.sel_item = self.inventory[self.sel]
-            self.des.set(self.sel_item.GetInfo())
-        elif self.slots_list.curselection():
-            self.sel = int(self.slots_list.curselection()[0])
-            self.sel_item = self.network.E_items[self.edge][self.sel]
-            self.des.set(self.sel_item.GetInfo())
+        # Just in case something is deleted in between
+        try:
+            if self.inv_list.curselection():
+                self.sel = int(self.inv_list.curselection()[0])
+                self.sel_item = self.inventory[self.sel]
+                self.des.set(self.sel_item.GetInfo())
+            elif self.slots_list.curselection():
+                self.sel = int(self.slots_list.curselection()[0])
+                self.sel_item = self.network.E_items[self.edge][self.sel]
+                self.des.set(self.sel_item.GetInfo())
+        except:
+            pass
 
         # Refresh max capacity display
         self.cap.set('Maximum capacity available at link: %0.2f' % (self.network.MaxCapAtEdge(self.edge) / 1000000) + ' Mbit/s')
@@ -215,7 +219,7 @@ class EditLink():
                     if added:
                         self.inventory.pop(self.sel)
                         if item_toadd.type() == 'Wired':
-                            game.action_q.append(['subtractcash',[-item_toadd.GetCost() + item_toadd.GetCost() * self.network.E_lengths[edge]]])
+                            game.action_q.append(['subtractcash',[-item_toadd.GetCost() + item_toadd.GetCost() * self.network.E_lengths[self.edge]]])
                         game.action_q.append(['inv',copy.deepcopy(self.inventory)])
                         self.do_item_change()
                     else:
@@ -257,10 +261,16 @@ class EditLink():
     def get_maint(self):
         # Check which item is selected
         if self.inv_list.curselection():
-            self.sel = int(self.inv_list.curselection()[0])
-            item = self.inventory[self.sel]
-            self.budget.set('%0.2f' % (item.GetMaintenance() * 24 * 7))
+            try:
+                self.sel = int(self.inv_list.curselection()[0])
+                item = self.inventory[self.sel]
+                self.budget.set('%0.2f' % (item.GetMaintenance() * 24 * 7))
+            except:
+                pass
         elif self.slots_list.curselection():
-            self.sel = int(self.slots_list.curselection()[0])
-            item = self.network.E_items[self.edge][self.sel]
-            self.budget.set('%0.2f' % (item.GetMaintenance() * 24 * 7))
+            try:
+                self.sel = int(self.slots_list.curselection()[0])
+                item = self.network.E_items[self.edge][self.sel]
+                self.budget.set('%0.2f' % (item.GetMaintenance() * 24 * 7))
+            except:
+                pass

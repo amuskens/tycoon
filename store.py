@@ -58,7 +58,7 @@ class Store():
         self.rad1.select()
         self.rad2 = Radiobutton(self.subFrame,text='Buildings',variable=self.v,value='building',anchor='w')
         self.rad2.pack(side='top',fill='x',padx=20)
-        self.rad3 = Radiobutton(self.subFrame,text='Routers and Mobile Base Stations',variable=self.v,value='router',anchor='w')
+        self.rad3 = Radiobutton(self.subFrame,text='Routers, Multiplexers, and Mobile Base Stations',variable=self.v,value='router',anchor='w')
         self.rad3.pack(side='top',fill='x',padx=20)
         self.rad4 = Radiobutton(self.subFrame,text='Radios',variable=self.v,value='radio',anchor='w')
         self.rad4.pack(side='top',fill='x',padx=20)
