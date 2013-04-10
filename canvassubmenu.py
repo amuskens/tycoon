@@ -117,24 +117,29 @@ class CanvasSubMenu():
             # Wait until
             game.clicked = False
             self.canvas.bind("<Double-Button-1>", lambda x: self.returnCoord())
+            self.close()
+            self.selected = self.canvas.create_oval(self.x -10,self.y -10,self.x + 10,self.y + 10,
+                                       outline='red',width=3)
 
                 
     def returnCoord(self):
         game.action_q.append(['addlink',[self.node,
                                              (self.canvas.canvasx(game.lastx),
                                               self.canvas.canvasy(game.lasty))]])
+        self.canvas.delete(self.selected)
         self.canvas.unbind("<Double-Button-1>")
-        self.close()
 
     def do_dellink(self):
         if self.linkflag:
             game.action_q.append(['dellink',[self.link]])
+            self.close()
             
     def do_addnode(self):
         if self.nodeflag:
             return
         else:
             self.msg_box_name('Enter a Network node name: ')
+            self.close()
            
 
     def do_delnode(self):

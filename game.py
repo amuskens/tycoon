@@ -490,6 +490,22 @@ class Game:
 						     'Are you sure you want to delete ' + self.gameNetwork.V_name[node_to_del] + ' and all of its contents?')
 			
 			if answer:
+				# Start by deleting all links attached to the node.
+				# Copy the list so you can iterate over it without changing size.
+				adj = copy.deepcopy(self.gameNetwork.graph.vertices())
+
+				for i in adj:
+					# Both ways
+					try:
+						self.gameNetwork.DelLink((node_to_del,i))
+						self.DelLinkCanvas((node_to_del,i))
+
+						self.gameNetwork.DelLink((i, node_to_del))
+						self.DelLinkCanvas((i, node_to_del))
+					except:
+						# Kinda like "on error resume next"
+						continue
+
 				new_inv = self.gameNetwork.DelNode(node_to_del)
 				self.DelNodeCanvas(node_to_del)
 				return
