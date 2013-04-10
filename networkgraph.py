@@ -322,9 +322,10 @@ class NetworkGraph:
 			maxradio_linkslots,
 			maxwired_linkslots)
 				
-	# Temp Cost function
+	# Cost is determined by the greatest available capacity at a link
 	def cost(self,e):
-		return 1
+		return 1/self.CapAtEdge(e)
+		
 
 	# Max capacity at a node
 	def MaxCapAtNode(self,node):

@@ -253,7 +253,7 @@ class Game:
 								activeimage=self.icons['node_active'],
 								anchor='center')
 		self.V_text[node] = self._canvas.create_text(x + 30,y,
-							     text=(self.gameNetwork.V_name[node] + '\n' + self.gameNetwork.ItemsAtNode(node) + ' items'),
+							     text=(self.gameNetwork.V_name[node]),
 							     anchor='w',fill='white')
 		# Attach mouse events to each node iamge
 		self._canvas.tag_bind(self.V_images[node],"<ButtonRelease-1>", lambda x: self.displayNode(node))
