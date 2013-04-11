@@ -150,7 +150,7 @@ class Game:
 		RightCounter+=1
 		messagebox.showinfo(message='Please select the add node button.')
 		messagebox.showinfo(message='This should be the green plus in the sub-menu.')
-		messagebox.showinfo(message='This NETWORK NODE represents\na bandwidth origin.')
+		messagebox.showinfo(message='This NETWORK NODE represents\na point of connectivity in the network. \nYou can place buildings with routers at these nodes..')
 		self.first_time = 1
 
 	# Draw cities
