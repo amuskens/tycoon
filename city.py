@@ -109,7 +109,7 @@ class City():
         # A more realistic way to determine growth is needed.
         # Update population only once a week.
         if turn % 168 == 0:
-            self.population = self.population + (100 - 100 * random.random()) * self.growth_factor
+            self.population = self.population + (120 - 100 * random.random()) * self.growth_factor
         """
         dm = (0.5 - random.random()) / 1000000 * multiplier
         db = (0.5 - random.random()) / 1000000 + vshift
