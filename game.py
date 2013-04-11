@@ -1,5 +1,6 @@
 # game.py
-# Contians the main game class, which holds all other game classes inside.
+# Contians the main game class, which holds all other game related classes inside.
+# Only one instance of the game class shoudl exist
 
 import random
 import math
@@ -20,6 +21,7 @@ from distfuncs import *
 import store
 import editnode
 
+# Import a level
 import LEVEL1_map
 
 # Globals for mouse clicks.
@@ -31,7 +33,7 @@ action_q = []
 
 """
 
-There will be use of a global "action queu" which other
+There will be use of a global "action queue" which other
 class can use to send actions to the game class. This will be popped
 until emptied every step, and the instruction swill be executed.
 
@@ -44,6 +46,9 @@ Action format:
 
 
 # Event callbacks:
+
+# This event is called back when the left mouse button is pressed.
+# Returns the location of the mouse pointer into global variables.
 def xy(event):
 	global lastx, lasty, clicked
 	lastx = event.x
@@ -53,7 +58,7 @@ def xy(event):
 class Game:
 	def __init__(self,title="Telecom Network Tycoon"):
 
-		# Load up teh item database
+		# Load up the asset database. This contains purchaseable items.
 		self.ItemDatabase = CapitalDatabase()
 
 		# Initialize message stack. 
@@ -61,6 +66,8 @@ class Game:
 		# which will display at turns.
 		self._messages = []
 		self.inventory = []
+
+		# Initial cash
 		self.cash = 500000
 		
 		# let us modify the value of the global gui variable
@@ -75,15 +82,22 @@ class Game:
 	def do_init(self):
 		global lastx, lasty
 		global RightCounter
-		RightCounter=1
-		self.gameNetwork = NetworkGraph((800,800),"Root",[],100000)
 
+		# Counter for determining tutorial mode
+		RightCounter=1
+
+		# Load up a network graph object which contains the actual network
+		# Not calling the optional scale factor argument. Set to default
+		self.gameNetwork = NetworkGraph()
+
+		# Load up the economy from the level setup. This defines cities, populations, and demand
+		# for the game engine
 		self.economy = LEVEL1_map.level1_setup(self)
 		
 		# Initialize message stack
 		self._messages = []
 
-		# Initialize the action queue
+		# Initialize the action queue to be empty
 		global action_q
 		action_q = []
 
@@ -94,23 +108,24 @@ class Game:
 
 		self.first_time = 0
 
-		# Load images
+		# Load images and icon graphics
 		self.loadImages()
 
+		# Create an empty list of subwindows to keep track of the instances of submenus
+		# for garbage collection.
 		self.subwindows = []
-		
 		
 		# Load up the canvas, load up bg
 		self._canvas = gui.get_canvas()	      
 		self.bg_image = self._canvas.create_image(0,0,image=self.icons['bg'],anchor='nw')
 
-		# Bind text for cash display
+		# Bind text for cash / status display. Will be updated on turns
 		self.cashLabel = gui.get_cashlabel()
 		self.cashcontents = StringVar()
 		self.cashLabel['textvariable'] = self.cashcontents
 		self.cashcontents.set(' $ ' + str(self.cash))
 
-		# Bind mouse motion
+		# Bind mouse motion events to the canvas to allow for clickable options
 		self._canvas.bind("<ButtonPress-1>", xy)
 		self._canvas.bind("<ButtonPress-3>", xy)
 		self._canvas.bind("<ButtonRelease-3>", lambda x: self.submenuother())
@@ -125,6 +140,8 @@ class Game:
 		self.E_lines = { }
 		self.E_text = {}
 		self.E_direction_marker = { }
+
+		# Draw any inital edges which may be in the network graph
 		for edge in self.gameNetwork.GetEdges():
 			self.NewEdgeCanvas(edge)
 			
@@ -133,6 +150,8 @@ class Game:
 		self.V_notify = { }
 		self.V_displays = set()
 		self.V_text = { }
+
+		# Draw any initial nodes which may be in the network graph
 		for node in self.gameNetwork.GetNodes():
 			self.NewNodeCanvas(node)
 
@@ -141,10 +160,11 @@ class Game:
 			      self._canvas,0,
 			      self.icons)
 
-		#Tutorial beginings
+		# Tutorial beginings
 		messagebox.showinfo('Welcome to Telecom Tycoon',message = 'Lets get started, shall we?')
 		messagebox.showinfo(message='Right click anywhere to begin')
 		
+	# Defines a tutorial of messages on first startup to assist with playing the game
 	def Tutorial(self):
 		global RightCounter
 		RightCounter+=1
@@ -153,14 +173,17 @@ class Game:
 		messagebox.showinfo(message='This NETWORK NODE represents\na point of connectivity in the network. \nYou can place buildings with routers at these nodes..')
 		self.first_time = 1
 
-	# Draw cities
+	# Draw cities on the canvas map
 	def DrawCity(self,city):
 		# Get the coordinates of the city.
 		(x,y) = city.GetCoord()
 
+		# Show the effective radius where nodes can be placed
 		self._canvas.create_oval(x-100,y-100,x+100,y+100,outline='blue')
 
-		# Draw different pictures for different populations
+		# Draw different pictures for different populations.
+		# Different title spacing is needed for different icon sizes.
+		# Determined experimentally.
 		vspace = 0
 		if city.GetPopulation() >= 1000000:
 			self.city_images[city.GetName()] =  self._canvas.create_image(x,y,
@@ -184,20 +207,24 @@ class Game:
 			vspace = 50
 
 		
+		# Draw the name of the city
 		self.city_text[city.GetName()] = self._canvas.create_text(x,y + vspace,
 							     text=city.GetName(),
 							     anchor='center',fill='white')
 
 	
 
-		# Attach event binding
+		# Attach event binding so city icons can be clicked to open a display window
 		self._canvas.tag_bind(self.city_images[city.GetName()],"<ButtonRelease-1>", lambda x: self.DispCity(city))
 
-	# Display city data
+	# Display city data in a subwindow
 	def DispCity(self,city):
+		# Mesy long string, but whatever. Not much you can do about this in Python
 		(i,o) = city.GetSupply()
 		messagebox.showinfo('City Info','Population:  %0.0f' % city.GetPopulation() + '\nDownlink Supply: %0.0f' %(o / 1000000) + ' Mbit/s' + '\nUplink Supply: %0.0f' %(i / 1000000) + ' Mbit/s')
 		
+
+	# Draw a new edge on the canvas, and keep track of the canvas object handlers so it can be deleted later
 	def NewEdgeCanvas(self,edge):
 		(x1,y1) = self.gameNetwork.V_coord[edge[0]]
 		(x2,y2) = self.gameNetwork.V_coord[edge[1]]
@@ -208,6 +235,8 @@ class Game:
 		else:
 			fillcolor='black'
 
+		# Calculate new coordinates for links so bidirectional link lines do not intersect. 
+		# Have them offset slightly. Determined experimentally
 		x1 = x1 + 5 * math.cos(math.atan2(y2-y1,x2-x1) + math.pi/2)
 		x2 = x2 + 5 * math.cos(math.atan2(y2-y1,x2-x1) + math.pi/2)
 		y1 = y1 + 5 * math.sin(math.atan2(y2-y1,x2-x1) + math.pi/2)
@@ -218,7 +247,7 @@ class Game:
 							      fill=fillcolor,activefill='purple',width=3)
 		(mid_x,mid_y) = midpoint((x1,y1),(x2,y2))
 
-		# Draw indicator for bidirectional links
+		# Draw arrow indicator for bidirectional links
 		(mid2_x,mid2_y) = midpoint((mid_x,mid_y),(x2,y2))
 		self.E_direction_marker[edge] = [self._canvas.create_line(mid2_x,mid2_y,
 									 mid2_x + 10 * math.cos(math.atan2(y2-y1,x2-x1) + 3.5 * math.pi/4),
@@ -229,17 +258,17 @@ class Game:
 									  mid2_y + 10 * math.sin(math.atan2(y2-y1,x2-x1) - 3.5 * math.pi/4),
 									  fill='blue',width=2)]
 
-		# Draw distances at edges
+		# Draw distances in km at edges
 		self.E_text[edge] = self._canvas.create_text(mid_x + 20 * math.cos(math.atan2(y2-y1,x2-x1) - math.pi / 2),
 							     mid_y + 30 * math.sin(math.atan2(y2-y1,x2-x1) - math.pi / 2),
 							     anchor='center',text=('%0.2f' % (self.gameNetwork.E_lengths[edge]) + ' km'),
 							     fill='white')
 							     
-		# Attach mouse events:
+		# Attach mouse events for click regions
 		self._canvas.tag_bind(self.E_lines[edge],"<ButtonRelease-3>", lambda x: self.submenuLink(edge))
 		self._canvas.tag_bind(self.E_lines[edge],"<ButtonRelease-1>", lambda x: self.editLink(edge))
 
-	# Delete a link from the canvas
+	# Delete a link from the canvas. Destroy object handlers to delete it from view
 	def DelLinkCanvas(self,link):
 		self._canvas.delete(self.E_lines[link])
 		for i in self.E_direction_marker[link]: self._canvas.delete(i)
@@ -248,10 +277,12 @@ class Game:
 	# Function adds new node imagery dictionaries and canvas
 	def NewNodeCanvas(self,node):
 		(x,y) = self.gameNetwork.V_coord[node]
+		# Draw the node icon
 		self.V_images[node] = self._canvas.create_image(x,y,
 								image=self.icons['node'],
 								activeimage=self.icons['node_active'],
 								anchor='center')
+		# Draw node name
 		self.V_text[node] = self._canvas.create_text(x + 30,y,
 							     text=(self.gameNetwork.V_name[node]),
 							     anchor='w',fill='white')
@@ -282,6 +313,7 @@ class Game:
 	# Open the edit link menu
 	def editLink(self,edge):
 		new = EditLink(gui.GetRoot(),self.inventory,edge,self.gameNetwork)
+		# This should get garbage collected once the menu is destroyed.
 
 	# Display a right-click submenu on the canvas
 	def submenuNode(self,node):
@@ -318,7 +350,7 @@ class Game:
 						     self._canvas.canvasy(lasty),
 						     self._canvas,0,
 						     self.icons)
-	# Loads a dictionary of imags
+	# Loads a dictionary of imags from files
 	def loadImages(self):
 		self.icons = { }
 		self.icons['sstower'] = PhotoImage(file = 'images/tower.gif')
@@ -353,8 +385,10 @@ class Game:
 		self.icons['dellink_active']= PhotoImage(file = 'images/canvassubmenu/dellink_active.gif')
 		self.icons['dellink_inactive']= PhotoImage(file = 'images/canvassubmenu/dellink_inactive.gif')
 
+	# Most important game function
+	# Executes to carry out any operations required for a turn
 	def do_turn(self):
-		# Message display
+		# Message display for tutorial
 		if self.first_time==1 and self.gameNetwork.vertex_counter==2:
 			messagebox.showinfo(message='You will need to create another\nif your current node\nis not near a city.')
 			self.first_time=2
@@ -371,23 +405,29 @@ class Game:
 				self.Tutorial()
 		
 		# Tried playing. Setting -50000 was too hard.
+		# This is a lose condition for the game. If you fall too far into debt, the game will quit.
 		if self.cash < -100000:
 			messagebox.showinfo(message='YOU LOSE. YOU WENT TOO FAR INTO DEBT.\nGAME OVER')
 			quit()
+
 		# Deal with action queue.
 		global action_q
 		
-		# Process each action
+		# Process each action in the queue
 		while len(action_q) > 0:
 			action = action_q.pop(0)
 			self.processAction(action)
 
+		# Calculate maintenance costs in the network
 		total_maintCost = 0
-		# Refresh ll stat windows, which will be inaccurate
+
+		# Refresh ll stat windows, which will be need updating with new information.
+		# Pass new inventory and capacity fraction indicators.
 		for window in self.subwindows:
 			if not window.Closed():
 				maxcap = self.gameNetwork.MaxCapAtNode(window.node)
 				cap_frac = (maxcap - self.gameNetwork.cap_at_node_cached[window.node]) / (maxcap + 0.00000001)
+				if cap_frac < 0: cap_frac = 0
 				window.refresh(self.inventory,
 					       cap_frac)
 				# Note avoiding divide by zero error above
@@ -401,6 +441,8 @@ class Game:
 			total_maintCost = total_maintCost + 1.38
 
 			if not self.gameNetwork.NodeOperational(nodeKey):
+				# Show a notification item if something fails. If there is a key error in the notification dictionary,
+				# we know the image must not exist.
 				try: 
 					self.V_notify[nodeKey]
 				except:
@@ -411,7 +453,8 @@ class Game:
 			else:
 				try: self._canvas.delete(self.V_notify[nodeKey])
 				except: pass
-				
+			
+			# update items in the node build slots
 			for item in self.gameNetwork.V_items[nodeKey]:
 				fail = item.Update()
 				# Add a message telling what failed and where, if it did.
@@ -451,29 +494,34 @@ class Game:
 					self._canvas.itemconfigure(self.E_lines[edgekey],fill='red')
 				
 		
-		# Update how much money to make:
+		# Update how much money to make per turn
 		revenue = 0
 
+		# Reset the capacity calculations from last time
 		self.gameNetwork.CapReset()
 		for city in self.economy.GetCities():
+			# This function needs the above reset because it calculates network bottlenecks based on current capacities
+			# caused by traffic created by other cities.
 			city.SetSupply(self.gameNetwork.CapAtCoord(city.GetCoord(),self.economy.GetCitiesCoord()))
+			# Debug
 			#print(city.GetName() + ': ' + str(city.GetSupply()))
 
-			# Add revenue
+			# Add revenue to the total
 			revenue = revenue + city.Revenue()
 		
+		# Cache the capacity calculations so the data can be displayed on node displays.
 		self.gameNetwork.CapCache()
 		
-		# Update the economy
+		# Update the economy 
 		self.economy.Update(self.turn)
-
 
 		# Update game parameters
 		self.cash = self.cash - total_maintCost + revenue
 
-		# A turn corresponds to one hour
+		# A turn corresponds to one hour, just to check
 		self.turn = self.turn + 1
 
+		# update the status display on the top bar
 		tempstr = 'Cash:  $ %0.2f' % self.cash + '  Cost per week: $%0.2f' % (total_maintCost * 24 * 7)
 		tempstr = tempstr + '  Weekly Revenue: $%0.2f' % (revenue * 24 * 7)
 		tempstr = tempstr + '  Net Profit per week: $ %0.2f' % ((-total_maintCost + revenue) * 7 * 24)
@@ -482,7 +530,9 @@ class Game:
 		tempstr = tempstr + ' Year: ' + str(self.turn  //  (365 * 24))
 		self.cashcontents.set(tempstr)
 		
-		# Empty the message stack to the user.
+		# Empty the message stack to the user. I realize it's more like a queue at this point than a stack,
+		# but the original intention was to have a fifo message box which would show previous messages and 
+		# allow the user to pop ones he didn't want to see. If we had more time, this could be implemented.
 		while len(self._messages) > 0:
 			messagebox.showinfo("Message",self._messages.pop(0),
 					    icon='warning')
@@ -506,6 +556,7 @@ class Game:
 			pt = action[1][1]
 			dist = 200
 
+			# Return the closest node to the click point
 			(closestNode, distance) = self.gameNetwork.ReturnClosePoint(pt)
 
 			# Return early if the selected link is invaiid. 
@@ -522,6 +573,7 @@ class Game:
 				self.NewEdgeCanvas((node,closestNode))
 				return
 
+		# Delete a node
 		elif action[0] == 'delnode':
 			node_to_del = action[1][0]
 			answer = messagebox.askyesno('Warning',
@@ -530,18 +582,21 @@ class Game:
 			if answer:
 				# Start by deleting all links attached to the node.
 				# Copy the list so you can iterate over it without changing size.
+				# Python doesn't allow iterating lists which change size.
 				adj = copy.deepcopy(self.gameNetwork.graph.vertices())
 
 				for i in adj:
-					# Both ways
+					# We want to delete any links connected to the node
+					# as well as the node itself.
 					try:
 						self.gameNetwork.DelLink((node_to_del,i))
 						self.DelLinkCanvas((node_to_del,i))
 
+						# Delete both ways
 						self.gameNetwork.DelLink((i, node_to_del))
 						self.DelLinkCanvas((i, node_to_del))
 					except:
-						# Kinda like "on error resume next"
+						# Kinda like "on error resume next", Visual Basic Style
 						continue
 
 				new_inv = self.gameNetwork.DelNode(node_to_del)
@@ -564,16 +619,8 @@ class Game:
 
 		# Change the inventory to the incoming inventory.
 		elif action[0] == 'inv':
-			"""
-			# Clear the inventory
-			while len(self.inventory) > 0:
-				self.inventory.pop()
-				
-			for item in action[1]:
-				self.inventory.append(copy.copy(item))
-				store.refresh_flag = True
-				editnode.refresh_flag = True
-			"""
+			# It seemed to be easier to replace the inventory instead of trying to determine
+			# what changed. 
 			self.inventory = copy.deepcopy(action[1])
 			global gui
 			gui.inventory = self.inventory

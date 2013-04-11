@@ -10,7 +10,7 @@ from capital import *
 class NetworkGraph:
 	# A network graph will contain the game's main graph.
 	# There will be an origin node whose coordinates are specified
-	def __init__(self,origin_coord,origin_name,origin_items,origin_startbandwidth,scale_factor = 0.2):
+	def __init__(self,scale_factor = 0.2):
 		self.graph = Digraph()
 		self.vertex_counter = 1
 		self.max_slots = 3
@@ -31,18 +31,7 @@ class NetworkGraph:
 		# Figure out the link distances beforehand, and cache them
 		self.E_lengths = { }
 
-		# Add the info for the origin node
-		"""
-		self.graph.add_vertex(0)
-		self.V_coord[0] = origin_coord
-		self.V_name[0] = origin_name
-		self.V_items[0] = origin_items
-		"""
-
-		# Set the start bandwidth at the origin
-		self.origin_bandwidth = origin_startbandwidth
-
-		# These are used for calculating capacity
+		# These are used for calculating capacity at nodes and edges
 		self.cap_at_node = {}
 		self.cap_at_edge = {}
 		self.cap_at_node_cached = {}
@@ -308,6 +297,8 @@ class NetworkGraph:
 		wired_linkslots = 0
 		maxradio_linkslots = 0
 		maxwired_linkslots = 0
+
+		# Check each item at the node
 		for item in self.V_items[node]:
 			if item.StructType() == 'Tower':
 				radio_linkslots = radio_linkslots +  item.GetCurLinkSlots()
@@ -323,9 +314,14 @@ class NetworkGraph:
 			maxwired_linkslots)
 				
 	# Cost is determined by the greatest available capacity at a link
-	# Cost is inversely proportional 
+	# Cost is inversely proportional to the available capacity
+	# This function will be used by Dyjkstra's algorithm to route data in the 
+	# most efficient way possible, avoiding bottlenecks and links with 
+	# too little capacity. This way, links with the greatest capacity will fill up first.
 	def cost(self,e):
 		cost = self.cap_at_edge[e]
+
+		# Avoid that nasty divide by zero error.
 		if cost == 0: return 0
 
 		return 1/cost
@@ -412,6 +408,9 @@ class NetworkGraph:
 
 	# Calculate the bandwidth available at a certain coordinate point.
 	# This function will be used to calculate revenue
+	# Premise is to use Dyjkstra's algorithm from every node near a city to every other node near every other city.
+	# While doing so, we will add up the current traffic flows through links and nodes in order to figure out
+	# how saturated links are, and restrict traffic flow accordingly.
 	def CapAtCoord(self,pt,to_pts):
 		(x, y) = pt
 
@@ -448,6 +447,8 @@ class NetworkGraph:
 				index = 0
 				
 				#print('Outgoing start:')
+
+				# If the edge does not have enough caacity, cap flow at this amount
 				cur_cap = self.cap_at_edge[(path[0],path[1])]
 				#print(cur_cap)
 				while index < len(path) - 1 and cur_cap > 0:
@@ -517,7 +518,8 @@ class NetworkGraph:
 		
 				
 		
-
+# Look up an item backwards in a dictionary
+# Assumes that every item is unique even across multiple keys.
 def rev_lookup(dict,item):
 	"""
 	Tests:	
@@ -535,7 +537,7 @@ def rev_lookup(dict,item):
 
 	return None
 
-# Subtraction, but not below zero
+# Subtraction, but not below zero. Cap at 0
 def sub_azero(a,b):
 	if a < 0: 
 		a = 0

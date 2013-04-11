@@ -468,6 +468,10 @@ class Wired(PointToPoint):
     def SetWireMaxCapacity(self,dist):
         self.cur_max_capacity = self.DistCapacity(dist)
 
+    # Override the parent classes' max capcity, and return one based on attenuation
+    def GetMaxCapacity(self):
+        return self.cur_max_capacity
+
     def GetInfo(self):
         item = self
         tempstr = 'Item Description: \n' + 'Name: ' + item.GetName()
