@@ -18,8 +18,6 @@ class EditSubslot():
         self.node = node
         self.network = gamenetwork
 
-        print(item_index)
-
         # Define fonts
         BoldFont = font.Font(family='Arial', size=14, weight='bold')
 

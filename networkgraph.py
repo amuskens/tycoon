@@ -330,7 +330,9 @@ class NetworkGraph:
 	# Max capacity at a node
 	def MaxCapAtNode(self,node):
 		cap = 0
-		connections = len(self.graph.adj_to(node))
+		multiplexed = 0
+		mux = 0
+		connections = len(self.graph.adj_to(node)) + len(self.graph.adj_from(node))
 		for item in self.V_items[node]:
 			for subitem in item.GetInventory():
 				cap = cap + subitem.GetMaxCapacity()
@@ -338,7 +340,11 @@ class NetworkGraph:
 				# Give a bonus for different router types
 				if subitem.type() == 'Router':
 					if subitem.RouterType() == 'Multiplexer':
-						cap = cap + (subitem.GetMaxCapacity()) * 10 * connections / (math.log10(connections) + 0.0000000001)
+						mux = mux + 1
+						multiplexed = multiplexed + subitem.GetMaxCapacity()
+
+		# Account for multiplexer advantage
+		cap = cap + connections * mux * multiplexed
 		return cap
 
 	# Max capacity available at an edge

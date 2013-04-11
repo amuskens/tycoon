@@ -44,6 +44,7 @@ class NodeDisplay():
         self.window = self.canvas.create_image(x-5,y-5,image=imagedict['backpane'],anchor='nw',tags=str(self.id))
         self.canvas.tag_bind(self.window,"<ButtonPress-1>", lambda x: self.close())
 
+        # Display capacity saturation
         self.cap_display_back = self.canvas.create_rectangle(x + self.width - 125, y + 5, 
                                                               x + self.width - 25, y + 15,
                                                               fill='black',outline='white')
@@ -118,7 +119,7 @@ class NodeDisplay():
                                                           tags=str(self.id)))
 
             self.slot_text.append(self.canvas.create_text(x+15, y + 66 + voffset,
-                                                          text='%0.3f' % (cap_avail // 1000000) + ' Mbps Capacity',
+                                                          text='%0.3f' % (cap_avail // 1000000) + ' Mbit/s Capacity',
                                                           fill='black',
                                                           anchor='nw',
                                                           font=self.Font3,
@@ -145,6 +146,7 @@ class NodeDisplay():
                 temp = 'Within Lifespan'
                 fillcolor='green'
 
+            # Draw age
             self.slot_text.append(self.canvas.create_text(x+380,y + 45 + voffset,
                                                               text='Age: ' + str(item.GetAge() // 24) + ' days',
                                                               fill=fillcolor,anchor='nw',font=self.Font2,tags=str(self.id)))

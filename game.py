@@ -221,7 +221,7 @@ class Game:
 	def DispCity(self,city):
 		# Mesy long string, but whatever. Not much you can do about this in Python
 		(i,o) = city.GetSupply()
-		messagebox.showinfo('City Info','Population:  %0.0f' % city.GetPopulation() + '\nDownlink Supply: %0.0f' %(o / 1000000) + ' Mbit/s' + '\nUplink Supply: %0.0f' %(i / 1000000) + ' Mbit/s')
+		messagebox.showinfo('City Info','Population:  %0.0f' % city.GetPopulation() + '\nDownlink Supply: %0.0f' %(o / 1000000) + ' Mbit/s' + '\nUplink Supply: %0.0f' %(i / 1000000000) + ' Gbit/s')
 		
 
 	# Draw a new edge on the canvas, and keep track of the canvas object handlers so it can be deleted later
