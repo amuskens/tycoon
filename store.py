@@ -79,7 +79,7 @@ class Store():
 
 
         # Select item list boxes
-        self.itemselector = Listbox(self.frame,height=20,width=40,selectmode=SINGLE)
+        self.itemselector = Listbox(self.frame,height=20,width=60,selectmode=SINGLE)
         self.itemselector.pack(side='left',padx=1,pady=10)
         self.item_scroll = Scrollbar(self.frame,orient=VERTICAL,
                                      command=self.itemselector.yview)

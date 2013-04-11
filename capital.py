@@ -351,7 +351,7 @@ class Router(Network):
         tempstr = tempstr + '\nCost: $ ' + "%0.2f" % item.GetCost()
         tempstr = tempstr + '\nSuggested maintenance budget: $ %0.2f'% (item.SugMaintenance() * 24 * 7) + ' per week'
         tempstr = tempstr + '\nProjected Lifespan: %0.2f' % (item.GetLifespan() / 365 / 24) + ' years'
-        tempstr = tempstr + '\nMaximum Capacity: %0.2f' % (float(item.GetMaxCapacity()) / 1000000) + ' megabits per second'
+        tempstr = tempstr + '\nMaximum Capacity: %0.2f' % (float(item.GetMaxCapacity()) / 1000000000) + 'Gbit/s'
         tempstr = tempstr + '\nType: ' + self.router_type
         if self.router_type == 'Cecllular Base Station':
             tempstr = tempstr + 'Service Radius: ' + str(self.service_range) + ' km'
