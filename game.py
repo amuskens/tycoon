@@ -68,7 +68,7 @@ class Game:
 		self.inventory = []
 
 		# Initial cash
-		self.cash = 500000
+		self.cash = 1000000
 		
 		# let us modify the value of the global gui variable
 		global gui
