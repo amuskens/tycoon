@@ -81,10 +81,6 @@ class Game:
 
 	def do_init(self):
 		global lastx, lasty
-		global RightCounter
-
-		# Counter for determining tutorial mode
-		RightCounter=1
 
 		# Load up a network graph object which contains the actual network
 		# Not calling the optional scale factor argument. Set to default
@@ -160,18 +156,6 @@ class Game:
 			      self._canvas,0,
 			      self.icons)
 
-		# Tutorial beginings
-		messagebox.showinfo('Welcome to Telecom Tycoon',message = 'Lets get started, shall we?')
-		messagebox.showinfo(message='Right click anywhere to begin')
-		
-	# Defines a tutorial of messages on first startup to assist with playing the game
-	def Tutorial(self):
-		global RightCounter
-		RightCounter+=1
-		messagebox.showinfo(message='Please select the add node button.')
-		messagebox.showinfo(message='This should be the green plus in the sub-menu.')
-		messagebox.showinfo(message='This NETWORK NODE represents\na point of connectivity in the network. \nYou can place buildings with routers at these nodes..')
-		self.first_time = 1
 
 	# Draw cities on the canvas map
 	def DrawCity(self,city):
@@ -246,8 +230,12 @@ class Game:
 		self.E_lines[edge] = self._canvas.create_line(x1,y1,x2,y2,
 							      fill=fillcolor,activefill='purple',width=3)
 								  
+		# Be sure to not obscure text and node images
 		self._canvas.tag_raise(self.V_images[edge[0]])
 		self._canvas.tag_raise(self.V_images[edge[1]])
+		self._canvas.tag_raise(self.V_text[edge[0]])
+		self._canvas.tag_raise(self.V_text[edge[1]])
+		
 		(mid_x,mid_y) = midpoint((x1,y1),(x2,y2))
 
 		# Draw arrow indicator for bidirectional links
@@ -391,21 +379,6 @@ class Game:
 	# Most important game function
 	# Executes to carry out any operations required for a turn
 	def do_turn(self):
-		# Message display for tutorial
-		if self.first_time==1 and self.gameNetwork.vertex_counter==2:
-			messagebox.showinfo(message='You will need to create another\nif your current node\nis not near a city.')
-			self.first_time=2
-
-		if self.first_time==2 and self.gameNetwork.vertex_counter==3:
-			messagebox.showinfo(message='Right click on your new node\n')
-			messagebox.showinfo(message='Then left click the connection button\n')
-			messagebox.showinfo(message='Again, this should be a green plus\n')
-			messagebox.showinfo(message='Double-click on your\nfirst node to \ncreate a connection.')
-			self.first_time = 3
-
-		if self.first_time==0:
-			if RightCounter==2:
-				self.Tutorial()
 		
 		# Tried playing. Setting -50000 was too hard.
 		# This is a lose condition for the game. If you fall too far into debt, the game will quit.
