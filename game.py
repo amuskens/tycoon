@@ -179,7 +179,7 @@ class Game:
 		(x,y) = city.GetCoord()
 
 		# Show the effective radius where nodes can be placed
-		self._canvas.create_oval(x-100,y-100,x+100,y+100,outline='blue')
+		self._canvas.create_oval(x-300,y-300,x+300,y+300,outline='blue')
 
 		# Draw different pictures for different populations.
 		# Different title spacing is needed for different icon sizes.
@@ -245,6 +245,9 @@ class Game:
 		# Add a little bit of separation so bidirectional links can be selected.
 		self.E_lines[edge] = self._canvas.create_line(x1,y1,x2,y2,
 							      fill=fillcolor,activefill='purple',width=3)
+								  
+		self._canvas.tag_raise(self.V_images[edge[0]])
+		self._canvas.tag_raise(self.V_images[edge[1]])
 		(mid_x,mid_y) = midpoint((x1,y1),(x2,y2))
 
 		# Draw arrow indicator for bidirectional links
@@ -283,9 +286,9 @@ class Game:
 								activeimage=self.icons['node_active'],
 								anchor='center')
 		# Draw node name
-		self.V_text[node] = self._canvas.create_text(x + 30,y,
+		self.V_text[node] = self._canvas.create_text(x,y + 20,
 							     text=(self.gameNetwork.V_name[node]),
-							     anchor='w',fill='white')
+							     anchor='center',fill='white')
 		# Attach mouse events to each node iamge
 		self._canvas.tag_bind(self.V_images[node],"<ButtonRelease-1>", lambda x: self.displayNode(node))
 		self._canvas.tag_bind(self.V_images[node],"<ButtonRelease-3>", lambda x: self.submenuNode(node))

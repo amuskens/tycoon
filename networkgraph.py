@@ -10,7 +10,7 @@ from capital import *
 class NetworkGraph:
 	# A network graph will contain the game's main graph.
 	# There will be an origin node whose coordinates are specified
-	def __init__(self,scale_factor = 0.02):
+	def __init__(self,scale_factor = 0.03):
 		self.graph = Digraph()
 		self.vertex_counter = 1
 		self.max_slots = 3
@@ -425,7 +425,7 @@ class NetworkGraph:
 		for ids in self.V_items.keys():
 			# Populate a list of distances to the start point
 			distance = dist(x,y,self.V_coord[ids][0],self.V_coord[ids][1])
-			if distance < 200: 
+			if distance < 300: 
 					closest.append(ids)
 
 		# Find the nodes nearest to other cities
