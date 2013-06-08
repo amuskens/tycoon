@@ -72,7 +72,7 @@ from bitflag import BitFlag
 from store import *
 import sys
 import platform
-
+import game
 
 
 # Singleton GUI instance, only one allowed to be created, remember it for
@@ -83,6 +83,8 @@ import platform
 
 gui = None
 debug = BitFlag()
+global counter
+counter = 0
 
 class GUI():
     """
@@ -282,12 +284,18 @@ class GUI():
             pass
 
         self._canvas.bind( "<Configure>", _do_resize)
-        if sys.platform == 'win32' or sys.platform == 'win64':
-            self._canvas.bind('<MouseWheel>', lambda event: self.rollWheel(event))
+        
+        # Set mouse middle click drag
+        if sys.platform == 'darwin':
+            self._canvas.bind("<ButtonPress-3>", xy)
+            self._canvas.bind('<B3-Motion>', lambda event: self.pan(event))
+            
         else:
-            self._canvas.bind('<MouseWheel>', lambda event: self.rollWheel(event))
-            self._canvas.bind('<ButtonPress-4>', lambda event: self.rollWheel(event))
-            self._canvas.bind('<ButtonPress-5>', lambda event: self.rollWheel(event))
+            self._canvas.bind("<ButtonPress-2>", xy)
+            self._canvas.bind('<B2-Motion>', lambda event: self.pan(event))
+        
+        self._canvas.bind('<ButtonPress-4>', lambda event: self.rollWheel(event))
+        self._canvas.bind('<ButtonPress-5>', lambda event: self.rollWheel(event))
 
     # public method to start the simulation
     def start(self):
@@ -412,9 +420,6 @@ class GUI():
 
     # Allow mouse scrolling
     def rollWheel(self,event,second=0): 
-        if (sys.platform == 'win32' or sys.platform == 'win64'):
-            print(platform.win32_ver())
-            
         direction = 0
         
         if event.num == 5 or event.delta < 0:
@@ -423,3 +428,25 @@ class GUI():
             direction = -event.delta
 
         self._canvas.yview_scroll(direction, UNITS)
+        
+    def pan(self,event):
+        global lastx, lasty, counter
+        counter += 1
+        if (lastx - event.x) > 0:
+            dx = 1
+        else:
+            dx = -1
+            
+        if (lasty - event.y) > 0:
+            dy = 1
+        else:
+            dy = -1
+            
+        if not counter % 5:
+            self._canvas.xview_scroll(int(dx), UNITS)
+            self._canvas.yview_scroll(int(dy), UNITS)
+        
+def xy(event):
+    global lastx, lasty
+    lastx = event.x
+    lasty = event.y

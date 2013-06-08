@@ -81,9 +81,11 @@ class Game:
 		
 		# let us modify the value of the global gui variable
 		global gui
+		(self.economy, self.bg,w,h) = LEVEL1_map.level1_setup()
+		
 		gui = GUI(copy.copy(self.inventory),self.ItemDatabase,
 			  init_fn=self.do_init, step_fn=self.do_turn, 
-			  xmax=2600,ymax=2400,title=title)
+			  xmax=w,ymax=h,title=title)
 
 	def start(self):
 		gui.start()
@@ -95,9 +97,11 @@ class Game:
 		# Not calling the optional scale factor argument. Set to default
 		self.gameNetwork = NetworkGraph()
 
+		# Load up the canvas, load up bg
+		self._canvas = gui.get_canvas()	  
+		
 		# Load up the economy from the level setup. This defines cities, populations, and demand
 		# for the game engine
-		self.economy = LEVEL1_map.level1_setup(self)
 		
 		# Initialize message stack
 		self._messages = []
@@ -119,10 +123,7 @@ class Game:
 		# Create an empty list of subwindows to keep track of the instances of submenus
 		# for garbage collection.
 		self.subwindows = []
-		
-		# Load up the canvas, load up bg
-		self._canvas = gui.get_canvas()	      
-		self.bg_image = self._canvas.create_image(0,0,image=self.icons['bg'],anchor='nw')
+		self._canvas.create_image(0,0,image=self.icons['bg'],anchor='nw')
 
 		# Bind text for cash / status display. Will be updated on turns
 		self.cashLabel = gui.get_cashlabel()
@@ -215,7 +216,7 @@ class Game:
 	def DispCity(self,city):
 		# Mesy long string, but whatever. Not much you can do about this in Python
 		(i,o) = city.GetSupply()
-		messagebox.showinfo('City Info','Population:  %0.0f' % city.GetPopulation() + '\nDownlink Supply: %0.0f' %(o / 1000000) + ' Mbit/s' + '\nUplink Supply: %0.0f' %(i / 1000000000) + ' Gbit/s')
+		messagebox.showinfo('City Info','Population:  %0.0f' % city.GetPopulation() + '\nDownlink Supply: %0.3f' %(o / 1000000000) + ' Gbit/s' + '\nUplink Supply: %0.3f' %(i / 1000000000) + ' Gbit/s')
 		
 
 	# Draw a new edge on the canvas, and keep track of the canvas object handlers so it can be deleted later
@@ -358,7 +359,7 @@ class Game:
 		self.icons['sstower_active'] = PhotoImage(file = 'images/tower_active.gif')
 		self.icons['node'] = PhotoImage(file = 'images/node.gif')
 		self.icons['node_active'] = PhotoImage(file = 'images/node_active.gif')
-		self.icons['bg'] = PhotoImage(file = 'images/terrain.gif')
+		self.icons['bg'] = PhotoImage(file = self.bg)
 		self.icons['close']= PhotoImage(file = 'images/close.gif')
 		self.icons['close_active']= PhotoImage(file = 'images/close_active.gif')
 		self.icons['addbutton']= PhotoImage(file = 'images/addbutton.gif')
