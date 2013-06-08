@@ -60,7 +60,7 @@ class CapitalDatabase():
             fields = line.split(",")
 
             # Allow comments in config file.
-            if fields[0] == '#': continue
+            if '#' in fields[0]: continue
 
             tempList = []
             for field in fields:
