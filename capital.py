@@ -482,7 +482,7 @@ class Wired(PointToPoint):
         tempstr = tempstr + '\nTarget Capacity: %0.2f' % (float(item.GetCapacity()) / 1000000) + ' megabits per second'
         tempstr = tempstr + '\nMaximum Link Length: ' + str(item.GetMaxLength()) + ' km'
         tempstr = tempstr + '\nCapacity for at Max Length: %0.2f' % (float(item.DistCapacity(item.GetMaxLength()) / 1000000)) + ' megabits per second'
-        tempstr = tempstr + '\nAttenuation: %0.2f' % (float(item.GetAttenuation()) / 100) + ' dB'
+        tempstr = tempstr + '\nAttenuation: -%0.2f' % (float(item.GetAttenuation()) / 10) + ' dB'
         tempstr = tempstr + '\nType: ' + item.WiredGetType()
         tempstr = tempstr + '\nAge: %0.2f' % (item.GetAge() / 24) + ' days'
         tempstr = tempstr + '\nOperational: ' + str(self.Operating())

@@ -66,7 +66,8 @@ that may be after quite some time!
 """
 
 import random
-import copy
+import copysize = int(iw * 0.25), int(ih * 0.25)
+        self.img25 = PhotoImage(self.img.resize(size))
 from _tkinter import *
 from bitflag import BitFlag
 from store import *

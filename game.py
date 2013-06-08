@@ -136,26 +136,29 @@ class Game:
 		self._canvas.bind(mouse_rightbtn, xy)
 		self._canvas.bind(mouse_rightbtnRel, lambda x: self.submenuother())
 
-		# Draw cities
-		self.city_images = {}
-		self.city_text = {}
-		for city in self.economy.GetCities():
-			self.DrawCity(city)
-
-		# Initialize a dictionary of lines objects
+                # Initialize image dictionaries
 		self.E_lines = { }
 		self.E_text = {}
 		self.E_direction_marker = { }
+                self.V_images = { }
+		self.V_notify = { }
+		self.V_displays = set()
+		self.V_text = { }
+		self.city_images = {}
+		self.city_text = {}
+
+                # Draw cities
+		for city in self.economy.GetCities():
+			self.DrawCity(city)
+
+		
 
 		# Draw any inital edges which may be in the network graph
 		for edge in self.gameNetwork.GetEdges():
 			self.NewEdgeCanvas(edge)
 			
 		# Initialize dictionary of node imagery
-		self.V_images = { }
-		self.V_notify = { }
-		self.V_displays = set()
-		self.V_text = { }
+		
 
 		# Draw any initial nodes which may be in the network graph
 		for node in self.gameNetwork.GetNodes():
@@ -603,6 +606,10 @@ class Game:
 		elif action[0] == 'subtractcash':
 			self.cash = self.cash - action[1][0]
 			return
+
+                elif action[0] == 'rescale':
+                        self.scale = action[1]
+                        self.canvas.scale(ALL, 0, 0, self.scale, self.scale)
 
 		# Change the inventory to the incoming inventory.
 		elif action[0] == 'inv':

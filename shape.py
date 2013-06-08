@@ -1,93 +1,61 @@
-import agentsim 
+
+
+from _tkinter import *
+
 class Shape():
-    """
-    Shape base class for simulation framework
+    def __init__(self,x,y,img,scale,canvas,activeimage=image,anchor='cemter'):
+        self.scale = scale
+        self.x = x
+        self.y = y
+        self.anchor = anchor
 
-    The visualization of the simulation uses shapes moving about on the 
-    canvas panel. Each shape is a collection of artifacts on the graphics
-    canvas that are manipulated as a whole.  The canvas has the coordinate
-    system of the top right quadrant of the Cartesian plane. (0,0) is the
-    lower left corner.
+        self.img = img
+        iw, ih = self.img.size
 
-    Each Shape has a position which must lie inside the dimensions of the
-    canvas. Some parts of the shape can extend outside the canvas area, and
-    are clipped.
+        size = int(iw * 0.5), int(ih * 0.5)
+        self.img50 = PhotoImage(self.img.resize(size))
+        size = int(iw * 0.25), int(ih * 0.25)
+        self.img25 = PhotoImage(self.img.resize(size))
+        size = int(iw * 0.10), int(ih * 0.10)
+        self.img10 = PhotoImage(self.img.resize(size))
 
-    get_xpos, set_xpos, get_xpos, set_ypos are accessors to the position.
-    Set will clip the position to lie within the canvas dimensions.
+        self.aimg = activeimage
+        iw, ih = self.aimg.size
 
-    Each shape has a graphics _gstate:
-      DRAWN means that the components of the shape have been rendered on the
-        canvas and are visible
-      ERASED means that the components of the shape have been deleted from the
-        canvas.
-      We do not yet support HIDDEN which would be DRAWN but not visible
+        size = int(iw * 0.5), int(ih * 0.5)
+        self.aimg50 = PhotoImage(self.aimg.resize(size))
+        size = int(iw * 0.25), int(ih * 0.25)
+        self.aimg25 = PhotoImage(self.aimg.resize(size))
+        size = int(iw * 0.10), int(ih * 0.10)
+        self.aimg10 = PhotoImage(self.aimg.resize(size))
 
-    The Shape base class implements the following operations on Shape s:
+        self.id = None
+        self.canvas = canvas
 
-    s.draw() - render the graphics artifacts associated with the shape onto
-        the canvas and set the state to DRAWN.
+    def rescale(self,scale):
 
-    s.erase() - remove all graphics artifacts from the canvas and set state
-        to ERASED
+        if self.id:
+            self.canvas.delete(self.id)
 
-    s.move_by(delta_x, delta_y) - move the position of the shape on the 
-        canvas by relative amounts delta_x, delta_y
+        if scale == 0.1:
+            self.canvas.create_image(self.x,self.y,
+                                image=self.img10,
+                                activeimage=self.aimg10,
+                                anchor=self.anchor)
+        elif scale == 0.25:
+            self.canvas.create_image(self.x,self.y,
+                                image=self.img25,
+                                activeimage=self.aimg25,
+                                anchor=self.anchor)
 
-    The base class move_by makes sure that positions are updated and properly
-    clipped.  The derived class move_by needs to do the actual action on the 
-    drawn graphic object.
+        elif scale == 0.5:
+            self.canvas.create_image(self.x,self.y,
+                                image=self.img50,
+                                activeimage=self.aimg50,
+                                anchor=self.anchor)
 
-    """
-
-    # global ERASED, DRAWN
-    ERASED = 0
-    DRAWN = 1
-
-    def __init__(self, 
-        xpos = 0,
-        ypos = 0,
-        ):
-
-        # instantiate the vars and clip
-        self.set_xpos(xpos)
-        self.set_ypos(ypos)
-
-        self._gstate = Shape.ERASED
-
-    def draw(self):
-        if self._gstate != Shape.DRAWN:
-            self._gstate = Shape.DRAWN
-        return self
-
-    def erase(self):
-        if self._gstate != Shape.ERASED:
-            self._gstate = Shape.ERASED
-        return self
-
-    # The base class move_by makes sure that positions are updated.  The
-    # derived class move needs to do the actual action on the drawn
-    # graphic object.
-
-    def move_by(self, delta_x, delta_y):
-        if agentsim.debug.get(4):
-            print("Shape:move_by", delta_x, delta_y)
-
-        self.set_xpos(self.get_xpos() + delta_x)
-        self.set_ypos(self.get_ypos() + delta_y)
-        return self
-
-    # accessors
-    def get_xpos(self):
-        return self._xpos
-
-    def get_ypos(self):
-        return self._ypos
-
-    def set_xpos(self, x):
-        self._xpos = Gui.clip_x(x)
-        return self._xpos
-
-    def set_ypos(self, y):
-        self._ypos = Gui.clip_y(y)
-        return self._ypos
+        else:
+            self.canvas.create_image(self.x,self.y,
+                                image=self.img,
+                                activeimage=self.aimg,
+                                anchor=self.anchor)

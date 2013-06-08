@@ -10,7 +10,7 @@ from capital import *
 class NetworkGraph:
 	# A network graph will contain the game's main graph.
 	# There will be an origin node whose coordinates are specified
-	def __init__(self,scale_factor = 0.03):
+	def __init__(self,scale_factor = 0.015):
 		self.graph = Digraph()
 		self.vertex_counter = 1
 		self.max_slots = 3
