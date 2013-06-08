@@ -417,7 +417,7 @@ class NetworkGraph:
 	# Premise is to use Dyjkstra's algorithm from every node near a city to every other node near every other city.
 	# While doing so, we will add up the current traffic flows through links and nodes in order to figure out
 	# how saturated links are, and restrict traffic flow accordingly.
-	def CapAtCoord(self,pt,to_pts):
+	def CapAtCoord(self,pt,to_pts,range):
 		(x, y) = pt
 
 		# Make a list of nodes which are within 100 units of the point.
@@ -425,7 +425,7 @@ class NetworkGraph:
 		for ids in self.V_items.keys():
 			# Populate a list of distances to the start point
 			distance = dist(x,y,self.V_coord[ids][0],self.V_coord[ids][1])
-			if distance < 300: 
+			if distance < range: 
 					closest.append(ids)
 
 		# Find the nodes nearest to other cities
