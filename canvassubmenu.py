@@ -14,6 +14,8 @@ from distfuncs import dist
 
 global LeftCounter
 
+
+
 class CanvasSubMenu():
     def __init__(self,x,y,canvas,nodeorlink,imagedict,nodeflag=0,linkflag=0):
         self.canvas = canvas
