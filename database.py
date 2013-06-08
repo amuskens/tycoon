@@ -39,11 +39,11 @@ class CapitalDatabase():
         # These dictionaries contain the possible items you can buy for the game.
         try:
             # Load equipment configurations
-            self.Towers = self.loadDict("gameconfig/towers.cfg")
-            self.Radios = self.loadDict("gameconfig/radios.cfg")
-            self.Wired = self.loadDict("gameconfig/wired.cfg")
-            self.Routers = self.loadDict("gameconfig/routers.cfg")
-            self.Buildings = self.loadDict("gameconfig/buildings.cfg")
+            self.Towers = self.loadDict("gameconfig/towers.csv")
+            self.Radios = self.loadDict("gameconfig/radios.csv")
+            self.Wired = self.loadDict("gameconfig/wired.csv")
+            self.Routers = self.loadDict("gameconfig/routers.csv")
+            self.Buildings = self.loadDict("gameconfig/buildings.csv")
         except:
             print("Failed to initialize capital database.")
             quit()
