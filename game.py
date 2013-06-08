@@ -5,6 +5,7 @@
 import random
 import math
 import copy
+import sys
 from tkinter import messagebox
 from agentsim import GUI
 
@@ -30,6 +31,14 @@ global mode
 global RightCounter
 global action_q
 action_q = []
+
+# Change right button event
+if sys.platform == 'darwin':
+	mouse_rightbtn = "<ButtonPress-2>"
+	mouse_rightbtnRel = "<ButtonRelease-2>"
+else:
+	mouse_rightbtn = "<ButtonPress-3>"
+	mouse_rightbtnRel = "<ButtonRelease-3>"
 
 """
 
@@ -123,8 +132,8 @@ class Game:
 
 		# Bind mouse motion events to the canvas to allow for clickable options
 		self._canvas.bind("<ButtonPress-1>", xy)
-		self._canvas.bind("<ButtonPress-3>", xy)
-		self._canvas.bind("<ButtonRelease-3>", lambda x: self.submenuother())
+		self._canvas.bind(mouse_rightbtn, xy)
+		self._canvas.bind(mouse_rightbtnRel, lambda x: self.submenuother())
 
 		# Draw cities
 		self.city_images = {}
@@ -163,8 +172,9 @@ class Game:
 		(x,y) = city.GetCoord()
 
 		# Show the effective radius where nodes can be placed
-		self._canvas.create_oval(x-300,y-300,x+300,y+300,outline='blue')
+		self._canvas.create_oval(x-city.range,y-city.range,x+city.range,y+city.range,outline='blue')
 
+		
 		# Draw different pictures for different populations.
 		# Different title spacing is needed for different icon sizes.
 		# Determined experimentally.
@@ -256,7 +266,7 @@ class Game:
 							     fill='white')
 							     
 		# Attach mouse events for click regions
-		self._canvas.tag_bind(self.E_lines[edge],"<ButtonRelease-3>", lambda x: self.submenuLink(edge))
+		self._canvas.tag_bind(self.E_lines[edge],mouse_rightbtnRel, lambda x: self.submenuLink(edge))
 		self._canvas.tag_bind(self.E_lines[edge],"<ButtonRelease-1>", lambda x: self.editLink(edge))
 
 	# Delete a link from the canvas. Destroy object handlers to delete it from view
@@ -279,7 +289,7 @@ class Game:
 							     anchor='center',fill='white')
 		# Attach mouse events to each node iamge
 		self._canvas.tag_bind(self.V_images[node],"<ButtonRelease-1>", lambda x: self.displayNode(node))
-		self._canvas.tag_bind(self.V_images[node],"<ButtonRelease-3>", lambda x: self.submenuNode(node))
+		self._canvas.tag_bind(self.V_images[node],mouse_rightbtnRel, lambda x: self.submenuNode(node))
 
 	# Delete a node from canvas
 	def DelNodeCanvas(self,node):
@@ -478,7 +488,7 @@ class Game:
 		for city in self.economy.GetCities():
 			# This function needs the above reset because it calculates network bottlenecks based on current capacities
 			# caused by traffic created by other cities.
-			city.SetSupply(self.gameNetwork.CapAtCoord(city.GetCoord(),self.economy.GetCitiesCoord()))
+			city.SetSupply(self.gameNetwork.CapAtCoord(city.GetCoord(),self.economy.GetCitiesCoord(),city.range))
 			# Debug
 			#print(city.GetName() + ': ' + str(city.GetSupply()))
 
