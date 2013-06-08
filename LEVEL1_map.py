@@ -13,12 +13,16 @@ def level1_setup():
     c.append(City("Mountain City",1500,200,950000,10))
     c.append(City("Oil City",3960,467,1050000,100))
     c.append(City("South Town",1430,1220,2030,100))
-    c.append(City("Sunny Brooks",1030,1350,12745,10))
+    c.append(City("Sunny Brooks",1230,1350,12745,10))
     c.append(City("Sunnyside",1530,400,1745,10))
     c.append(City("Forest Town",1930,1676,81745,10)) 
     c.append(City("Station Square",2500,3000,1817451,10))      
-            
-    bg_image = 'images/terrain.gif'
+    
+    bg_image = ['','','','']
+    bg_image[0] = 'images/levels/terrain40.gif'
+    bg_image[1] = 'images/levels/terrain60.gif'
+    bg_image[2] = 'images/levels/terrain80.gif'
+    bg_image[3] = 'images/levels/terrain.gif'
     w = 4200
     h = 4200
     

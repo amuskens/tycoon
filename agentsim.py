@@ -66,8 +66,6 @@ that may be after quite some time!
 """
 
 import random
-import copysize = int(iw * 0.25), int(ih * 0.25)
-        self.img25 = PhotoImage(self.img.resize(size))
 from _tkinter import *
 from bitflag import BitFlag
 from store import *
@@ -234,8 +232,12 @@ class GUI():
                                  from_=1, to=100, label='Game Speed', orient=HORIZONTAL,
                                  length=100,command=on_speed_change)
         self._speedscale.pack(side='top', fill='x')
-
-
+        
+        self.scale = 1.0
+        self._scaler = Scale(self._frame,
+                                 from_=0, to=3, label='Map Zoom', orient=HORIZONTAL,
+                                 length=100,command=self.on_zoom_change)
+        self._scaler.pack(side='top', fill='x')
         # Inventory label
         self.inv_lbl =Label(self._frame,text='Inventory:',
                                    font=appHighlightFont,justify='left')
@@ -333,6 +335,20 @@ class GUI():
         if not self._running:
             self._running = 1
             self._run()
+            
+    def on_zoom_change(self,v):
+        lastscale = self.scale
+        if int(v) == 0:
+            self.scale = 0.4
+        elif int(v) == 1:
+            self.scale = 0.6
+        elif int(v) == 2:
+            self.scale = 0.8
+        elif int(v) == 3:
+            self.scale = 1.0
+           
+        self._canvas.scale(ALL,0,0,self.scale/lastscale,self.scale/lastscale)
+        game.action_q.append(['rescale',[self.scale,v]])
 
     def _goto_store(self):
         try:
