@@ -67,10 +67,11 @@ that may be after quite some time!
 
 import random
 import copy
-from tkinter import *
-from tkinter import font
+from _tkinter import *
 from bitflag import BitFlag
 from store import *
+import sys
+import platform
 
 
 
@@ -281,7 +282,12 @@ class GUI():
             pass
 
         self._canvas.bind( "<Configure>", _do_resize)
-        self._canvas.bind('<MouseWheel>', lambda event: self.rollWheel(event))
+        if sys.platform == 'win32' or sys.platform == 'win64':
+            self._canvas.bind('<MouseWheel>', lambda event: self.rollWheel(event))
+        else:
+            self._canvas.bind('<MouseWheel>', lambda event: self.rollWheel(event))
+            self._canvas.bind('<ButtonPress-4>', lambda event: self.rollWheel(event))
+            self._canvas.bind('<ButtonPress-5>', lambda event: self.rollWheel(event))
 
     # public method to start the simulation
     def start(self):
@@ -405,10 +411,15 @@ class GUI():
         # into it, or they are in lala land.
 
     # Allow mouse scrolling
-    def rollWheel(event):
+    def rollWheel(self,event,second=0): 
+        if (sys.platform == 'win32' or sys.platform == 'win64'):
+            print(platform.win32_ver())
+            
         direction = 0
-        if event.num == 5 or event.delta == -120:
-            direction = 1
-            if event.num == 4 or event.delta == 120:
-                direction = -1
-                self.canvas.yview_scroll(direction, UNITS)
+        
+        if event.num == 5 or event.delta < 0:
+            direction = -event.delta
+        if event.num == 4 or event.delta > 0:
+            direction = -event.delta
+
+        self._canvas.yview_scroll(direction, UNITS)
