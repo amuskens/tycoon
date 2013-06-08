@@ -294,6 +294,7 @@ class GUI():
             self._canvas.bind("<ButtonPress-2>", xy)
             self._canvas.bind('<B2-Motion>', lambda event: self.pan(event))
         
+        self._canvas.bind('<MouseWheel>', lambda event: self.rollWheel(event))
         self._canvas.bind('<ButtonPress-4>', lambda event: self.rollWheel(event))
         self._canvas.bind('<ButtonPress-5>', lambda event: self.rollWheel(event))
 
