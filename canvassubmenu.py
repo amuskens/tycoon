@@ -17,13 +17,14 @@ global LeftCounter
 
 
 class CanvasSubMenu():
-    def __init__(self,x,y,canvas,nodeorlink,imagedict,nodeflag=0,linkflag=0):
+    def __init__(self,x,y,canvas,nodeorlink,imagedict,zoom,nodeflag=0,linkflag=0):
         self.canvas = canvas
         self.x = x
         self.y = y
         self.width = 200
         self.height = 200
         self.imagedict = imagedict
+        self.zoom_factor = zoom
 
         if nodeflag:
             self.node = nodeorlink

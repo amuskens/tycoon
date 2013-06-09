@@ -8,6 +8,7 @@ import copy
 import sys
 from tkinter import messagebox
 from agentsim import GUI
+import _thread
 
 # Import network graph
 from networkgraph import *
@@ -31,6 +32,7 @@ global lastx, lasty
 global mode
 global RightCounter
 global action_q
+global bg
 action_q = []
 
 # Change right button event
@@ -84,7 +86,7 @@ class Game:
         global gui
         (self.economy, self.bgf,w,h) = LEVEL1_map.level1_setup()
         
-        gui = GUI(copy.copy(self.inventory),self.ItemDatabase,
+        gui = GUI(copy.copy(self.inventory),self.ItemDatabase,self.bgf,
               init_fn=self.do_init, step_fn=self.do_turn, 
               xmax=w,ymax=h,title=title)
 
@@ -124,9 +126,8 @@ class Game:
         # Create an empty list of subwindows to keep track of the instances of submenus
         # for garbage collection.
         self.subwindows = []
-        self.bg = self._canvas.create_image(0,0,
-                    self.icons['bg3'],
-                    anchor='nw')
+        
+                        
         # Bind text for cash / status display. Will be updated on turns
         self.cashLabel = gui.get_cashlabel()
         self.cashcontents = StringVar()
@@ -169,7 +170,8 @@ class Game:
         # Create initial submenu
         self.submenu =  CanvasSubMenu(100,100,
               self._canvas,0,
-              self.icons)
+              self.icons,1.0)
+
 
 
     # Draw cities on the canvas map
@@ -190,21 +192,21 @@ class Game:
                               image=self.icons['big_city'],
                               activeimage=self.icons['big_city_active'],
                               anchor='center')
-            vspace = 80
+            vspace = 150
 
         elif 50000 <= city.GetPopulation() < 1000000:
             self.city_images[city.GetName()] =  self._canvas.create_image(x,y,
                               image=self.icons['city'],
                               activeimage=self.icons['city_active'],
                               anchor='center')
-            vspace = 70
+            vspace = 130
 
         elif city.GetPopulation() < 50000:
             self.city_images[city.GetName()] =  self._canvas.create_image(x,y,
                               image=self.icons['town'],
                               activeimage=self.icons['town_active'],
                               anchor='center')
-            vspace = 50
+            vspace = 110
 
         
         # Draw the name of the city
@@ -228,7 +230,10 @@ class Game:
     def NewEdgeCanvas(self,edge):
         (x1,y1) = self.gameNetwork.V_coord[edge[0]]
         (x2,y2) = self.gameNetwork.V_coord[edge[1]]
-
+        x1 *= self.zoom_factor
+        x2 *= self.zoom_factor
+        y1 *= self.zoom_factor
+        y2 *= self.zoom_factor
         # Color code nodes by operation
         if len(self.gameNetwork.E_items[edge]) > 0:
             fillcolor = 'green'
@@ -285,6 +290,8 @@ class Game:
     def NewNodeCanvas(self,node):
         (x,y) = self.gameNetwork.V_coord[node]
         # Draw the node icon
+        x *= self.zoom_factor
+        y *= self.zoom_factor
         self.V_images[node] = self._canvas.create_image(x,y,
                     image=self.icons['node'],
                     activeimage=self.icons['node_active'],
@@ -326,12 +333,15 @@ class Game:
     def submenuNode(self,node):
         global lastx, lasty
         # Close the previous instance of the menu
-        self.submenu.close()
-        del self.submenu
+        try:
+            self.submenu.close()
+        except:
+            pass
+
         self.submenu = CanvasSubMenu(self._canvas.canvasx(lastx),
                  self._canvas.canvasy(lasty),
                  self._canvas,node,
-                 self.icons,nodeflag=1)
+                 self.icons,self.zoom_factor,nodeflag=1)
     
     # Display a submenu for clicking a link
     def submenuLink(self,edge):
@@ -341,7 +351,7 @@ class Game:
         self.submenu = CanvasSubMenu(self._canvas.canvasx(lastx),
                  self._canvas.canvasy(lasty),
                  self._canvas,edge,
-                 self.icons,linkflag=1)
+                 self.icons,self.zoom_factor,linkflag=1)
 
     # Display submenu for other clicks
     def submenuother(self):
@@ -356,7 +366,7 @@ class Game:
             self.submenu = CanvasSubMenu(self._canvas.canvasx(lastx),
                      self._canvas.canvasy(lasty),
                      self._canvas,0,
-                     self.icons)
+                     self.icons,self.zoom_factor)
     # Loads a dictionary of imags from files
     def loadImages(self):
         self.icons = { }
@@ -365,10 +375,9 @@ class Game:
         self.icons['node'] = PhotoImage(file = 'images/node.gif')
         self.icons['node_active'] = PhotoImage(file = 'images/node_active.gif')
         
-        self.icons['bg3'] = PhotoImage(file = self.bgf[0])
-        self.icons['bg0'] = PhotoImage(file = self.bgf[1])
-        self.icons['bg1'] = PhotoImage(file = self.bgf[2])
-        self.icons['bg2'] = PhotoImage(file = self.bgf[3])
+
+
+
         
         self.icons['close']= PhotoImage(file = 'images/close.gif')
         self.icons['close_active']= PhotoImage(file = 'images/close_active.gif')
@@ -540,8 +549,14 @@ class Game:
         # DIfferent actions are possible based on the item at index 0.
 
         if action[0] == 'addnode':
-            coord = action[1][0]
+            (x, y) = action[1][0]
             name = action[1][1]
+            
+            x /= self.zoom_factor
+            y /= self.zoom_factor
+            
+            coord = (x , y)
+            
             # add the node
             node = self.gameNetwork.NewNode(coord,name,[])
             self.NewNodeCanvas(node)
@@ -549,9 +564,13 @@ class Game:
 
         elif action[0] == 'addlink':
             node = action[1][0]
-            pt = action[1][1]
+            (x,y) = action[1][1]
             dist = 200
 
+            x /= self.zoom_factor
+            y /= self.zoom_factor
+            pt = (x , y)
+            
             # Return the closest node to the click point
             (closestNode, distance) = self.gameNetwork.ReturnClosePoint(pt)
 
@@ -614,11 +633,8 @@ class Game:
             return
 
         elif action[0] == 'rescale':
-            if self.bg:
-                self._canvas.delete(self.bg)
-            self.bg = self._canvas.create_image(0,0,
-                    self.icons['bg' + action[1][1]],
-                    anchor='nw')               
+            self.submenu.close()
+            self.zoom_factor = action[1][0]
             
             
 

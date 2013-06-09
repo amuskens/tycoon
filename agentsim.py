@@ -128,10 +128,12 @@ class GUI():
     # there can only be one instance of this class
     num_instances = 0
 
-    def __init__(self, inventory, database, init_fn=None, step_fn=None, title="Simulation",xmax=1000,ymax=1000):
+    def __init__(self, inventory, database, bgf, init_fn=None, step_fn=None, title="Simulation",xmax=1000,ymax=1000):
         if GUI.num_instances != 0:
             raise Exception("GUI: can only have one instance of a simulation")
         GUI.num_instances = 1
+        
+        
 
         self._canvas_x_size = 1000
         self._canvas_y_size = 1000
@@ -300,6 +302,17 @@ class GUI():
         self._canvas.bind('<MouseWheel>', lambda event: self.rollWheel(event))
         self._canvas.bind('<ButtonPress-4>', lambda event: self.rollWheel(event))
         self._canvas.bind('<ButtonPress-5>', lambda event: self.rollWheel(event))
+        
+        # Load background image
+        self.bgimgs = {}
+        self.bgimgs['bg0'] = PhotoImage(file = bgf[0])
+        self.bgimgs['bg1'] = PhotoImage(file = bgf[1])
+        self.bgimgs['bg2'] = PhotoImage(file = bgf[2])
+        self.bgimgs['bg3'] = PhotoImage(file = bgf[3])
+        
+        self.bgimg = self._canvas.create_image(0,0,
+                        image=self.bgimgs['bg3'],
+                        anchor='nw')
 
     # public method to start the simulation
     def start(self):
@@ -339,15 +352,27 @@ class GUI():
     def on_zoom_change(self,v):
         lastscale = self.scale
         if int(v) == 0:
-            self.scale = 0.4
+            self.scale = 0.2
         elif int(v) == 1:
-            self.scale = 0.6
+            self.scale = 0.5
         elif int(v) == 2:
             self.scale = 0.8
         elif int(v) == 3:
             self.scale = 1.0
            
         self._canvas.scale(ALL,0,0,self.scale/lastscale,self.scale/lastscale)
+        
+        if self.bgimg:
+            self._canvas.delete(self.bgimg)
+        self.bgimg = self._canvas.create_image(0,0,
+                image=self.bgimgs['bg' + v],
+                anchor='nw')               
+        self._canvas.lower(self.bgimg)
+        self._canvas.lower(self.bgimg)
+        
+        self._canvas.configure(width=int(self._canvas_x_max * self.scale))
+        self._canvas.configure(height=int(self._canvas_y_max * self.scale))
+            
         game.action_q.append(['rescale',[self.scale,v]])
 
     def _goto_store(self):

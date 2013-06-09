@@ -2,7 +2,7 @@ import random
 import math
 import copy
 
-class Item:
+class Item(object):
     """
     Test item operation:
 
